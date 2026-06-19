@@ -1,9 +1,13 @@
--- CareerDeck Supabase Schema
--- Run this in the Supabase SQL Editor (https://supabase.com/dashboard/project/iqzkcrvmcvlmwfweltie/sql/new)
+-- CareerDeck Supabase Schema (corrected: text ids for Google OAuth compatibility)
+-- Run this in the Supabase SQL Editor at:
+-- https://supabase.com/dashboard/project/iqzkcrvmcvlmwfweltie/sql/new
 
--- 1. User Profiles
-create table if not exists profiles (
-  id uuid primary key,
+drop function if exists get_generations_this_month;
+drop table if exists generations;
+drop table if exists profiles;
+
+create table profiles (
+  id text primary key,
   email text,
   name text,
   avatar_url text,
@@ -15,18 +19,16 @@ create table if not exists profiles (
   updated_at timestamp default now()
 );
 
--- 2. Generation Tracking
-create table if not exists generations (
+create table generations (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references profiles(id) not null,
+  user_id text references profiles(id) not null,
   dossier_type text not null,
   company_name text,
   role text,
   created_at timestamp default now()
 );
 
--- 3. Monthly count helper
-create or replace function get_generations_this_month(user_uuid uuid)
+create or replace function get_generations_this_month(user_uuid text)
 returns integer as $$
   select count(*)::integer
   from generations
