@@ -20,10 +20,10 @@ const metrics = [
 
 export default function ProblemSolutionSection() {
   return (
-    <section id="section-problem-solution" className="relative bg-[#FAFAFA] py-24 overflow-hidden border-t border-gray-100/60">
+    <section id="section-problem-solution" className="relative bg-[#FAFAFA] py-16 overflow-hidden border-t border-gray-100/60">
       <div className="max-w-7xl mx-auto px-8">
         {/* ---- PROBLEM ---- */}
-        <div className="grid lg:grid-cols-2 gap-16 items-center mb-28">
+        <div className="grid lg:grid-cols-2 gap-16 items-center mb-16">
           <NonReversingReveal id="problem-text">
             <p className="text-[11px] font-semibold text-[#F28C28] tracking-[0.15em] mb-4 uppercase">
               The Old Way
@@ -47,6 +47,15 @@ export default function ProblemSolutionSection() {
                 </li>
               ))}
             </ul>
+
+            <div className="mt-8">
+              <Link
+                href="/generate"
+                className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200/80 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-sm shadow-sm"
+              >
+                See how CareerDeck fixes this &darr;
+              </Link>
+            </div>
           </NonReversingReveal>
 
           <NonReversingReveal id="problem-visual" className="flex justify-center">

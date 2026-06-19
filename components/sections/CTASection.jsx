@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function CTASection() {
   return (
-    <section id="section-cta" className="relative bg-[#FAFAFA] py-20 border-t border-gray-100/60">
+    <section id="section-cta" className="relative bg-[#FAFAFA] py-16 border-t border-gray-100/60">
       <div className="max-w-3xl mx-auto px-8 text-center">
         <NonReversingReveal id="cta-content">
           <div className="w-12 h-[5px] bg-[#F28C28] rounded-full mx-auto mb-8" />
@@ -51,8 +51,6 @@ export default function CTASection() {
         <div className="mt-12 flex items-center justify-center gap-8 text-xs text-[#94A3B8]">
           <Link href="/" className="hover:text-[#64748B] transition-colors">Home</Link>
           <Link href="/generate" className="hover:text-[#64748B] transition-colors">Generate</Link>
-          <Link href="/about" className="hover:text-[#64748B] transition-colors">About</Link>
-          <Link href="/pricing" className="hover:text-[#64748B] transition-colors">Pricing</Link>
         </div>
         <p className="mt-4 text-xs text-[#94A3B8]">
           &copy; {new Date().getFullYear()} CareerDeck. Verify critical facts before your interview.

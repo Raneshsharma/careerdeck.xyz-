@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export default function StepsSection() {
   return (
-    <section id="section-steps" className="relative bg-[#FAFAFA] py-24 overflow-hidden border-t border-gray-100/60">
+    <section id="section-steps" className="relative bg-[#FAFAFA] py-16 overflow-hidden border-t border-gray-100/60">
       <div className="max-w-7xl mx-auto px-8">
         {/* ---- SECTION HEADER ---- */}
         <NonReversingReveal id="steps-headline" className="text-center">
@@ -66,7 +66,7 @@ export default function StepsSection() {
         </NonReversingReveal>
 
         {/* ---- THREE CARDS ---- */}
-        <div className="flex flex-nowrap justify-center items-start gap-3">
+        <div className="flex flex-nowrap justify-center items-start gap-6">
           <NonReversingReveal id="steps-card-1">
             <div className="animate-float-ambient">
               <StepsFormCard />

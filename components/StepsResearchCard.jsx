@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 const pills = [
   "Financials", "News & Updates", "Competitors",
   "Earnings Calls", "Salaries", "Leadership",
@@ -56,6 +58,14 @@ export default function StepsResearchCard() {
           </div>
           <p className="text-[11px] text-[#94A3B8] mt-2 text-center">Researching in real time...</p>
         </div>
+
+        {/* CTA */}
+        <Link
+          href="/generate"
+          className="w-full h-12 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2"
+        >
+          Start your research &rarr;
+        </Link>
       </div>
     </div>
   );

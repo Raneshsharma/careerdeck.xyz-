@@ -33,7 +33,7 @@ const TIERS = [
       "High priority generation",
     ],
     cta: "Upgrade to Pro",
-    href: "#",
+    href: "/generate",
     badge: "Popular",
     highlight: true,
   },
@@ -50,7 +50,7 @@ const TIERS = [
       "Instant generation priority",
     ],
     cta: "Contact sales",
-    href: "#",
+    href: "/generate",
     badge: null,
     highlight: false,
   },
@@ -58,7 +58,7 @@ const TIERS = [
 
 export default function PricingSection() {
   return (
-    <section id="section-pricing" className="relative bg-[#FAFAFA] py-24 border-t border-gray-100/60">
+    <section id="section-pricing" className="relative bg-[#FAFAFA] py-16 border-t border-gray-100/60">
       <div className="max-w-7xl mx-auto px-8">
         <NonReversingReveal id="pricing-headline" className="text-center">
           <div className="w-12 h-[5px] bg-[#F28C28] rounded-full mx-auto mb-8" />

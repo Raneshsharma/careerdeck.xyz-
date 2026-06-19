@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import NonReversingReveal from "@/components/NonReversingReveal";
 import HeroDashboardMockup from "@/components/HeroDashboardMockup";
@@ -23,12 +24,16 @@ export default function HeroSection() {
     <section id="section-hero" className="relative bg-[#FAFAFA] overflow-hidden">
       {/* ---- TOP NAV ---- */}
       <header className="relative z-50 flex items-center justify-between px-8 py-5 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-white text-xs font-bold">
-            C
-          </div>
-          <span className="text-sm font-semibold text-gray-900">CareerDeck</span>
-        </div>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/logo.png"
+            alt="CareerDeck"
+            height={40}
+            width={60}
+            className="h-10 w-auto"
+            priority
+          />
+        </Link>
         <nav className="flex items-center gap-6">
           <Link href="#section-dossiers" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
             Dossiers
@@ -91,12 +96,12 @@ export default function HeroSection() {
               >
                 Generate Your First Dossier &rarr;
               </Link>
-              <button
-                type="button"
+              <Link
+                href="/generate"
                 className="inline-flex items-center justify-center h-12 px-6 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200/80 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-sm shadow-sm"
               >
                 View Sample Report
-              </button>
+              </Link>
             </div>
 
             {/* Social Proof */}

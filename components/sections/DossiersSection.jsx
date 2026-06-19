@@ -1,6 +1,7 @@
 "use client";
 
 import NonReversingReveal from "@/components/NonReversingReveal";
+import Link from "next/link";
 
 const gridCards = [
   { title: "Company Dossier", desc: "Research the company inside out", bg: "#FFF7ED", color: "#F97316", icon: "briefcase" },
@@ -99,7 +100,7 @@ function DossierIcon({ type, color, bg }) {
 
 export default function DossiersSection() {
   return (
-    <section id="section-dossiers" className="relative bg-[#FAFAFA] py-24 overflow-hidden border-t border-gray-100/60">
+    <section id="section-dossiers" className="relative bg-[#FAFAFA] py-16 overflow-hidden border-t border-gray-100/60">
       <div className="max-w-7xl mx-auto px-8">
         <div className="grid lg:grid-cols-[40%_60%] gap-20 items-center">
           {/* ===== LEFT COLUMN ===== */}
@@ -131,6 +132,12 @@ export default function DossiersSection() {
                     </div>
                     <h3 className="text-base font-bold text-[#0F172A]">{card.title}</h3>
                     <p className="text-sm text-[#64748B] mt-1 leading-snug">{card.desc}</p>
+                    <Link
+                      href="/generate"
+                      className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#F28C28] hover:text-[#E07E1F] transition-colors"
+                    >
+                      Generate &rarr;
+                    </Link>
                   </div>
                 ))}
               </div>
@@ -164,17 +171,32 @@ export default function DossiersSection() {
                     </ul>
                   </div>
 
-                  {/* Arrow button */}
-                  <div className="w-14 h-14 rounded-full border border-[rgba(15,23,42,0.08)] flex items-center justify-center shrink-0 hover:bg-[#F28C28]/10 hover:border-[#F28C28]/30 transition-all duration-200 cursor-pointer group">
-                    <svg className="w-5 h-5 text-[#64748B] group-hover:text-[#F28C28] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  {/* Generate button */}
+                  <Link
+                    href="/generate"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F28C28]/10 hover:bg-[#F28C28]/20 text-[#F28C28] font-bold text-sm transition-all duration-200 shrink-0 whitespace-nowrap"
+                  >
+                    Generate
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
-                  </div>
+                  </Link>
                 </div>
               </NonReversingReveal>
             ))}
           </div>
         </div>
+
+        {/* ---- BOTTOM CTA ---- */}
+        <NonReversingReveal id="dos-cta" className="text-center mt-16">
+          <Link
+            href="/generate"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] font-bold rounded-2xl transition-all duration-200 text-sm shadow-[0_4px_14px_rgba(242,140,40,0.3)] hover:shadow-[0_8px_25px_rgba(242,140,40,0.4)] hover:-translate-y-0.5"
+          >
+            Generate Your First Dossier &rarr;
+          </Link>
+          <p className="mt-3 text-sm text-[#94A3B8]">No account needed. Takes 90 seconds.</p>
+        </NonReversingReveal>
       </div>
     </section>
   );
