@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useSession, signIn, signOut } from "next-auth/react";
 import NonReversingReveal from "@/components/NonReversingReveal";
 import HeroDashboardMockup from "@/components/HeroDashboardMockup";
 import TypewriterText from "@/components/TypewriterText";
@@ -20,6 +21,8 @@ const avatars = [
 ];
 
 export default function HeroSection() {
+  const { data: session, status } = useSession();
+
   return (
     <section id="section-hero" className="relative bg-[#FAFAFA] overflow-hidden">
       {/* ---- TOP NAV ---- */}
@@ -35,6 +38,9 @@ export default function HeroSection() {
           />
         </Link>
         <nav className="flex items-center gap-6">
+          <Link href="#section-steps" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+            How It Works
+          </Link>
           <Link href="#section-dossiers" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
             Dossiers
           </Link>
@@ -42,11 +48,43 @@ export default function HeroSection() {
             Pricing
           </Link>
           <Link
-            href="/generate"
+            href="/auth"
             className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200"
           >
             Generate
           </Link>
+          {status === "authenticated" ? (
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => signOut()}
+                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Sign Out
+              </button>
+              {session.user?.image ? (
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name || ""}
+                  height={28}
+                  width={28}
+                  className="rounded-full"
+                />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center text-white text-[10px] font-bold">
+                  {(session.user?.name || "U")[0]}
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => signIn("google")}
+              className="text-xs font-semibold px-4 py-2 rounded-lg border border-gray-200/80 hover:border-gray-300 hover:bg-gray-50 text-gray-700 transition-all duration-200"
+            >
+              Sign In
+            </button>
+          )}
         </nav>
       </header>
 
@@ -91,7 +129,7 @@ export default function HeroSection() {
             {/* CTA Row */}
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <Link
-                href="/generate"
+                href="/auth"
                 className="inline-flex items-center justify-center gap-2 h-12 px-6 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-xl transition-all duration-200 text-sm shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] hover:-translate-y-0.5"
               >
                 Generate Your First Dossier &rarr;

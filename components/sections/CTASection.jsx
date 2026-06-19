@@ -17,7 +17,7 @@ export default function CTASection() {
           </p>
           <div className="mt-10">
             <Link
-              href="/generate"
+              href="/auth"
               className="inline-flex items-center gap-2 px-8 py-4 bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] font-bold rounded-2xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
             >
               Generate Your First Dossier
@@ -51,6 +51,7 @@ export default function CTASection() {
         <div className="mt-12 flex items-center justify-center gap-8 text-xs text-[#94A3B8]">
           <Link href="/" className="hover:text-[#64748B] transition-colors">Home</Link>
           <Link href="/generate" className="hover:text-[#64748B] transition-colors">Generate</Link>
+          <Link href="/auth" className="hover:text-[#64748B] transition-colors">Sign In</Link>
         </div>
         <p className="mt-4 text-xs text-[#94A3B8]">
           &copy; {new Date().getFullYear()} CareerDeck. Verify critical facts before your interview.

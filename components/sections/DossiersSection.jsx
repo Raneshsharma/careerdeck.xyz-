@@ -133,7 +133,7 @@ export default function DossiersSection() {
                     <h3 className="text-base font-bold text-[#0F172A]">{card.title}</h3>
                     <p className="text-sm text-[#64748B] mt-1 leading-snug">{card.desc}</p>
                     <Link
-                      href="/generate"
+                      href="/auth"
                       className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#F28C28] hover:text-[#E07E1F] transition-colors"
                     >
                       Generate &rarr;
@@ -173,7 +173,7 @@ export default function DossiersSection() {
 
                   {/* Generate button */}
                   <Link
-                    href="/generate"
+                    href="/auth"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F28C28]/10 hover:bg-[#F28C28]/20 text-[#F28C28] font-bold text-sm transition-all duration-200 shrink-0 whitespace-nowrap"
                   >
                     Generate
@@ -190,7 +190,7 @@ export default function DossiersSection() {
         {/* ---- BOTTOM CTA ---- */}
         <NonReversingReveal id="dos-cta" className="text-center mt-16">
           <Link
-            href="/generate"
+            href="/auth"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] font-bold rounded-2xl transition-all duration-200 text-sm shadow-[0_4px_14px_rgba(242,140,40,0.3)] hover:shadow-[0_8px_25px_rgba(242,140,40,0.4)] hover:-translate-y-0.5"
           >
             Generate Your First Dossier &rarr;

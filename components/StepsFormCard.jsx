@@ -44,7 +44,7 @@ export default function StepsFormCard() {
 
       {/* CTA */}
       <Link
-        href="/generate"
+        href="/auth"
         className="w-full h-14 rounded-2xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] font-bold text-sm transition-all duration-200 shadow-[0_4px_14px_rgba(242,140,40,0.3)] hover:shadow-[0_8px_25px_rgba(242,140,40,0.4)] mt-auto flex items-center justify-center"
       >
         Generate Dossier &rarr;

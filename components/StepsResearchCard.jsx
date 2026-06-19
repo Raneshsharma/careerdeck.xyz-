@@ -61,7 +61,7 @@ export default function StepsResearchCard() {
 
         {/* CTA */}
         <Link
-          href="/generate"
+          href="/auth"
           className="w-full h-12 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2"
         >
           Start your research &rarr;

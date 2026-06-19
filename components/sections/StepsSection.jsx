@@ -89,7 +89,7 @@ export default function StepsSection() {
         {/* ---- BOTTOM CTA ---- */}
         <NonReversingReveal id="steps-cta" className="text-center mt-16">
           <Link
-            href="/generate"
+            href="/auth"
             className="inline-flex items-center justify-center w-[280px] h-[72px] rounded-2xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] font-bold text-base transition-all duration-200 shadow-[0_8px_30px_rgba(242,140,40,0.35)] hover:shadow-[0_12px_40px_rgba(242,140,40,0.45)] hover:-translate-y-0.5"
           >
             Try it now &rarr;
