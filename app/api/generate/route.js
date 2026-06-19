@@ -1,3 +1,5 @@
+import { getServerSession } from "next-auth";
+import { authConfig } from "@/lib/auth.config";
 import { buildCompanyPrompt } from "@/lib/prompt-company";
 import { buildRolePrompt } from "@/lib/prompt-role";
 import { buildJDPrompt } from "@/lib/prompt-jd";
@@ -8,6 +10,12 @@ import {
   researchRole,
 } from "@/lib/research";
 import { tryAcquire, release, cancel } from "@/lib/rate-limiter";
+import {
+  FREE_MONTHLY_LIMIT,
+  getGenerationsThisMonth,
+  getProfile,
+  recordGeneration,
+} from "@/lib/generation-limits";
 
 export const maxDuration = 300;
 
@@ -272,6 +280,23 @@ export async function POST(request) {
   let acquired = false;
 
   try {
+    // ── Auth check ──
+    const session = await getServerSession(authConfig);
+    if (!session?.user?.id) {
+      return Response.json({ error: "Sign in required" }, { status: 401 });
+    }
+
+    // ── Generation limit check ──
+    const profile = await getProfile(session.user.id).catch(() => null);
+    const planLimit = profile?.plan_tier === "free" ? FREE_MONTHLY_LIMIT : 9999;
+    const usedThisMonth = await getGenerationsThisMonth(session.user.id).catch(() => 0);
+    if (usedThisMonth >= planLimit) {
+      return Response.json(
+        { error: "You've used all generations for this month. Upgrade coming soon." },
+        { status: 403 },
+      );
+    }
+
     // ── Rate limit check ──
     const limit = tryAcquire(request);
     if (!limit.allowed) {
@@ -396,12 +421,13 @@ export async function POST(request) {
     const stopHeartbeat = startHeartbeat(emitter);
 
     const abort = new AbortController();
+    const userId = session.user.id;
     streamFn(abort.signal)
       .then((body) => procFn(body, emitter))
       .then(() => {
-        // Stream finished successfully — close so client knows we're done
         try { emitter.close(); } catch {}
         release(request, false);
+        recordGeneration(userId, dosType, cName, rName).catch(() => {});
       })
       .catch((e) => {
         if (e.name !== "AbortError") {

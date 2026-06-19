@@ -55,6 +55,12 @@ export default function HeroSection() {
           </Link>
           {status === "authenticated" ? (
             <div className="flex items-center gap-3">
+              <Link
+                href="/profile"
+                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Profile
+              </Link>
               <button
                 type="button"
                 onClick={() => signOut()}
@@ -79,7 +85,7 @@ export default function HeroSection() {
           ) : (
             <button
               type="button"
-              onClick={() => signIn("google")}
+              onClick={() => signIn("google", { callbackUrl: "/generate" })}
               className="text-xs font-semibold px-4 py-2 rounded-lg border border-gray-200/80 hover:border-gray-300 hover:bg-gray-50 text-gray-700 transition-all duration-200"
             >
               Sign In
