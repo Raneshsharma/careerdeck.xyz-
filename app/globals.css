@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand: #2563eb;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+}
+
+@layer components {
+  .dossier-markdown h1 {
+    @apply text-2xl font-bold mt-10 mb-4 pb-2 border-b-2 border-brand-600 text-gray-900;
+  }
+  .dossier-markdown h2 {
+    @apply text-xl font-bold mt-8 mb-3 text-gray-800;
+  }
+  .dossier-markdown h3 {
+    @apply text-lg font-semibold mt-6 mb-2 text-gray-800;
+  }
+  .dossier-markdown h4 {
+    @apply text-base font-semibold mt-4 mb-1 text-gray-700;
+  }
+  .dossier-markdown p {
+    @apply mb-3 leading-relaxed text-gray-700 text-justify;
+  }
+  .dossier-markdown ul,
+  .dossier-markdown ol {
+    @apply mb-3 pl-6 leading-relaxed text-gray-700 text-justify;
+  }
+  .dossier-markdown ul {
+    @apply list-disc;
+  }
+  .dossier-markdown ol {
+    @apply list-decimal;
+  }
+  .dossier-markdown li {
+    @apply mb-1;
+  }
+  .dossier-markdown code {
+    @apply bg-gray-100 text-brand-700 px-1.5 py-0.5 rounded text-sm;
+  }
+  .dossier-markdown pre {
+    @apply bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto;
+  }
+  .dossier-markdown pre code {
+    @apply bg-transparent text-gray-100 p-0;
+  }
+  .dossier-markdown blockquote {
+    @apply border-l-4 border-brand-400 pl-4 italic text-gray-600 mb-3;
+  }
+  .dossier-markdown strong {
+    @apply font-semibold text-gray-900;
+  }
+  .dossier-markdown hr {
+    @apply my-8 border-gray-200;
+  }
+  .dossier-markdown a {
+    @apply text-brand-600 underline;
+  }
+  .dossier-markdown table {
+    @apply w-full mb-4 border-collapse;
+  }
+  .dossier-markdown th {
+    @apply bg-brand-50 text-left p-2 border border-gray-200 font-semibold;
+  }
+  .dossier-markdown td {
+    @apply p-2 border border-gray-200;
+  }
+}
+
+@media print {
+  body {
+    @apply bg-white text-black;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .dossier-markdown {
+    @apply text-black;
+  }
+  .dossier-markdown h1,
+  .dossier-markdown h2,
+  .dossier-markdown h3,
+  .dossier-markdown h4,
+  .dossier-markdown p,
+  .dossier-markdown li,
+  .dossier-markdown strong {
+    @apply text-black;
+  }
+  .dossier-markdown h1 {
+    border-bottom-color: #000 !important;
+  }
+  .dossier-markdown code {
+    @apply bg-gray-200 text-black;
+  }
+}
