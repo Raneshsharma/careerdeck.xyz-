@@ -16,7 +16,16 @@ export default function RootLayout({ children }) {
     <html lang="en" className={inter.className}>
       <body className="min-h-screen antialiased">
         <SessionProvider>
-          <Toaster position="top-right" />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              error: {
+                style: { background: "#DC2626", color: "#fff", fontSize: "14px" },
+                iconTheme: { primary: "#fff", secondary: "#DC2626" },
+                duration: 4000,
+              },
+            }}
+          />
           {children}
         </SessionProvider>
       </body>

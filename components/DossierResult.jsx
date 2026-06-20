@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 
-export default function DossierResult({ content, onReset, isPartial }) {
+export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner }) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
   const resultRef = useRef(null);

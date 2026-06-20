@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 
-export default function SectionNav({ content }) {
+export default function SectionNav({ content, className = "" }) {
   const [headings, setHeadings] = useState([]);
   const [activeId, setActiveId] = useState(null);
 
@@ -51,7 +51,7 @@ export default function SectionNav({ content }) {
   if (headings.length === 0) return null;
 
   return (
-    <nav className="no-print sticky top-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 p-4 max-h-[calc(100vh-2rem)] overflow-y-auto shadow-sm">
+    <nav className={`no-print bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 p-4 max-h-[calc(100vh-2rem)] overflow-y-auto shadow-sm ${className}`}>
       <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">On this page</h4>
       <ul className="space-y-0.5">
         {headings.map((h) => (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -36,26 +36,58 @@ export default function GeneratePage() {
   const [genId, setGenId] = useState(null);
   const [activeDossierId, setActiveDossierId] = useState(null);
   const [sidebarVersion, setSidebarVersion] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const [loadingDossier, setLoadingDossier] = useState(false);
   const abortRef = useRef(null);
+  const prevStateRef = useRef({ activeDossierId: null, content: "" });
+
+  const wordCount = useMemo(() => content.split(/\s+/).filter(Boolean).length, [content]);
+  const minRead = useMemo(() => Math.ceil(wordCount / 250), [wordCount]);
+
+  const handleCopy = useCallback(async () => {
+    try { await navigator.clipboard.writeText(content); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+  }, [content]);
+
+  const handleDownload = useCallback(() => {
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "careerdeck-dossier.md";
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [content]);
+
+  const handlePrint = useCallback(() => { window.print(); }, []);
 
   const loadDossier = useCallback(async (id) => {
+    prevStateRef.current = { activeDossierId, content };
+
+    setContent("");
+    setLoadingDossier(true);
+    setWasPartial(false);
+    setErrorMessage(null);
+    setGenerating(false);
+    setGenId(null);
+    setNewsCount(null);
+    setActiveDossierId(id);
+
     try {
-      const res = await fetch(`/api/generations/${id}`)
-      if (!res.ok) throw new Error("Failed to load dossier")
-      const data = await res.json()
-      if (data.generation?.content) {
-        setContent(data.generation.content)
-        setActiveDossierId(id)
-        setGenId(null)
-        setGenerating(false)
-        setWasPartial(false)
-        setErrorMessage(null)
-        setNewsCount(null)
-      }
+      const res = await fetch(`/api/generations/${id}`);
+      if (!res.ok) throw new Error("Failed to load dossier");
+      const data = await res.json();
+      if (!data.generation?.content) throw new Error("Dossier has no content");
+      setContent(data.generation.content);
     } catch (err) {
-      toast.error(err.message)
+      setActiveDossierId(prevStateRef.current.activeDossierId);
+      setContent(prevStateRef.current.content);
+      toast.error(err.message, {
+        style: { background: "#DC2626", color: "#fff", fontSize: "14px" },
+      });
+    } finally {
+      setLoadingDossier(false);
     }
-  }, [])
+  }, [activeDossierId, content]);
 
   const saveContent = useCallback(async (id, dossierContent) => {
     try {
@@ -236,10 +268,35 @@ export default function GeneratePage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-          {/* ── Sidebar ── */}
-          <aside className="w-full md:w-72 shrink-0">
-            <div className="md:sticky md:top-24">
+        {/* ── Full-width toolbar ── */}
+        {content && !generating && (
+          <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-sm border-b border-gray-200 mb-6 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 no-print">
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
+              <span className="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full font-medium">
+                {wordCount.toLocaleString()} words &middot; ~{minRead} min read
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button onClick={handleReset} className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+                  &larr; New
+                </button>
+                <button onClick={handleCopy} className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 ${copied ? "bg-green-50 text-green-700 border-green-200" : "border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"}`}>
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+                <button onClick={handleDownload} className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+                  .md
+                </button>
+                <button onClick={handlePrint} className="px-3 py-1.5 text-xs font-medium rounded-full bg-brand-500 text-white hover:bg-brand-600 transition-all duration-200 shadow-sm">
+                  Print
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* ── Left: History Sidebar ── */}
+          <aside className="w-full lg:w-72 shrink-0">
+            <div className="lg:sticky lg:top-24">
               <HistorySidebar
                 key={sidebarVersion}
                 onSelect={loadDossier}
@@ -248,9 +305,16 @@ export default function GeneratePage() {
             </div>
           </aside>
 
-          {/* ── Main content ── */}
+          {/* ── Center: Main content ── */}
           <div className="flex-1 min-w-0 max-w-2xl">
-            {!content && !generating && (
+            {loadingDossier && (
+              <div className="text-center py-16">
+                <div className="w-14 h-14 rounded-full border-[3px] border-gray-200 border-t-brand-500 animate-spin mx-auto mb-6 bg-transparent" />
+                <p className="text-sm text-gray-400 animate-pulse">Loading dossier...</p>
+              </div>
+            )}
+
+            {!loadingDossier && !content && !generating && (
               <>
                 {errorMessage && (
                   <div className="bg-red-50 border border-red-300 rounded-lg p-4 mb-4 flex items-start gap-3 animate-shake">
@@ -292,10 +356,8 @@ export default function GeneratePage() {
 
             {generating && (
               <div className="max-w-2xl">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-                  <div className="animate-pulse-glow mx-auto mb-5 w-fit">
-                    <div className="w-14 h-14 rounded-full border-4 border-amber-200 border-t-brand-500 animate-spin" />
-                  </div>
+                <div className="text-center">
+                  <div className="w-14 h-14 rounded-full border-[3px] border-gray-200 border-t-brand-500 animate-spin mx-auto mb-5 bg-transparent" />
                   <h2 className="text-xl font-bold text-[#0F172A] mb-1">Building Your {DOSSIER_LABELS[dossierType]}</h2>
                   <p className="text-sm text-[#64748B] mb-8">Gathering intelligence, analyzing data, and structuring your dossier</p>
 
@@ -354,15 +416,27 @@ export default function GeneratePage() {
                     </div>
                   </div>
                 )}
-                <div className="lg:grid lg:grid-cols-[1fr_220px] gap-6">
-                  <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} />
-                  <div className="mt-6 lg:mt-0 lg:block">
-                    <SectionNav content={content} />
-                  </div>
-                </div>
+                <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} hideToolbar hideShortBanner />
               </>
             )}
           </div>
+
+          {/* ── Right: Amber banner + TOC ── */}
+          {content && !generating && (
+            <aside className="w-full lg:w-56 shrink-0">
+              <div className="space-y-4">
+                {wasPartial && (
+                  <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 no-print">
+                    <p className="text-sm text-yellow-800"><strong>&#x26A0;&#xFE0F; Partial output:</strong> Generation was cut short — some later sections may be incomplete. What was generated is fully usable.</p>
+                  </div>
+                )}
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 no-print">
+                  <p className="text-sm text-amber-800"><strong>&#x23F0; Short on time?</strong> Jump to the Interview Intelligence and Smart Questions sections for quick prep.</p>
+                </div>
+                <SectionNav content={content} className="sticky top-24" />
+              </div>
+            </aside>
+          )}
         </div>
       </main>
 
