@@ -3,7 +3,10 @@ import { authConfig } from "@/lib/auth.config"
 import { supabase } from "@/lib/supabase"
 
 export async function POST(request) {
-  const session = await getServerSession(authConfig)
+  let session
+  try {
+    session = await getServerSession(authConfig)
+  } catch {}
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
@@ -14,19 +17,20 @@ export async function POST(request) {
     return Response.json({ error: "All fields are required" }, { status: 400 })
   }
 
-  const { error } = await supabase.from("profiles").upsert({
-    id: session.user.id,
-    email: session.user.email,
-    name: name.trim(),
-    avatar_url: session.user.image,
-    industry,
-    experience_level: experienceLevel,
-    plan_tier: "free",
-    onboarded: true,
-  })
-
-  if (error) {
-    console.error("Onboard save error:", error)
+  try {
+    const { error } = await supabase.from("profiles").upsert({
+      id: session.user.id,
+      email: session.user.email,
+      name: name.trim(),
+      avatar_url: session.user.image,
+      industry,
+      experience_level: experienceLevel,
+      plan_tier: "free",
+      onboarded: true,
+    })
+    if (error) throw error
+  } catch (err) {
+    console.error("Onboard save error:", err)
     return Response.json({ error: "Failed to save profile" }, { status: 500 })
   }
 

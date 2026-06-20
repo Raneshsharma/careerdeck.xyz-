@@ -36,6 +36,8 @@ export default function OnboardPage() {
   const [experienceLevel, setExperienceLevel] = useState("")
   const [saving, setSaving] = useState(false)
 
+  const [checkingOnboarded, setCheckingOnboarded] = useState(true)
+
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/auth")
   }, [status, router])
@@ -44,7 +46,18 @@ export default function OnboardPage() {
     if (session?.user?.name) setName(session.user.name)
   }, [session])
 
-  if (status !== "authenticated") return null
+  useEffect(() => {
+    if (status !== "authenticated") return
+    fetch("/api/profile")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.profile?.onboarded) router.replace("/generate")
+      })
+      .catch(() => {})
+      .finally(() => setCheckingOnboarded(false))
+  }, [status, router])
+
+  if (status !== "authenticated" || checkingOnboarded) return null
 
   const handleSubmit = async (e) => {
     e.preventDefault()

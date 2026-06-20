@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { authConfig } from "@/lib/auth.config"
 import { supabase } from "@/lib/supabase"
-import { FREE_MONTHLY_LIMIT } from "@/lib/generation-limits"
 
 export const metadata = {
   title: "Generate Dossier — CareerDeck",
