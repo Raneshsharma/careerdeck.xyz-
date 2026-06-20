@@ -74,7 +74,11 @@ export default function GeneratePage() {
 
     try {
       const res = await fetch(`/api/generations/${id}`);
-      if (!res.ok) throw new Error("Failed to load dossier");
+      if (!res.ok) {
+        let detail = "";
+        try { const e = await res.json(); detail = e.error || ""; } catch {}
+        throw new Error(`Failed to load dossier (${res.status}${detail ? ": " + detail : ""})`);
+      }
       const data = await res.json();
       if (!data.generation?.content) throw new Error("Dossier has no content");
       setContent(data.generation.content);
