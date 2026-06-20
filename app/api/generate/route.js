@@ -421,9 +421,10 @@ export async function POST(request) {
     const stopHeartbeat = startHeartbeat(emitter);
 
     // Record generation before streaming to close race window
-    recordGeneration(session.user.id, dosType, cName, rName).catch((err) => {
-      console.error("recordGeneration error:", err);
-    });
+    const genId = await recordGeneration(session.user.id, dosType, cName, rName);
+    if (genId) {
+      try { emitter.emit("gen-id", { id: genId }); } catch {}
+    }
 
     const abort = new AbortController();
     streamFn(abort.signal)
