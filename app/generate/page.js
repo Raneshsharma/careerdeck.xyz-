@@ -80,7 +80,12 @@ export default function GeneratePage() {
         throw new Error(`Failed to load dossier (${res.status}${detail ? ": " + detail : ""})`);
       }
       const data = await res.json();
-      if (!data.generation?.content) throw new Error("Dossier has no content");
+      if (!data.generation?.content) {
+        setContent("");
+        setErrorMessage("This dossier has no saved content yet.");
+        setLoadingDossier(false);
+        return;
+      }
       setContent(data.generation.content);
     } catch (err) {
       setActiveDossierId(prevStateRef.current.activeDossierId);

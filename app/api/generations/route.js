@@ -13,7 +13,6 @@ export async function GET() {
       .from("generations")
       .select("id, dossier_type, company_name, role, created_at")
       .eq("user_id", session.user.id)
-      .not("content", "is", null)
       .order("created_at", { ascending: false })
       .limit(20)
 
