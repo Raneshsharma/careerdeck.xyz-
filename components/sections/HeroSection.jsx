@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import NonReversingReveal from "@/components/NonReversingReveal";
 import HeroDashboardMockup from "@/components/HeroDashboardMockup";
@@ -22,11 +23,25 @@ const avatars = [
 
 export default function HeroSection() {
   const { data: session, status } = useSession();
+  const [scrolled, setScrolled] = useState(false);
+  const [hovering, setHovering] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const headerOpacity = hovering || !scrolled ? "bg-white/80" : "bg-white/10";
 
   return (
-    <section id="section-hero" className="relative bg-[#FAFAFA] overflow-hidden">
+    <section id="section-hero" className="relative bg-[#FAFAFA]">
       {/* ---- TOP NAV ---- */}
-      <header className="relative z-50 flex items-center justify-between px-8 py-5 max-w-7xl mx-auto">
+      <header
+        className={`sticky top-0 z-50 flex items-center justify-between px-8 py-5 max-w-7xl mx-auto backdrop-blur-sm transition-all duration-300 ${headerOpacity}`}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+      >
         <Link href="/" className="flex items-center">
           <Image
             src="/logo.png"
