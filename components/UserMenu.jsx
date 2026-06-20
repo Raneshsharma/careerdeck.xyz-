@@ -3,15 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 
 export default function UserMenu() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -25,28 +22,11 @@ export default function UserMenu() {
 
   useEffect(() => {
     const handleClick = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setOpen(false);
-        setConfirmDelete(false);
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
-
-  const handleDeleteAccount = async () => {
-    setDeleting(true);
-    try {
-      const res = await fetch("/api/delete-account", { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete account");
-      toast.success("Account deleted");
-      signOut({ callbackUrl: "/" });
-    } catch (err) {
-      toast.error(err.message);
-      setDeleting(false);
-      setConfirmDelete(false);
-    }
-  };
 
   if (status !== "authenticated") return null;
 
@@ -102,35 +82,6 @@ export default function UserMenu() {
           >
             Profile
           </button>
-
-          {/* Delete account */}
-          {confirmDelete ? (
-            <div className="mt-1 pt-2 border-t border-red-100">
-              <p className="text-xs text-red-600 mb-2 px-2">Delete your account and all data?</p>
-              <div className="flex gap-2 px-2">
-                <button
-                  onClick={handleDeleteAccount}
-                  disabled={deleting}
-                  className="flex-1 text-xs font-medium bg-red-500 text-white py-1.5 rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors"
-                >
-                  {deleting ? "Deleting..." : "Confirm"}
-                </button>
-                <button
-                  onClick={() => setConfirmDelete(false)}
-                  className="flex-1 text-xs font-medium bg-gray-100 text-gray-600 py-1.5 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button
-              onClick={() => setConfirmDelete(true)}
-              className="w-full text-left text-sm text-red-500 hover:text-red-700 hover:bg-red-50 py-1.5 px-2 rounded-lg transition-colors mt-1"
-            >
-              Delete Account
-            </button>
-          )}
 
           {/* Sign out */}
           <button

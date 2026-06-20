@@ -1,11 +1,12 @@
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import UserMenu from "@/components/UserMenu"
+import toast from "react-hot-toast"
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
@@ -13,6 +14,8 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null)
   const [usage, setUsage] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/auth")
@@ -131,6 +134,47 @@ export default function ProfilePage() {
             )}
           </div>
         )}
+
+        {/* Delete account */}
+        <div className="text-center pb-12">
+          {confirmDelete ? (
+            <div className="inline-flex items-center gap-2">
+              <span className="text-xs text-red-400">Delete all data?</span>
+              <button
+                onClick={async () => {
+                  setDeleting(true)
+                  try {
+                    const res = await fetch("/api/delete-account", { method: "DELETE" })
+                    if (!res.ok) throw new Error()
+                    toast.success("Account deleted")
+                    signOut({ callbackUrl: "/" })
+                  } catch {
+                    toast.error("Failed to delete account")
+                    setDeleting(false)
+                    setConfirmDelete(false)
+                  }
+                }}
+                disabled={deleting}
+                className="text-xs text-red-500 font-medium hover:text-red-700 transition-colors"
+              >
+                {deleting ? "Deleting..." : "Confirm"}
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="text-xs text-gray-300 hover:text-red-400 transition-colors"
+            >
+              Delete account
+            </button>
+          )}
+        </div>
       </main>
     </div>
   )
