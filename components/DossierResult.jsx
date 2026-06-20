@@ -1,10 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 
 export default function DossierResult({ content, onReset, isPartial }) {
   const [copied, setCopied] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const resultRef = useRef(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setVisible(true));
+  }, []);
 
   const handlePrint = () => { window.print(); };
 
@@ -13,7 +19,7 @@ export default function DossierResult({ content, onReset, isPartial }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "interview-ready-dossier.md";
+    a.download = "careerdeck-dossier.md";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -27,16 +33,25 @@ export default function DossierResult({ content, onReset, isPartial }) {
   const wordCount = content.split(/\s+/).filter(Boolean).length;
 
   return (
-    <div>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6 no-print flex flex-wrap items-center justify-between gap-3">
-        <span className="text-sm text-gray-500">{wordCount.toLocaleString()} words &middot; ~{Math.ceil(wordCount / 250)} min read</span>
-        <div className="flex items-center gap-2 flex-wrap">
-          <button onClick={onReset} className="px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors">&#x2190; New Dossier</button>
-          <button onClick={handleCopy} className={`px-3 py-1.5 text-sm rounded-md border transition-all ${copied ? "border-green-400 bg-green-50 text-green-700" : "border-gray-300 text-gray-600 hover:bg-gray-50"}`}>
-            {copied ? "\u2705 Copied!" : "\uD83D\uDCCB Copy"}
+    <div ref={resultRef} className={`transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+      {/* Toolbar */}
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 p-3 mb-6 no-print flex items-center justify-between gap-3">
+        <span className="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full font-medium">
+          {wordCount.toLocaleString()} words &middot; ~{Math.ceil(wordCount / 250)} min read
+        </span>
+        <div className="flex items-center gap-1.5">
+          <button onClick={onReset} className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+            &larr; New
           </button>
-          <button onClick={handleDownload} className="px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors">&#x2B07; Download .md</button>
-          <button onClick={handlePrint} className="px-3 py-1.5 text-sm rounded-md bg-brand-600 text-white hover:bg-brand-700 transition-colors">&#x1F5A8; Print / PDF</button>
+          <button onClick={handleCopy} className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 ${copied ? "bg-green-50 text-green-700 border-green-200" : "border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"}`}>
+            {copied ? "Copied!" : "Copy"}
+          </button>
+          <button onClick={handleDownload} className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+            .md
+          </button>
+          <button onClick={handlePrint} className="px-3 py-1.5 text-xs font-medium rounded-full bg-brand-500 text-white hover:bg-brand-600 transition-all duration-200 shadow-sm">
+            Print
+          </button>
         </div>
       </div>
 

@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import DossierTabs from "@/components/DossierTabs";
 import DossierForm from "@/components/DossierForm";
 import DossierResult from "@/components/DossierResult";
 import SectionNav from "@/components/SectionNav";
+import NonReversingReveal from "@/components/NonReversingReveal";
 
 const DOSSIER_LABELS = {
   company: "Company Dossier",
@@ -13,6 +16,13 @@ const DOSSIER_LABELS = {
   jd: "JD Dossier",
   news: "News Dossier",
 };
+
+const INFO_CARDS = [
+  { stat: "4", label: "Dossier Types", desc: "Company, Role, JD, News" },
+  { stat: "3+", label: "Data Sources", desc: "SerpAPI, OpenAI, real-time news" },
+  { stat: "21", label: "Sections Deep", desc: "From strategy to interview questions" },
+  { stat: "90s", label: "Generation Time", desc: "From input to complete dossier" },
+];
 
 export default function GeneratePage() {
   const [dossierType, setDossierType] = useState("company");
@@ -158,24 +168,27 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="min-h-screen">
-      <header className="bg-white border-b border-gray-200 no-print">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
-          <div className="flex items-center gap-3 mb-1">
-            <span className="text-3xl">&#x1F3AF;</span>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">CareerDeck</h1>
-          </div>
-          <p className="text-gray-500 text-sm sm:text-base">
-            Company, Role, JD, and News dossiers — built for MBA students and early-career professionals.
-          </p>
+    <div className="min-h-screen bg-[#FAFAFA]">
+      {/* ── Header ── */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between h-16">
+          <Link href="/" className="flex items-center gap-2.5">
+            <Image src="/logo.png" alt="CareerDeck" height={32} width={48} className="h-8 w-auto" />
+            <span className="text-sm font-bold text-[#0F172A] hidden sm:inline">CareerDeck</span>
+          </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/profile" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Profile</Link>
+            <Link href="/" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Home</Link>
+          </nav>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:py-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
+        {/* ── IDLE STATE: form + info ── */}
         {!content && !generating && (
           <div className="max-w-2xl mx-auto">
             {errorMessage && (
-              <div className="bg-red-50 border border-red-300 rounded-lg p-4 mb-4 flex items-start gap-3">
+              <div className="bg-red-50 border border-red-300 rounded-lg p-4 mb-4 flex items-start gap-3 animate-shake">
                 <span className="text-red-500 shrink-0 mt-0.5">&#x26A0;&#xFE0F;</span>
                 <div className="flex-1">
                   <p className="text-sm text-red-800">{errorMessage}</p>
@@ -184,54 +197,81 @@ export default function GeneratePage() {
               </div>
             )}
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8">
-              <DossierTabs selected={dossierType} onChange={(t) => { setDossierType(t); setErrorMessage(null); }} disabled={generating} />
-              <div className="mt-6">
-                <h2 className="text-lg font-semibold text-gray-800 mb-1">{DOSSIER_LABELS[dossierType]}</h2>
-                <p className="text-sm text-gray-500 mb-6">
+            <NonReversingReveal id="form-card" className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+              <div className="mb-6">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] tracking-tight">{DOSSIER_LABELS[dossierType]}</h1>
+                <p className="text-sm text-[#64748B] mt-1">
                   {dossierType === "company" && "Deep dive into a company's business model, strategy, culture, and interview prep."}
                   {dossierType === "role" && "Understand a role's responsibilities, skills, career path, and interview expectations."}
                   {dossierType === "jd" && "Decode a specific job description — hidden expectations, STAR blueprints, and hiring manager perspective."}
                   {dossierType === "news" && "Last 30 days of high-signal developments, analyzed for business and interview relevance."}
                 </p>
+              </div>
+              <DossierTabs selected={dossierType} onChange={(t) => { setDossierType(t); setErrorMessage(null); }} disabled={generating} />
+              <div className="mt-6">
                 <DossierForm onSubmit={handleSubmit} generating={generating} dossierType={dossierType} />
               </div>
-            </div>
+            </NonReversingReveal>
 
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { emoji: "\uD83D\uDCCA", title: "4 Dossier Types", desc: "Company, Role, JD, and News — each with its own deep, structured framework." },
-                { emoji: "\uD83D\uDD0D", title: "Real Data Powered", desc: "SerpAPI fetches financials, competitors, news, and salary data for real numbers." },
-                { emoji: "\uD83C\uDFAF", title: "Interview Focused", desc: "Every section includes talking points, smart questions, and likely interview topics." },
-                { emoji: "\u26A1", title: "MBA/Grad Optimized", desc: "Practical, business-aware language — never academic theory or encyclopedia fluff." },
-              ].map((card) => (
-                <div key={card.title} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-5">
-                  <p className="text-2xl mb-2">{card.emoji}</p>
-                  <h3 className="font-semibold text-gray-800 mb-1">{card.title}</h3>
-                  <p className="text-sm text-gray-500">{card.desc}</p>
+            <NonReversingReveal id="generate-stats" className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {INFO_CARDS.map((card) => (
+                <div key={card.label} className="bg-white rounded-xl border border-gray-100 p-4 text-center hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200">
+                  <p className="text-2xl font-extrabold text-brand-500">{card.stat}</p>
+                  <p className="text-sm font-semibold text-[#0F172A] mt-0.5">{card.label}</p>
+                  <p className="text-xs text-[#94A3B8] mt-0.5">{card.desc}</p>
                 </div>
               ))}
-            </div>
+            </NonReversingReveal>
           </div>
         )}
 
+        {/* ── GENERATING STATE ── */}
         {generating && (
-          <div className="max-w-2xl mx-auto text-center py-12">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-              <div className="animate-spin h-10 w-10 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Generating {DOSSIER_LABELS[dossierType]}...</h2>
-              <p className="text-gray-500 mb-4">Building your dossier with CareerDeck AI. This takes about 60-90 seconds.</p>
-              {newsCount !== null && (
-                <p className="text-sm text-green-600 mb-2">&#x1F4F0; {newsCount} data points found for context</p>
-              )}
-              {content && (
-                <p className="text-sm text-brand-600">{content.length.toLocaleString()} characters generated so far</p>
-              )}
-              <button onClick={handleCancel} className="mt-4 px-4 py-2 text-sm text-gray-600 hover:text-red-600 transition-colors">Cancel</button>
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
+              <div className="w-14 h-14 rounded-full border-4 border-amber-200 border-t-brand-500 animate-spin mx-auto mb-5 animate-pulse-glow" />
+              <h2 className="text-xl font-bold text-[#0F172A] mb-1">Building Your {DOSSIER_LABELS[dossierType]}</h2>
+              <p className="text-sm text-[#64748B] mb-8">Gathering intelligence, analyzing data, and structuring your dossier</p>
+
+              {/* Status pipeline */}
+              <div className="max-w-xs mx-auto space-y-4 text-left">
+                <div className="flex items-center gap-3">
+                  <span className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-xs shrink-0">&#x2713;</span>
+                  <div>
+                    <p className="text-sm font-medium text-green-700">Research complete</p>
+                    {newsCount !== null && (
+                      <p className="text-xs text-green-500">{newsCount} data points found</p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-brand-500 animate-pulse" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium text-amber-700">Generating dossier</p>
+                    {content && (
+                      <p className="text-xs text-amber-500">{content.length.toLocaleString()} characters so far</p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                    <span className="w-2 h-2 rounded-full bg-gray-300" />
+                  </span>
+                  <p className="text-sm text-gray-400">Formatting output</p>
+                </div>
+              </div>
+
+              <button onClick={handleCancel} className="mt-8 text-xs text-gray-400 hover:text-red-500 transition-colors">
+                Cancel generation
+              </button>
             </div>
+
+            {/* Live preview */}
             {content && (
-              <div className="mt-8 text-left">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
+              <div className="mt-8 transition-all duration-300">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-10 opacity-90 hover:opacity-100 transition-opacity">
                   <div className="dossier-markdown" dangerouslySetInnerHTML={{ __html: renderMarkdownPreview(content) }} />
                 </div>
               </div>
@@ -239,10 +279,11 @@ export default function GeneratePage() {
           </div>
         )}
 
+        {/* ── RESULT STATE ── */}
         {content && !generating && (
           <>
             {errorMessage && (
-              <div className="bg-red-50 border border-red-300 rounded-lg p-4 mb-4 flex items-start gap-3">
+              <div className="max-w-5xl mx-auto mb-4 bg-red-50 border border-red-300 rounded-lg p-4 flex items-start gap-3 animate-shake">
                 <span className="text-red-500 shrink-0 mt-0.5">&#x26A0;&#xFE0F;</span>
                 <div className="flex-1">
                   <p className="text-sm text-red-800">{errorMessage}</p>
@@ -250,7 +291,7 @@ export default function GeneratePage() {
                 </div>
               </div>
             )}
-            <div className="lg:grid lg:grid-cols-[1fr_220px] gap-6">
+            <div className="lg:grid lg:grid-cols-[1fr_220px] gap-6 max-w-5xl mx-auto">
               <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} />
               <div className="mt-6 lg:mt-0 lg:block">
                 <SectionNav content={content} />
@@ -260,8 +301,9 @@ export default function GeneratePage() {
         )}
       </main>
 
-      <footer className="bg-white border-t border-gray-200 mt-12 no-print">
-        <div className="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-gray-400">
+      {/* ── Footer ── */}
+      <footer className="bg-white border-t border-gray-100 mt-16 no-print">
+        <div className="max-w-7xl mx-auto px-8 py-6 text-center text-xs text-gray-400">
           <p><strong className="text-gray-500">CareerDeck</strong> — Verify critical facts before your interview. Good luck!</p>
         </div>
       </footer>
@@ -291,4 +333,3 @@ function renderMarkdownPreview(md) {
 function escapeHTML(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
-
