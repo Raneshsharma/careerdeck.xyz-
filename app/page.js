@@ -1,5 +1,6 @@
 "use client";
 
+import LandingHeader from "@/components/LandingHeader";
 import HeroSection from "@/components/sections/HeroSection";
 import ProblemSolutionSection from "@/components/sections/ProblemSolutionSection";
 import StepsSection from "@/components/sections/StepsSection";
@@ -10,6 +11,7 @@ import CTASection from "@/components/sections/CTASection";
 export default function Home() {
   return (
     <main className="relative">
+      <LandingHeader />
       <HeroSection />
       <ProblemSolutionSection />
       <StepsSection />
