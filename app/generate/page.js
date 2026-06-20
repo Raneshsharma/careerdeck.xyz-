@@ -172,9 +172,8 @@ export default function GeneratePage() {
       {/* ── Header ── */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center">
             <Image src="/logo.png" alt="CareerDeck" height={32} width={48} className="h-8 w-auto" />
-            <span className="text-sm font-bold text-[#0F172A] hidden sm:inline">CareerDeck</span>
           </Link>
           <nav className="flex items-center gap-6">
             <Link href="/profile" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Profile</Link>
