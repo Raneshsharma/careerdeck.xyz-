@@ -16,12 +16,11 @@ export default function LandingHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const headerBg = hovering || !scrolled ? "bg-white/80" : "bg-white/10";
+  const headerBg = hovering || !scrolled ? "bg-[#FAFAFA]/90" : "bg-[#FAFAFA]/0";
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 max-w-7xl mx-auto backdrop-blur-sm transition-all duration-300 ${headerBg}`}
-      style={{ left: "50%", transform: "translateX(-50%)" }}
+      className={`fixed top-2 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-7xl flex items-center justify-between px-6 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-300 border border-gray-100/80 ${headerBg}`}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
@@ -29,9 +28,9 @@ export default function LandingHeader() {
         <Image
           src="/logo.png"
           alt="CareerDeck"
-          height={40}
-          width={60}
-          className="h-10 w-auto"
+          height={32}
+          width={48}
+          className="h-8 w-auto"
           priority
         />
       </Link>

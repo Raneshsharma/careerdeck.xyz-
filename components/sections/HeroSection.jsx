@@ -21,7 +21,7 @@ const avatars = [
 
 export default function HeroSection() {
   return (
-    <section id="section-hero" className="relative bg-[#FAFAFA] pt-36">
+    <section id="section-hero" className="relative bg-[#FAFAFA] pt-24">
       {/* ---- MAIN HERO ---- */}
       <div className="max-w-7xl mx-auto px-8 pb-8">
         <div className="grid lg:grid-cols-[45%_55%] gap-8 items-center">
