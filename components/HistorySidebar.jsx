@@ -9,7 +9,7 @@ const TYPE_LABELS = {
   news: "News",
 };
 
-export default function HistorySidebar({ onSelect, activeId }) {
+export default function HistorySidebar({ onSelect, activeId, onDelete }) {
   const [generations, setGenerations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,13 +17,10 @@ export default function HistorySidebar({ onSelect, activeId }) {
 
   useEffect(() => {
     mountedRef.current = true;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-
     setLoading(true);
     setError(null);
 
-    fetch("/api/generations", { signal: controller.signal })
+    fetch("/api/generations")
       .then((r) => r.json())
       .then((data) => {
         if (!mountedRef.current) return;
@@ -38,12 +35,21 @@ export default function HistorySidebar({ onSelect, activeId }) {
         if (mountedRef.current) setLoading(false);
       });
 
-    return () => {
-      mountedRef.current = false;
-      clearTimeout(timeout);
-      controller.abort();
-    };
+    return () => { mountedRef.current = false; };
   }, []);
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    const prev = generations;
+    setGenerations((g) => g.filter((gen) => gen.id !== id));
+    try {
+      const res = await fetch(`/api/generations/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete");
+      if (onDelete) onDelete(id);
+    } catch {
+      setGenerations(prev);
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl border-2 border-amber-200 p-4 shadow-md">
@@ -93,10 +99,10 @@ export default function HistorySidebar({ onSelect, activeId }) {
       {!loading && !error && generations.length > 0 && (
         <ul className="space-y-1 max-h-[60vh] overflow-y-auto">
           {generations.map((gen) => (
-            <li key={gen.id}>
+            <li key={gen.id} className="group flex items-stretch">
               <button
                 onClick={() => onSelect(gen.id)}
-                className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                className={`flex-1 text-left px-3 py-2.5 rounded-l-lg transition-all duration-200 ${
                   activeId === gen.id
                     ? "bg-brand-50 border border-brand-200 text-brand-700"
                     : "hover:bg-gray-50 border border-transparent text-gray-600"
@@ -117,6 +123,19 @@ export default function HistorySidebar({ onSelect, activeId }) {
                     {new Date(gen.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                   </span>
                 </div>
+              </button>
+              <button
+                onClick={(e) => handleDelete(e, gen.id)}
+                className="px-2 rounded-r-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all duration-200 flex items-center"
+                aria-label="Delete dossier"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 4.5 4.5 4.5 11 4.5" />
+                  <path d="M4.5 4.5V3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1.5" />
+                  <path d="M5.5 6.5v4" />
+                  <path d="M8.5 6.5v4" />
+                  <path d="M2.5 4.5h9l-1 8H3.5z" />
+                </svg>
               </button>
             </li>
           ))}

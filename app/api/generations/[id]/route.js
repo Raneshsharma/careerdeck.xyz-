@@ -2,6 +2,38 @@ import { getServerSession } from "next-auth"
 import { authConfig } from "@/lib/auth.config"
 import { supabase } from "@/lib/supabase"
 
+export async function DELETE(request, { params }) {
+  const session = await getServerSession(authConfig)
+  if (!session?.user?.id) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const { id } = params
+
+  try {
+    const { data: existing } = await supabase
+      .from("generations")
+      .select("user_id")
+      .eq("id", id)
+      .single()
+
+    if (!existing || existing.user_id !== session.user.id) {
+      return Response.json({ error: "Not found" }, { status: 404 })
+    }
+
+    const { error } = await supabase
+      .from("generations")
+      .delete()
+      .eq("id", id)
+
+    if (error) throw error
+    return Response.json({ ok: true })
+  } catch (err) {
+    console.error("Generation delete error:", err)
+    return Response.json({ error: "Failed to delete generation" }, { status: 500 })
+  }
+}
+
 export async function GET(request, { params }) {
   const session = await getServerSession(authConfig)
   if (!session?.user?.id) {

@@ -60,6 +60,15 @@ export default function GeneratePage() {
 
   const handlePrint = useCallback(() => { window.print(); }, []);
 
+  const handleDeleteDossier = useCallback((deletedId) => {
+    if (activeDossierId === deletedId) {
+      setContent("");
+      setActiveDossierId(null);
+      setWasPartial(false);
+      setErrorMessage(null);
+    }
+  }, [activeDossierId]);
+
   const loadDossier = useCallback(async (id) => {
     prevStateRef.current = { activeDossierId, content };
 
@@ -310,6 +319,7 @@ export default function GeneratePage() {
                 key={sidebarVersion}
                 onSelect={loadDossier}
                 activeId={activeDossierId}
+                onDelete={handleDeleteDossier}
               />
             </div>
           </aside>
