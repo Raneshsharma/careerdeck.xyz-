@@ -20,7 +20,9 @@ export async function GET() {
       .eq("id", session.user.id)
       .single()
     profile = data
-  } catch {}
+  } catch (err) {
+    console.error("Profile fetch error:", err)
+  }
 
   try {
     const { data, count } = await supabase
@@ -32,7 +34,9 @@ export async function GET() {
       .limit(10)
     recent = data || []
     usedThisMonth = count ?? recent.length
-  } catch {}
+  } catch (err) {
+    console.error("Generations fetch error:", err)
+  }
 
   const planLimit = profile?.plan_tier === "free" ? FREE_MONTHLY_LIMIT : 9999
 

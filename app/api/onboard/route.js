@@ -2,11 +2,23 @@ import { getServerSession } from "next-auth"
 import { authConfig } from "@/lib/auth.config"
 import { supabase } from "@/lib/supabase"
 
+const ALLOWED_INDUSTRIES = [
+  "Technology / SaaS", "Finance & Banking", "Consulting", "Healthcare & Pharma",
+  "Consumer Goods & Retail", "Media & Entertainment", "Energy & Utilities",
+  "Manufacturing", "Real Estate", "Education", "Other",
+]
+
+const ALLOWED_EXPERIENCE_LEVELS = [
+  "Entry Level (0–2 yrs)", "Mid Level (3–5 yrs)", "Senior Level (6–10 yrs)", "Executive (10+ yrs)",
+]
+
 export async function POST(request) {
   let session
   try {
     session = await getServerSession(authConfig)
-  } catch {}
+  } catch (err) {
+    console.error("Onboard session error:", err)
+  }
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
@@ -15,6 +27,14 @@ export async function POST(request) {
 
   if (!name?.trim() || !industry || !experienceLevel) {
     return Response.json({ error: "All fields are required" }, { status: 400 })
+  }
+
+  if (!ALLOWED_INDUSTRIES.includes(industry)) {
+    return Response.json({ error: "Invalid industry" }, { status: 400 })
+  }
+
+  if (!ALLOWED_EXPERIENCE_LEVELS.includes(experienceLevel)) {
+    return Response.json({ error: "Invalid experience level" }, { status: 400 })
   }
 
   try {

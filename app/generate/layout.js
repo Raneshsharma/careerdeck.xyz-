@@ -13,7 +13,9 @@ export default async function GenerateLayout({ children }) {
   let session
   try {
     session = await getServerSession(authConfig)
-  } catch {}
+  } catch (err) {
+    console.error("Generate layout session error:", err)
+  }
   if (!session?.user?.id) redirect("/auth")
 
   // Check / create profile
@@ -37,7 +39,8 @@ export default async function GenerateLayout({ children }) {
     }
 
     if (!profile.onboarded) redirect("/onboard")
-  } catch {
+  } catch (err) {
+    console.error("Generate layout error:", err)
     // If anything fails (Supabase down, etc.), let users proceed anyway
   }
 

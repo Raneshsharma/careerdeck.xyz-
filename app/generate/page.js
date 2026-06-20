@@ -200,13 +200,13 @@ export default function GeneratePage() {
 
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { emoji: "&#x1F4CA;", title: "4 Dossier Types", desc: "Company, Role, JD, and News — each with its own deep, structured framework." },
-                { emoji: "&#x1F50D;", title: "Real Data Powered", desc: "SerpAPI fetches financials, competitors, news, and salary data for real numbers." },
-                { emoji: "&#x1F3AF;", title: "Interview Focused", desc: "Every section includes talking points, smart questions, and likely interview topics." },
-                { emoji: "&#x26A1;", title: "MBA/Grad Optimized", desc: "Practical, business-aware language — never academic theory or encyclopedia fluff." },
+                { emoji: "\uD83D\uDCCA", title: "4 Dossier Types", desc: "Company, Role, JD, and News — each with its own deep, structured framework." },
+                { emoji: "\uD83D\uDD0D", title: "Real Data Powered", desc: "SerpAPI fetches financials, competitors, news, and salary data for real numbers." },
+                { emoji: "\uD83C\uDFAF", title: "Interview Focused", desc: "Every section includes talking points, smart questions, and likely interview topics." },
+                { emoji: "\u26A1", title: "MBA/Grad Optimized", desc: "Practical, business-aware language — never academic theory or encyclopedia fluff." },
               ].map((card) => (
                 <div key={card.title} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-5">
-                  <p className="text-2xl mb-2" dangerouslySetInnerHTML={{ __html: card.emoji }} />
+                  <p className="text-2xl mb-2">{card.emoji}</p>
                   <h3 className="font-semibold text-gray-800 mb-1">{card.title}</h3>
                   <p className="text-sm text-gray-500">{card.desc}</p>
                 </div>

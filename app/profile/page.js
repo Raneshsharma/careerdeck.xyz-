@@ -25,7 +25,7 @@ export default function ProfilePage() {
         setProfile(data.profile)
         setUsage(data.usage)
       })
-      .catch(() => {})
+      .catch((err) => console.error("Profile fetch error:", err))
       .finally(() => setLoading(false))
   }, [status])
 

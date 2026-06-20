@@ -420,14 +420,17 @@ export async function POST(request) {
     const { stream } = emitter;
     const stopHeartbeat = startHeartbeat(emitter);
 
+    // Record generation before streaming to close race window
+    recordGeneration(session.user.id, dosType, cName, rName).catch((err) => {
+      console.error("recordGeneration error:", err);
+    });
+
     const abort = new AbortController();
-    const userId = session.user.id;
     streamFn(abort.signal)
       .then((body) => procFn(body, emitter))
       .then(() => {
         try { emitter.close(); } catch {}
         release(request, false);
-        recordGeneration(userId, dosType, cName, rName).catch(() => {});
       })
       .catch((e) => {
         if (e.name !== "AbortError") {

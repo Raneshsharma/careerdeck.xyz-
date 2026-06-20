@@ -53,7 +53,7 @@ export default function OnboardPage() {
       .then((data) => {
         if (data?.profile?.onboarded) router.replace("/generate")
       })
-      .catch(() => {})
+      .catch((err) => console.error("Onboard check error:", err))
       .finally(() => setCheckingOnboarded(false))
   }, [status, router])
 
