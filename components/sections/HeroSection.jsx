@@ -55,12 +55,6 @@ export default function HeroSection() {
           </Link>
           {status === "authenticated" ? (
             <div className="flex items-center gap-3">
-              <Link
-                href="/profile"
-                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                Profile
-              </Link>
               <button
                 type="button"
                 onClick={() => signOut()}
