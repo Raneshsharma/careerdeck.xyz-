@@ -367,7 +367,7 @@ export async function POST(request) {
     let userPrompt;
     switch (dosType) {
       case "company":
-        userPrompt = buildCompanyPrompt(cName, newsData, companyResearch);
+        userPrompt = buildCompanyPrompt(cName, newsData, companyResearch, rName, jd);
         break;
       case "role":
         userPrompt = buildRolePrompt(rName, cName || "", roleResearch);
