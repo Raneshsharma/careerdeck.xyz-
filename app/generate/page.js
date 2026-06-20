@@ -9,6 +9,7 @@ import DossierForm from "@/components/DossierForm";
 import DossierResult from "@/components/DossierResult";
 import SectionNav from "@/components/SectionNav";
 import NonReversingReveal from "@/components/NonReversingReveal";
+import UserMenu from "@/components/UserMenu";
 
 const DOSSIER_LABELS = {
   company: "Company Dossier",
@@ -175,9 +176,8 @@ export default function GeneratePage() {
           <Link href="/" className="flex items-center">
             <Image src="/logo.png" alt="CareerDeck" height={32} width={48} className="h-8 w-auto" />
           </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/profile" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Profile</Link>
-            <Link href="/" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Home</Link>
+          <nav className="flex items-center">
+            <UserMenu />
           </nav>
         </div>
       </header>

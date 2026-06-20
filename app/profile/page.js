@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import UserMenu from "@/components/UserMenu"
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
@@ -47,7 +48,7 @@ export default function ProfilePage() {
           <Link href="/generate" className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-all duration-200">
             Generate
           </Link>
-          <Link href="/" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Home</Link>
+          <UserMenu />
         </div>
       </header>
 
