@@ -77,7 +77,7 @@ export default function LandingHeader() {
           <button
             type="button"
             onClick={() => signIn("google", { callbackUrl: "/generate" })}
-            className="text-xs font-semibold px-4 py-2 rounded-lg border border-gray-200/80 hover:border-gray-300 hover:bg-gray-50 text-gray-700 transition-all duration-200"
+            className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200"
           >
             Sign In
           </button>
