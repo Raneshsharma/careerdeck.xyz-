@@ -1,7 +1,8 @@
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { authConfig } from "@/lib/auth.config"
-import { getProfile, createProfile } from "@/lib/generation-limits"
+import { supabase } from "@/lib/supabase"
+import { FREE_MONTHLY_LIMIT } from "@/lib/generation-limits"
 
 export const metadata = {
   title: "Generate Dossier — CareerDeck",
@@ -10,24 +11,36 @@ export const metadata = {
 }
 
 export default async function GenerateLayout({ children }) {
-  const session = await getServerSession(authConfig)
+  let session
+  try {
+    session = await getServerSession(authConfig)
+  } catch {}
   if (!session?.user?.id) redirect("/auth")
 
-  let profile = await getProfile(session.user.id).catch(() => null)
+  // Check / create profile
+  try {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", session.user.id)
+      .single()
 
-  if (!profile) {
-    await createProfile({
-      id: session.user.id,
-      email: session.user.email,
-      name: session.user.name,
-      avatar_url: session.user.image,
-      plan_tier: "free",
-      onboarded: false,
-    })
-    redirect("/onboard")
+    if (!profile) {
+      await supabase.from("profiles").upsert({
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        avatar_url: session.user.image,
+        plan_tier: "free",
+        onboarded: false,
+      })
+      redirect("/onboard")
+    }
+
+    if (!profile.onboarded) redirect("/onboard")
+  } catch {
+    // If anything fails (Supabase down, etc.), let users proceed anyway
   }
-
-  if (!profile.onboarded) redirect("/onboard")
 
   return <>{children}</>
 }
