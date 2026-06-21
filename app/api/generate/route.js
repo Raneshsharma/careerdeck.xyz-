@@ -373,7 +373,7 @@ export async function POST(request) {
         userPrompt = buildCompanyPrompt(cName, newsData, companyResearch, rName, jd);
         break;
       case "role":
-        userPrompt = buildRolePrompt(rName, cName || "", roleResearch);
+        userPrompt = buildRolePrompt(rName, cName || "", roleResearch, jd);
         break;
       case "jd":
         userPrompt = buildJDPrompt(cName, rName, jd, newsData, companyResearch);
