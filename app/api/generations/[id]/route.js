@@ -45,7 +45,7 @@ export async function GET(request, { params }) {
   try {
     const { data, error } = await supabase
       .from("generations")
-      .select("id, user_id, dossier_type, company_name, role, created_at, content")
+      .select("id, user_id, dossier_type, company_name, role, created_at")
       .eq("id", id)
       .single()
 
@@ -57,7 +57,15 @@ export async function GET(request, { params }) {
       return Response.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    return Response.json({ generation: data })
+    // Optionally fetch content column (may not exist yet)
+    const { data: contentRow } = await supabase
+      .from("generations")
+      .select("content")
+      .eq("id", id)
+      .single()
+      .catch(() => ({ data: null }))
+
+    return Response.json({ generation: { ...data, content: contentRow?.content || null } })
   } catch (err) {
     console.error("Generation fetch error:", err)
     return Response.json({ error: "Failed to fetch generation" }, { status: 500 })
@@ -93,7 +101,13 @@ export async function PATCH(request, { params }) {
       .update({ content })
       .eq("id", id)
 
-    if (error) throw error
+    if (error) {
+      // If column doesn't exist, ignore silently
+      if (error.message?.includes("column") || error.code === "PGRST204") {
+        return Response.json({ ok: true, note: "content column not available" })
+      }
+      throw error
+    }
     return Response.json({ ok: true })
   } catch (err) {
     console.error("Generation update error:", err)
