@@ -35,14 +35,15 @@ export async function DELETE(request, { params }) {
 }
 
 export async function GET(request, { params }) {
-  const session = await getServerSession(authConfig)
-  if (!session?.user?.id) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  const { id } = params
-
   try {
+    const session = await getServerSession(authConfig)
+    if (!session?.user?.id) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const { id } = params
+    console.log("GET generation id:", id)
+
     const { data, error } = await supabase
       .from("generations")
       .select("id, user_id, dossier_type, company_name, role, created_at")
@@ -50,6 +51,7 @@ export async function GET(request, { params }) {
       .single()
 
     if (error || !data) {
+      console.error("GET generation supabase error:", error, "data:", data)
       return Response.json({ error: "Not found" }, { status: 404 })
     }
 
@@ -57,18 +59,18 @@ export async function GET(request, { params }) {
       return Response.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    // Optionally fetch content column (may not exist yet)
-    const { data: contentRow } = await supabase
+    let content = null
+    const { data: contentData } = await supabase
       .from("generations")
       .select("content")
       .eq("id", id)
       .single()
-      .catch(() => ({ data: null }))
+    if (contentData) content = contentData.content
 
-    return Response.json({ generation: { ...data, content: contentRow?.content || null } })
+    return Response.json({ generation: { ...data, content } })
   } catch (err) {
-    console.error("Generation fetch error:", err)
-    return Response.json({ error: "Failed to fetch generation" }, { status: 500 })
+    console.error("Generation fetch error:", err?.message || err, "stack:", err?.stack)
+    return Response.json({ error: "Failed to fetch generation: " + (err?.message || "Unknown") }, { status: 500 })
   }
 }
 
