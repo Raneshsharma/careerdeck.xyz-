@@ -7,7 +7,7 @@ import { buildNewsPrompt } from "@/lib/prompt-news";
 import { extractCompanyFacts } from "@/lib/extract-facts-structured";
 import {
   fetchCompanyNews,
-  researchCompany,
+  researchCompanyWikipedia,
   researchRole,
 } from "@/lib/research";
 import { tryAcquire, release, cancel } from "@/lib/rate-limiter";
@@ -236,6 +236,10 @@ function formatResearchSnippets(data) {
 function buildResearchInjection(research) {
   if (!research) return "";
 
+  if (research.extract) {
+    return `\nRESEARCH DATA (verified by Wikipedia — use these EXACT facts, cite them):\n${research.extract}\n[Source: ${research.pageUrl}]\n`;
+  }
+
   let text = "\nRESEARCH DATA (verified by SerpAPI — use these EXACT numbers, cite them):\n";
 
   if (research.financials?.data?.length) {
@@ -275,6 +279,14 @@ function buildSalaryInjection(salaryData) {
 }
 
 function buildPlainText(research, news) {
+  if (research?.extract) {
+    let text = research.extract;
+    if (Array.isArray(news) && news.length) {
+      text += "\n\n--- RECENT NEWS ---\n" + news.map((d) => `${d.title}: ${d.snippet}`).join("\n");
+    }
+    return text;
+  }
+
   const parts = [];
   if (research?.financials?.data?.length) {
     parts.push(...research.financials.data.map((d) => d.snippet));
@@ -370,7 +382,7 @@ export async function POST(request) {
 
     if (cName && (dosType === "company" || dosType === "jd" || dosType === "news")) {
       const [research, news] = await Promise.all([
-        researchCompany(cName).catch(() => null),
+        researchCompanyWikipedia(cName).catch(() => null),
         fetchCompanyNews(cName, daysBack).catch(() => null),
       ]);
       companyResearch = research;
@@ -391,10 +403,17 @@ export async function POST(request) {
     let userPrompt;
     switch (dosType) {
       case "company":
-        const researchText = JSON.stringify(companyResearch) + '\n\n' + JSON.stringify(newsData);
+        const researchText = buildPlainText(companyResearch, newsData);
         console.log("=== PLAIN TEXT LENGTH:", researchText.length);
         console.log("=== FIRST 200 CHARS:", researchText.substring(0, 200));
         const facts = await extractCompanyFacts(researchText);
+        if (!facts || facts.length === 0) {
+          console.log("=== EXTRACTOR RETURNED EMPTY, USING FALLBACK ===");
+          const fallbackText = buildPlainText(companyResearch, newsData);
+          if (fallbackText) {
+            facts.push(...fallbackText.split("\n\n").filter(Boolean));
+          }
+        }
         const factList = facts.map((f) => `- ${f}`).join("\n");
         console.log("===== EXTRACTED FACTS =====");
         console.log(factList);
