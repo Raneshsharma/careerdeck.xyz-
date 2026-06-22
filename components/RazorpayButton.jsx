@@ -30,7 +30,7 @@ export default function RazorpayButton({ plan, label, className }) {
     }
 
     sessionStorage.setItem("upgradePlan", plan);
-    router.push("/auth?upgrade=" + plan);
+    router.push("/auth");
   }
 
   return (

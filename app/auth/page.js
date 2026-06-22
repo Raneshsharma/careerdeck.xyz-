@@ -1,22 +1,19 @@
 "use client";
 
 import { signIn, useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, Suspense } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Image from "next/image";
 
-function AuthContent() {
+export default function AuthPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const upgrade = searchParams.get("upgrade");
-  const callbackUrl = "/generate" + (upgrade ? "?upgrade=" + upgrade : "");
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace(callbackUrl);
+      router.replace("/generate");
     }
-  }, [status, router, callbackUrl]);
+  }, [status, router]);
 
   if (status === "authenticated") return null;
 
@@ -43,7 +40,7 @@ function AuthContent() {
 
         <button
           type="button"
-          onClick={() => signIn("google", { callbackUrl })}
+          onClick={() => signIn("google", { callbackUrl: "/generate" })}
           disabled={status === "loading"}
           className="w-full flex items-center justify-center gap-3 h-14 rounded-2xl bg-white border border-gray-200/80 hover:border-gray-300 hover:bg-gray-50 text-[#0F172A] font-semibold text-sm transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -61,13 +58,5 @@ function AuthContent() {
         </p>
       </div>
     </div>
-  );
-}
-
-export default function AuthPage() {
-  return (
-    <Suspense fallback={null}>
-      <AuthContent />
-    </Suspense>
   );
 }

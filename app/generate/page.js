@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -44,14 +43,12 @@ export default function GeneratePage() {
   const abortRef = useRef(null);
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
 
-  const searchParams = useSearchParams();
   const { status: authStatus } = useSession();
   const upgradeDone = useRef(false);
 
   useEffect(() => {
     if (upgradeDone.current) return;
-    const upgrade = searchParams.get("upgrade");
-    if (!upgrade || authStatus !== "authenticated") return;
+    if (authStatus !== "authenticated") return;
 
     const plan = sessionStorage.getItem("upgradePlan");
     if (!plan || !["pro", "enterprise"].includes(plan)) return;
@@ -62,9 +59,6 @@ export default function GeneratePage() {
       try {
         await executePayment(plan);
         sessionStorage.removeItem("upgradePlan");
-        const url = new URL(window.location.href);
-        url.searchParams.delete("upgrade");
-        window.history.replaceState({}, "", url);
       } catch (e) {
         if (e.message === "CANCELLED") return;
         console.error("Auto-upgrade failed:", e.message);
@@ -72,7 +66,7 @@ export default function GeneratePage() {
     }, 800);
 
     return () => clearTimeout(timer);
-  }, [authStatus, searchParams]);
+  }, [authStatus]);
 
   const wordCount = useMemo(() => content.split(/\s+/).filter(Boolean).length, [content]);
   const minRead = useMemo(() => Math.ceil(wordCount / 250), [wordCount]);
