@@ -4,7 +4,7 @@ import { buildCompanyPrompt } from "@/lib/prompt-company";
 import { buildRolePrompt } from "@/lib/prompt-role";
 import { buildJDPrompt } from "@/lib/prompt-jd";
 import { buildNewsPrompt } from "@/lib/prompt-news";
-import { extractFacts } from "@/lib/extract-facts";
+import { extractCompanyFacts } from "@/lib/extract-facts-structured";
 import {
   fetchCompanyNews,
   researchCompany,
@@ -274,6 +274,26 @@ function buildSalaryInjection(salaryData) {
   return text;
 }
 
+function buildPlainText(research, news) {
+  const parts = [];
+  if (research?.financials?.data?.length) {
+    parts.push(...research.financials.data.map((d) => d.snippet));
+  }
+  if (research?.competitors?.data?.length) {
+    parts.push(...research.competitors.data.map((d) => d.snippet));
+  }
+  if (research?.industry?.data?.length) {
+    parts.push(...research.industry.data.map((d) => d.snippet));
+  }
+  if (research?.profile?.data?.length) {
+    parts.push(...research.profile.data.map((d) => d.snippet));
+  }
+  if (Array.isArray(news)) {
+    parts.push(...news.map((d) => `${d.title}: ${d.snippet}`));
+  }
+  return parts.join("\n\n");
+}
+
 // ─── Route handler ──────────────────────────────────────────────────────
 
 export async function POST(request) {
@@ -371,7 +391,9 @@ export async function POST(request) {
     let userPrompt;
     switch (dosType) {
       case "company":
-        const factList = await extractFacts(companyResearch, newsData);
+        const researchText = buildPlainText(companyResearch, newsData);
+        const { facts } = await extractCompanyFacts(researchText);
+        const factList = facts.map((f) => `- ${f}`).join("\n");
         console.log("===== EXTRACTED FACTS =====");
         console.log(factList);
         console.log("===========================");
