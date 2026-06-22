@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authConfig } from "@/lib/auth.config";
+import { createClient } from "@/lib/supabase-server";
 import { buildCompanyPrompt } from "@/lib/prompt-company";
 import { buildRolePrompt } from "@/lib/prompt-role";
 import { buildJDPrompt } from "@/lib/prompt-jd";
@@ -342,15 +341,16 @@ export async function POST(request) {
 
   try {
     // ── Auth check ──
-    const session = await getServerSession(authConfig);
-    if (!session?.user?.id) {
+    const supabaseAuth = await createClient();
+    const { data: { user } } = await supabaseAuth.auth.getUser();
+    if (!user) {
       return Response.json({ error: "Sign in required" }, { status: 401 });
     }
 
     // ── Generation limit check ──
-    const isAdmin = session.user.email === "raneshsharma33@gmail.com";
+    const isAdmin = user.email === "raneshsharma33@gmail.com";
     if (!isAdmin) {
-      const profile = await getProfile(session.user.id).catch(() => null);
+      const profile = await getProfile(user.id).catch(() => null);
       const planLimit = profile?.plan_tier === "free" ? FREE_MONTHLY_LIMIT : 9999;
       const usedThisMonth = await getGenerationsThisMonth(session.user.id).catch(() => 0);
       if (usedThisMonth >= planLimit) {
@@ -524,7 +524,7 @@ export async function POST(request) {
     const stopHeartbeat = startHeartbeat(emitter);
 
     // Record generation before streaming to close race window
-    const genId = await recordGeneration(session.user.id, dosType, cName, rName);
+    const genId = await recordGeneration(user.id, dosType, cName, rName);
     if (genId) {
       try { emitter.emit("gen-id", { id: genId }); } catch {}
     }

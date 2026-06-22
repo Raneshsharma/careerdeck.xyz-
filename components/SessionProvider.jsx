@@ -1,11 +1,37 @@
 "use client";
 
-import { SessionProvider as NextAuthSessionProvider } from "next-auth/react";
+import { createClient } from "@/lib/supabase-client";
+import { createContext, useContext, useEffect, useState } from "react";
 
-export default function SessionProvider({ children, session }) {
+const AuthContext = createContext({ user: null, loading: true });
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
+export default function SessionProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => listener?.subscription?.unsubscribe();
+  }, []);
+
   return (
-    <NextAuthSessionProvider session={session}>
+    <AuthContext.Provider value={{ user, loading }}>
       {children}
-    </NextAuthSessionProvider>
+    </AuthContext.Provider>
   );
 }

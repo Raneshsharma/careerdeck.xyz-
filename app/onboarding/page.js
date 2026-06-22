@@ -1,6 +1,6 @@
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/components/SessionProvider"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Image from "next/image"
@@ -28,7 +28,7 @@ const EXPERIENCE_LEVELS = [
 ]
 
 export default function OnboardPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
 
   const [name, setName] = useState("")
@@ -39,25 +39,26 @@ export default function OnboardPage() {
   const [checkingOnboarded, setCheckingOnboarded] = useState(true)
 
   useEffect(() => {
-    if (status === "unauthenticated") router.replace("/auth")
-  }, [status, router])
+    if (!user && !loading) router.replace("/auth")
+  }, [user, loading, router])
 
   useEffect(() => {
-    if (session?.user?.name) setName(session.user.name)
-  }, [session])
+    const displayName = user?.user_metadata?.full_name || user?.email
+    if (displayName) setName(displayName)
+  }, [user])
 
   useEffect(() => {
-    if (status !== "authenticated") return
+    if (!user) return
     fetch("/api/profile")
       .then((r) => r.json())
       .then((data) => {
-        if (data?.profile?.onboarded) router.replace("/generate")
+        if (data?.profile?.onboarded) router.replace("/dashboard")
       })
       .catch((err) => console.error("Onboard check error:", err))
       .finally(() => setCheckingOnboarded(false))
-  }, [status, router])
+  }, [user, loading, router])
 
-  if (status !== "authenticated" || checkingOnboarded) return null
+  if (!user || checkingOnboarded) return null
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -68,7 +69,7 @@ export default function OnboardPage() {
 
     setSaving(true)
     try {
-      const res = await fetch("/api/onboard", {
+      const res = await fetch("/api/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -82,7 +83,7 @@ export default function OnboardPage() {
         throw new Error(err.error || "Failed to save")
       }
       toast.success("Profile saved!")
-      router.replace("/generate")
+      router.replace("/dashboard")
     } catch (err) {
       toast.error(err.message)
     } finally {

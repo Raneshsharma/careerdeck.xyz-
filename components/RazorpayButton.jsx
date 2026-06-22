@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/components/SessionProvider";
 import { useRouter } from "next/navigation";
 import { executePayment } from "@/lib/razorpay-checkout";
 
 export default function RazorpayButton({ plan, label, className }) {
-  const { status } = useSession();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -14,7 +14,7 @@ export default function RazorpayButton({ plan, label, className }) {
   async function handleClick() {
     setError(null);
 
-    if (status === "authenticated") {
+    if (!!user) {
       setLoading(true);
       try {
         await executePayment(plan);
@@ -40,7 +40,7 @@ export default function RazorpayButton({ plan, label, className }) {
         disabled={loading}
         className={className}
       >
-        {loading ? "Processing..." : status === "loading" ? "Loading..." : label}
+        {loading ? "Processing..." : authLoading ? "Loading..." : label}
       </button>
       {error && (
         <p className="mt-2 text-xs text-red-600 text-center">{error}</p>

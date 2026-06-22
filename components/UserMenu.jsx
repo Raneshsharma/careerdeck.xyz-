@@ -1,24 +1,25 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useAuth } from "@/components/SessionProvider";
+import { createClient } from "@/lib/supabase-client";
 import { useRouter } from "next/navigation";
 
 export default function UserMenu() {
-  const { data: session, status } = useSession();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const menuRef = useRef(null);
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (!!user) {
       fetch("/api/profile")
         .then((r) => r.json())
         .then((data) => setProfileData(data))
         .catch(() => {});
     }
-  }, [status]);
+  }, [user, loading]);
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -28,9 +29,9 @@ export default function UserMenu() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  if (status !== "authenticated") return null;
+  if (!user) return null;
 
-  const initial = (session.user?.name || "U")[0].toUpperCase();
+  const initial = (user?.user_metadata?.full_name || user?.email || "U")[0].toUpperCase();
   const used = profileData?.usage?.used ?? 0;
   const limit = profileData?.usage?.limit ?? 3;
   const remaining = Math.max(limit - used, 0);
@@ -54,9 +55,9 @@ export default function UserMenu() {
             </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-[#0F172A] truncate">
-                {profileData?.profile?.name || session.user?.name}
+                {profileData?.profile?.name || user?.user_metadata?.full_name || user?.email}
               </p>
-              <p className="text-xs text-[#64748B] truncate">{session.user?.email}</p>
+              <p className="text-xs text-[#64748B] truncate">{user?.email}</p>
             </div>
           </div>
 
@@ -85,7 +86,7 @@ export default function UserMenu() {
 
           {/* Sign out */}
           <button
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={() => { createClient().auth.signOut().then(() => router.push("/")); }}
             className="w-full text-left text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 py-1.5 px-2 rounded-lg transition-colors mt-0.5"
           >
             Sign Out

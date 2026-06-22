@@ -69,7 +69,7 @@ export default function HeroSection() {
                 Generate Your First Dossier &rarr;
               </Link>
               <Link
-                href="/generate"
+                href="/dashboard"
                 className="inline-flex items-center justify-center h-12 px-6 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200/80 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-sm shadow-sm"
               >
                 View Sample Report

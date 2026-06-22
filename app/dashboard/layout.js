@@ -1,6 +1,5 @@
-import { getServerSession } from "next-auth"
-import { redirect } from "next/navigation"
-import { authConfig } from "@/lib/auth.config"
+import { createClient } from "@/lib/supabase-server";
+import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase"
 
 export const metadata = {
@@ -10,35 +9,37 @@ export const metadata = {
 }
 
 export default async function GenerateLayout({ children }) {
-  let session
+  let user
   try {
-    session = await getServerSession(authConfig)
+    const supabaseAuth = await createClient();
+    const { data } = await supabaseAuth.auth.getUser();
+    user = data.user;
   } catch (err) {
     console.error("Generate layout session error:", err)
   }
-  if (!session?.user?.id) redirect("/auth")
+  if (!user?.id) redirect("/auth")
 
   // Check / create profile
   try {
     const { data: profile } = await supabase
       .from("profiles")
       .select("*")
-      .eq("id", session.user.id)
+      .eq("id", user.id)
       .single()
 
     if (!profile) {
       await supabase.from("profiles").upsert({
-        id: session.user.id,
-        email: session.user.email,
-        name: session.user.name,
-        avatar_url: session.user.image,
+        id: user.id,
+        email: user.email,
+        name: user.user_metadata?.full_name,
+        avatar_url: user.user_metadata?.avatar_url,
         plan_tier: "free",
         onboarded: false,
       })
-      redirect("/onboard")
+      redirect("/onboarding")
     }
 
-    if (!profile.onboarded) redirect("/onboard")
+    if (!profile.onboarded) redirect("/onboarding")
   } catch (err) {
     console.error("Generate layout error:", err)
     // If anything fails (Supabase down, etc.), let users proceed anyway

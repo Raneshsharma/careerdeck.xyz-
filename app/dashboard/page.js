@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/components/SessionProvider";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -12,7 +12,6 @@ import SectionNav from "@/components/SectionNav";
 import HistorySidebar from "@/components/HistorySidebar";
 import NonReversingReveal from "@/components/NonReversingReveal";
 import UserMenu from "@/components/UserMenu";
-import { executePayment } from "@/lib/razorpay-checkout";
 
 const DOSSIER_LABELS = {
   company: "Company Dossier",
@@ -43,30 +42,7 @@ export default function GeneratePage() {
   const abortRef = useRef(null);
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
 
-  const { status: authStatus } = useSession();
-  const upgradeDone = useRef(false);
-
-  useEffect(() => {
-    if (upgradeDone.current) return;
-    if (authStatus !== "authenticated") return;
-
-    const plan = sessionStorage.getItem("upgradePlan");
-    if (!plan || !["pro", "enterprise"].includes(plan)) return;
-
-    upgradeDone.current = true;
-
-    const timer = setTimeout(async () => {
-      try {
-        await executePayment(plan);
-        sessionStorage.removeItem("upgradePlan");
-      } catch (e) {
-        if (e.message === "CANCELLED") return;
-        console.error("Auto-upgrade failed:", e.message);
-      }
-    }, 800);
-
-    return () => clearTimeout(timer);
-  }, [authStatus]);
+  const { user, loading } = useAuth();
 
   const wordCount = useMemo(() => content.split(/\s+/).filter(Boolean).length, [content]);
   const minRead = useMemo(() => Math.ceil(wordCount / 250), [wordCount]);

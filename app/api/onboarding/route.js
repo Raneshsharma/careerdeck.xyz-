@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth"
-import { authConfig } from "@/lib/auth.config"
+import { createClient } from "@/lib/supabase-server";
 import { supabase } from "@/lib/supabase"
 
 const ALLOWED_INDUSTRIES = [
@@ -13,13 +12,15 @@ const ALLOWED_EXPERIENCE_LEVELS = [
 ]
 
 export async function POST(request) {
-  let session
+  let user
   try {
-    session = await getServerSession(authConfig)
+    const supabaseAuth = await createClient();
+    const { data } = await supabaseAuth.auth.getUser();
+    user = data.user;
   } catch (err) {
     console.error("Onboard session error:", err)
   }
-  if (!session?.user?.id) {
+  if (!user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -39,10 +40,10 @@ export async function POST(request) {
 
   try {
     const { error } = await supabase.from("profiles").upsert({
-      id: session.user.id,
-      email: session.user.email,
+      id:     user.id,
+      email: user.email,
       name: name.trim(),
-      avatar_url: session.user.image,
+      avatar_url: user.user_metadata?.avatar_url,
       industry,
       experience_level: experienceLevel,
       plan_tier: "free",

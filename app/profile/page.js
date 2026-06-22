@@ -1,6 +1,7 @@
 "use client"
 
-import { useSession, signOut } from "next-auth/react"
+import { useAuth } from "@/components/SessionProvider"
+import { createClient } from "@/lib/supabase-client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Image from "next/image"
@@ -9,7 +10,7 @@ import UserMenu from "@/components/UserMenu"
 import toast from "react-hot-toast"
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const [profile, setProfile] = useState(null)
   const [usage, setUsage] = useState(null)
@@ -18,11 +19,11 @@ export default function ProfilePage() {
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
-    if (status === "unauthenticated") router.replace("/auth")
-  }, [status, router])
+    if (!user && !authLoading) router.replace("/auth")
+  }, [user, authLoading, router])
 
   useEffect(() => {
-    if (status !== "authenticated") return
+    if (!user) return
     fetch("/api/profile")
       .then((r) => r.json())
       .then((data) => {
@@ -31,9 +32,9 @@ export default function ProfilePage() {
       })
       .catch((err) => console.error("Profile fetch error:", err))
       .finally(() => setLoading(false))
-  }, [status])
+  }, [user, authLoading])
 
-  if (status !== "authenticated") return null
+  if (!user) return null
 
   const planName = profile?.plan_tier === "free" ? "Free" : "Pro"
   const planColor = profile?.plan_tier === "free" ? "bg-gray-100 text-gray-700" : "bg-amber-100 text-amber-700"
@@ -48,7 +49,7 @@ export default function ProfilePage() {
           <Image src="/logo.png" alt="CareerDeck" height={40} width={60} className="h-10 w-auto" />
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/generate" className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-all duration-200">
+          <Link href="/dashboard" className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-all duration-200">
             Generate
           </Link>
           <UserMenu />
@@ -63,16 +64,16 @@ export default function ProfilePage() {
             {/* User Info Card */}
             <div className="bg-white rounded-2xl border border-gray-200/80 p-8 shadow-sm">
               <div className="flex items-center gap-5">
-                {session.user?.image ? (
-                  <Image src={session.user.image} alt="" height={64} width={64} className="rounded-full" />
+                {user?.user_metadata?.avatar_url ? (
+                  <Image src={user.user_metadata.avatar_url} alt="" height={64} width={64} className="rounded-full" />
                 ) : (
                   <div className="w-16 h-16 rounded-full bg-amber-500 flex items-center justify-center text-white text-xl font-bold">
-                    {(session.user?.name || "U")[0]}
+                    {(user?.user_metadata?.full_name || user?.email || "U")[0]}
                   </div>
                 )}
                 <div>
-                  <h1 className="text-2xl font-extrabold text-[#0F172A]">{profile?.name || session.user?.name}</h1>
-                  <p className="text-sm text-[#64748B]">{session.user?.email}</p>
+                  <h1 className="text-2xl font-extrabold text-[#0F172A]">{profile?.name || user?.user_metadata?.full_name || user?.email}</h1>
+                  <p className="text-sm text-[#64748B]">{user?.email}</p>
                   {profile?.industry && (
                     <p className="text-xs text-[#94A3B8] mt-1">{profile.industry} &middot; {profile.experience_level}</p>
                   )}
@@ -147,7 +148,8 @@ export default function ProfilePage() {
                     const res = await fetch("/api/delete-account", { method: "DELETE" })
                     if (!res.ok) throw new Error()
                     toast.success("Account deleted")
-                    signOut({ callbackUrl: "/" })
+                    await createClient().auth.signOut()
+                    router.push("/")
                   } catch {
                     toast.error("Failed to delete account")
                     setDeleting(false)

@@ -1,10 +1,10 @@
-import { getServerSession } from "next-auth"
-import { authConfig } from "@/lib/auth.config"
+import { createClient } from "@/lib/supabase-server";
 import { supabase } from "@/lib/supabase"
 
 export async function DELETE(request, { params }) {
-  const session = await getServerSession(authConfig)
-  if (!session?.user?.id) {
+  const supabaseAuth = await createClient();
+  const { data: { user } } = await supabaseAuth.auth.getUser();
+  if (!user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -17,7 +17,7 @@ export async function DELETE(request, { params }) {
       .eq("id", id)
       .single()
 
-    if (!existing || existing.user_id !== session.user.id) {
+    if (!existing || existing.user_id !== user.id) {
       return Response.json({ error: "Not found" }, { status: 404 })
     }
 
@@ -36,8 +36,9 @@ export async function DELETE(request, { params }) {
 
 export async function GET(request, { params }) {
   try {
-    const session = await getServerSession(authConfig)
-    if (!session?.user?.id) {
+    const supabaseAuth2 = await createClient();
+    const { data: { user: user2 } } = await supabaseAuth2.auth.getUser();
+    if (!user2) {
       return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -55,7 +56,7 @@ export async function GET(request, { params }) {
       return Response.json({ error: "Not found" }, { status: 404 })
     }
 
-    if (data.user_id !== session.user.id) {
+    if (data.user_id !== user2.id) {
       return Response.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -75,8 +76,9 @@ export async function GET(request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
-  const session = await getServerSession(authConfig)
-  if (!session?.user?.id) {
+  const supabaseAuth3 = await createClient();
+  const { data: { user: user3 } } = await supabaseAuth3.auth.getUser();
+  if (!user3) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -94,7 +96,7 @@ export async function PATCH(request, { params }) {
       .eq("id", id)
       .single()
 
-    if (!existing || existing.user_id !== session.user.id) {
+    if (!existing || existing.user_id !== user3.id) {
       return Response.json({ error: "Not found" }, { status: 404 })
     }
 

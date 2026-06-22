@@ -3,10 +3,13 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/SessionProvider";
+import { createClient } from "@/lib/supabase-client";
 
 export default function LandingHeader() {
-  const { data: session, status } = useSession();
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [hovering, setHovering] = useState(false);
 
@@ -50,33 +53,33 @@ export default function LandingHeader() {
         >
           Generate
         </Link>
-        {status === "authenticated" ? (
+        {!!user ? (
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => signOut()}
+              onClick={() => { createClient().auth.signOut().then(() => router.push("/")); }}
               className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
             >
               Sign Out
             </button>
-            {session.user?.image ? (
+            {user?.user_metadata?.avatar_url ? (
               <Image
-                src={session.user.image}
-                alt={session.user.name || ""}
+                src={user.user_metadata.avatar_url}
+                alt={user.user_metadata?.full_name || user.email || ""}
                 height={28}
                 width={28}
                 className="rounded-full"
               />
             ) : (
               <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center text-white text-[10px] font-bold">
-                {(session.user?.name || "U")[0]}
+                {(user?.user_metadata?.full_name || user?.email || "U")[0]}
               </div>
             )}
           </div>
         ) : (
           <button
             type="button"
-            onClick={() => signIn("google", { callbackUrl: "/generate" })}
+            onClick={() => { const supabase = createClient(); supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback` } }); }}
             className="text-xs font-semibold px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white transition-all duration-200"
           >
             Sign In

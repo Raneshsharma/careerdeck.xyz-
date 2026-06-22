@@ -50,7 +50,7 @@ export default function CTASection() {
 
         <div className="mt-12 flex items-center justify-center gap-8 text-xs text-[#94A3B8]">
           <Link href="/" className="hover:text-[#64748B] transition-colors">Home</Link>
-          <Link href="/generate" className="hover:text-[#64748B] transition-colors">Generate</Link>
+          <Link href="/dashboard" className="hover:text-[#64748B] transition-colors">Generate</Link>
           <Link href="/auth" className="hover:text-[#64748B] transition-colors">Sign In</Link>
         </div>
         <p className="mt-4 text-xs text-[#94A3B8]">

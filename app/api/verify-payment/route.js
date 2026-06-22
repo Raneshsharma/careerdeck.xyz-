@@ -1,12 +1,12 @@
 import { createHmac } from "crypto";
-import { getServerSession } from "next-auth";
-import { authConfig } from "@/lib/auth.config";
+import { createClient } from "@/lib/supabase-server";
 import { supabase } from "@/lib/supabase";
 
 export async function POST(request) {
   try {
-    const session = await getServerSession(authConfig);
-    if (!session?.user?.id) {
+    const supabaseAuth = await createClient();
+    const { data: { user } } = await supabaseAuth.auth.getUser();
+    if (!user) {
       return Response.json({ error: "Sign in required" }, { status: 401 });
     }
 
@@ -31,7 +31,7 @@ export async function POST(request) {
     if (plan && ["pro", "enterprise"].includes(plan)) {
       const { error: dbErr } = await supabase
         .from("profiles")
-        .upsert({ id: session.user.id, plan_tier: plan })
+        .upsert({ id: user.id, plan_tier: plan })
         .select("id")
         .single();
 
