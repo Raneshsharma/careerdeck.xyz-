@@ -38,19 +38,19 @@ export default function CTASection() {
                 placeholder="your@email.com"
                 className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200/80 bg-white text-[#0F172A] text-sm placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#F28C28]/30 focus:border-[#F28C28]/50 transition-all"
               />
-              <button
-                type="button"
-                className="px-5 py-2.5 rounded-xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] text-sm font-bold transition-all duration-200 shrink-0"
+              <Link
+                href="/auth"
+                className="inline-flex items-center px-5 py-2.5 rounded-xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] text-sm font-bold transition-all duration-200 shrink-0"
               >
-                Subscribe
-              </button>
+                Get Started
+              </Link>
             </div>
           </div>
         </NonReversingReveal>
 
         <div className="mt-12 flex items-center justify-center gap-8 text-xs text-[#94A3B8]">
           <Link href="/" className="hover:text-[#64748B] transition-colors">Home</Link>
-          <Link href="/dashboard" className="hover:text-[#64748B] transition-colors">Generate</Link>
+          <Link href="/auth" className="hover:text-[#64748B] transition-colors">Generate</Link>
           <Link href="/auth" className="hover:text-[#64748B] transition-colors">Sign In</Link>
         </div>
         <p className="mt-4 text-xs text-[#94A3B8]">

@@ -352,7 +352,7 @@ export async function POST(request) {
     if (!isAdmin) {
       const profile = await getProfile(user.id).catch(() => null);
       const planLimit = profile?.plan_tier === "free" ? FREE_MONTHLY_LIMIT : 9999;
-      const usedThisMonth = await getGenerationsThisMonth(session.user.id).catch(() => 0);
+      const usedThisMonth = await getGenerationsThisMonth(user.id).catch(() => 0);
       if (usedThisMonth >= planLimit) {
         return Response.json(
           { error: "You've used all generations for this month. Upgrade coming soon." },

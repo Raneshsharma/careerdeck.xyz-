@@ -1,13 +1,14 @@
 "use client";
 
+import Link from "next/link";
+
 export default function SkipLink() {
   return (
-    <a
-      id="skip-link"
-      href="/dashboard"
-      className="fixed top-5 right-6 z-50 text-sm text-zinc-500 hover:text-amber-400 transition-colors opacity-0"
+    <Link
+      href="/auth"
+      className="fixed top-5 right-6 z-50 text-sm text-zinc-500 hover:text-amber-400 transition-colors"
     >
-      Skip story &rarr;
-    </a>
+      Get Started &rarr;
+    </Link>
   );
 }

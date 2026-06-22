@@ -16,14 +16,11 @@ export default function Header() {
           </Link>
 
           <nav className="flex items-center gap-6">
-            <Link href="/about" className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">
-              About
-            </Link>
             <Link href="/pricing" className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">
               Pricing
             </Link>
             <Link
-              href="/dashboard"
+              href="/auth"
               className="text-sm px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-medium transition-all duration-200"
             >
               Generate

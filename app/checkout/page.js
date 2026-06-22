@@ -26,7 +26,6 @@ function CheckoutContent() {
     setLoading(true);
     try {
       await executePayment(planKey);
-      router.replace("/dashboard");
     } catch (e) {
       if (e.message === "CANCELLED") return;
       setError(e.message || "Payment failed");

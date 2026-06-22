@@ -28,7 +28,10 @@ export async function DELETE() {
     if (profErr) throw profErr
 
     const { error: authErr } = await supabase.auth.admin.deleteUser(user.id)
-    if (authErr) console.error("Failed to delete auth user:", authErr.message)
+    if (authErr) {
+      console.error("Failed to delete auth user:", authErr.message)
+      return Response.json({ error: "Account data removed but auth deletion failed. Contact support." }, { status: 500 })
+    }
   } catch (err) {
     console.error("Delete account error:", err)
     return Response.json({ error: "Failed to delete account" }, { status: 500 })

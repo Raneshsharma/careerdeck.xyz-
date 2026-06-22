@@ -35,6 +35,7 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
   return (
     <div ref={resultRef} className={`transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       {/* Toolbar */}
+      {!hideToolbar && (
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200 p-3 mb-6 no-print flex items-center justify-between gap-3">
         <span className="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full font-medium">
           {wordCount.toLocaleString()} words &middot; ~{Math.ceil(wordCount / 250)} min read
@@ -54,6 +55,7 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
           </button>
         </div>
       </div>
+      )}
 
       {isPartial && (
         <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-4 no-print">
@@ -61,9 +63,11 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
         </div>
       )}
 
+      {!hideShortBanner && (
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 no-print">
         <p className="text-sm text-amber-800"><strong>&#x23F0; Short on time?</strong> Jump to the Interview Intelligence and Smart Questions sections for quick prep.</p>
       </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
         <article className="dossier-markdown">

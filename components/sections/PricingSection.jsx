@@ -49,7 +49,7 @@ const TIERS = [
       "PDF export + API integration",
       "Instant generation priority",
     ],
-    cta: "Contact sales",
+    cta: "Upgrade to Enterprise",
     href: "/checkout?plan=enterprise",
     badge: null,
     highlight: false,

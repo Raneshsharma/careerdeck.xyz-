@@ -1,8 +1,8 @@
 "use client"
 
 import { useAuth } from "@/components/SessionProvider"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState, Suspense } from "react"
 import Image from "next/image"
 import toast from "react-hot-toast"
 
@@ -27,9 +27,10 @@ const EXPERIENCE_LEVELS = [
   "Executive (10+ yrs)",
 ]
 
-export default function OnboardPage() {
+function OnboardContent() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const [name, setName] = useState("")
   const [industry, setIndustry] = useState("")
@@ -52,7 +53,10 @@ export default function OnboardPage() {
     fetch("/api/profile")
       .then((r) => r.json())
       .then((data) => {
-        if (data?.profile?.onboarded) router.replace("/dashboard")
+        if (data?.profile?.onboarded) {
+          const destination = searchParams.get("redirectTo") || "/dashboard"
+          router.replace(destination)
+        }
       })
       .catch((err) => console.error("Onboard check error:", err))
       .finally(() => setCheckingOnboarded(false))
@@ -83,7 +87,8 @@ export default function OnboardPage() {
         throw new Error(err.error || "Failed to save")
       }
       toast.success("Profile saved!")
-      router.replace("/dashboard")
+      const destination = searchParams.get("redirectTo") || "/dashboard"
+      router.replace(destination)
     } catch (err) {
       toast.error(err.message)
     } finally {
@@ -172,5 +177,13 @@ export default function OnboardPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function OnboardPage() {
+  return (
+    <Suspense fallback={null}>
+      <OnboardContent />
+    </Suspense>
   )
 }
