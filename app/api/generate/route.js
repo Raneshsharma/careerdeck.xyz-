@@ -391,10 +391,10 @@ export async function POST(request) {
     let userPrompt;
     switch (dosType) {
       case "company":
-        const researchText = buildPlainText(companyResearch, newsData);
+        const researchText = JSON.stringify(companyResearch) + '\n\n' + JSON.stringify(newsData);
+        console.log("=== PLAIN TEXT LENGTH:", researchText.length);
+        console.log("=== FIRST 200 CHARS:", researchText.substring(0, 200));
         const facts = await extractCompanyFacts(researchText);
-        console.log("Extracted facts:", facts);
-        console.log("Plain text length:", researchText.length);
         const factList = facts.map((f) => `- ${f}`).join("\n");
         console.log("===== EXTRACTED FACTS =====");
         console.log(factList);
