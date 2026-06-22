@@ -4,6 +4,7 @@ import { buildCompanyPrompt } from "@/lib/prompt-company";
 import { buildRolePrompt } from "@/lib/prompt-role";
 import { buildJDPrompt } from "@/lib/prompt-jd";
 import { buildNewsPrompt } from "@/lib/prompt-news";
+import { extractFacts } from "@/lib/extract-facts";
 import {
   fetchCompanyNews,
   researchCompany,
@@ -370,7 +371,8 @@ export async function POST(request) {
     let userPrompt;
     switch (dosType) {
       case "company":
-        userPrompt = buildCompanyPrompt(cName, newsData, companyResearch, rName, jd);
+        const factList = await extractFacts(companyResearch, newsData);
+        userPrompt = buildCompanyPrompt(cName, factList, rName, jd);
         break;
       case "role":
         userPrompt = buildRolePrompt(rName, cName || "", roleResearch, jd, "");
