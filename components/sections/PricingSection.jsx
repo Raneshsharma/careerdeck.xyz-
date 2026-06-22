@@ -1,6 +1,7 @@
 "use client";
 
 import NonReversingReveal from "@/components/NonReversingReveal";
+import RazorpayButton from "@/components/RazorpayButton";
 import Link from "next/link";
 
 const TIERS = [
@@ -108,16 +109,28 @@ export default function PricingSection() {
                   ))}
                 </ul>
 
-                <Link
-                  href={tier.href}
-                  className={`block text-center py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 ${
-                    tier.highlight
-                      ? "bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
-                      : "bg-gray-100 hover:bg-gray-200 text-[#64748B]"
-                  }`}
-                >
-                  {tier.cta}
-                </Link>
+                {tier.name === "Free" ? (
+                  <Link
+                    href={tier.href}
+                    className={`block text-center py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 ${
+                      tier.highlight
+                        ? "bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
+                        : "bg-gray-100 hover:bg-gray-200 text-[#64748B]"
+                    }`}
+                  >
+                    {tier.cta}
+                  </Link>
+                ) : (
+                  <RazorpayButton
+                    plan={tier.name.toLowerCase()}
+                    label={tier.cta}
+                    className={`block w-full text-center py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 ${
+                      tier.highlight
+                        ? "bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
+                        : "bg-gray-100 hover:bg-gray-200 text-[#64748B]"
+                    }`}
+                  />
+                )}
               </div>
             </NonReversingReveal>
           ))}

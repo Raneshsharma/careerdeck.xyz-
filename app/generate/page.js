@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -11,6 +13,7 @@ import SectionNav from "@/components/SectionNav";
 import HistorySidebar from "@/components/HistorySidebar";
 import NonReversingReveal from "@/components/NonReversingReveal";
 import UserMenu from "@/components/UserMenu";
+import { executePayment } from "@/lib/razorpay-checkout";
 
 const DOSSIER_LABELS = {
   company: "Company Dossier",
@@ -40,6 +43,36 @@ export default function GeneratePage() {
   const [loadingDossier, setLoadingDossier] = useState(false);
   const abortRef = useRef(null);
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
+
+  const searchParams = useSearchParams();
+  const { status: authStatus } = useSession();
+  const upgradeDone = useRef(false);
+
+  useEffect(() => {
+    if (upgradeDone.current) return;
+    const upgrade = searchParams.get("upgrade");
+    if (!upgrade || authStatus !== "authenticated") return;
+
+    const plan = sessionStorage.getItem("upgradePlan");
+    if (!plan || !["pro", "enterprise"].includes(plan)) return;
+
+    upgradeDone.current = true;
+
+    const timer = setTimeout(async () => {
+      try {
+        await executePayment(plan);
+        sessionStorage.removeItem("upgradePlan");
+        const url = new URL(window.location.href);
+        url.searchParams.delete("upgrade");
+        window.history.replaceState({}, "", url);
+      } catch (e) {
+        if (e.message === "CANCELLED") return;
+        console.error("Auto-upgrade failed:", e.message);
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [authStatus, searchParams]);
 
   const wordCount = useMemo(() => content.split(/\s+/).filter(Boolean).length, [content]);
   const minRead = useMemo(() => Math.ceil(wordCount / 250), [wordCount]);

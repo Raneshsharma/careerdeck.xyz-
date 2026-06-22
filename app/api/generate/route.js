@@ -4,7 +4,7 @@ import { buildCompanyPrompt } from "@/lib/prompt-company";
 import { buildRolePrompt } from "@/lib/prompt-role";
 import { buildJDPrompt } from "@/lib/prompt-jd";
 import { buildNewsPrompt } from "@/lib/prompt-news";
-import { extractCompanyFacts } from "@/lib/extract-facts-structured";
+import { extractCompanyFacts, extractRoleFacts, extractJDFacts, extractNewsFacts } from "@/lib/extract-facts-structured";
 import {
   fetchCompanyNews,
   researchCompanyWikipedia,
@@ -306,6 +306,34 @@ function buildPlainText(research, news) {
   return parts.join("\n\n");
 }
 
+function buildRoleText(roleResearch, jd) {
+  const parts = [];
+  if (roleResearch?.salary?.data?.length) {
+    parts.push("Salary Data: " + roleResearch.salary.data.map((d) => d.snippet).join(" | "));
+  }
+  if (jd) parts.push("Job Description: " + jd);
+  return parts.join("\n\n");
+}
+
+function buildJDText(jd, research, news) {
+  const parts = [jd];
+  if (research?.extract) parts.push("Company Context: " + research.extract);
+  if (Array.isArray(news) && news.length) {
+    parts.push("Company News: " + news.map((d) => d.title + ": " + d.snippet).join(" | "));
+  }
+  return parts.join("\n\n");
+}
+
+function buildNewsText(news, research) {
+  const parts = [];
+  if (Array.isArray(news) && news.length) {
+    parts.push(news.map((d) => `[${d.date || "?"}] ${d.title}: ${d.snippet}`).join("\n"));
+  }
+  if (research?.extract) parts.push("Company Profile: " + research.extract);
+  return parts.join("\n\n");
+}
+
+
 // ─── Route handler ──────────────────────────────────────────────────────
 
 export async function POST(request) {
@@ -424,13 +452,34 @@ export async function POST(request) {
         console.log("=======================");
         break;
       case "role":
-        userPrompt = buildRolePrompt(rName, cName || "", roleResearch, jd, "");
+        const roleText = buildRoleText(roleResearch, jd);
+        let roleFacts = await extractRoleFacts(roleText);
+        if (!roleFacts || roleFacts.length === 0) {
+          const fallback = roleText.split("\n\n").filter(Boolean);
+          roleFacts = fallback.length > 0 ? fallback : [];
+        }
+        const roleFactStr = roleFacts.length > 0 ? roleFacts.map((f) => `- ${f}`).join("\n") : "";
+        userPrompt = buildRolePrompt(rName, cName || "", roleFactStr, jd, "");
         break;
       case "jd":
-        userPrompt = buildJDPrompt(cName, rName, jd, newsData, companyResearch);
+        const jdText = buildJDText(jd, companyResearch, newsData);
+        let jdFacts = await extractJDFacts(jdText);
+        if (!jdFacts || jdFacts.length === 0) {
+          const jdFallback = jdText.split("\n\n").filter(Boolean);
+          jdFacts = jdFallback.length > 0 ? jdFallback : [];
+        }
+        const jdFactStr = jdFacts.length > 0 ? jdFacts.map((f) => `- ${f}`).join("\n") : "";
+        userPrompt = buildJDPrompt(cName, rName, jd, newsData, jdFactStr);
         break;
       case "news":
-        userPrompt = buildNewsPrompt(cName, rName || "", newsData, companyResearch);
+        const newsText = buildNewsText(newsData, companyResearch);
+        let newsFacts = await extractNewsFacts(newsText);
+        if (!newsFacts || newsFacts.length === 0) {
+          const nsFallback = newsText.split("\n").filter(Boolean);
+          newsFacts = nsFallback.length > 0 ? nsFallback : [];
+        }
+        const nsFactStr = newsFacts.length > 0 ? newsFacts.map((f) => `- ${f}`).join("\n") : "";
+        userPrompt = buildNewsPrompt(cName, rName || "", newsData, nsFactStr);
         break;
       default:
         userPrompt = buildCompanyPrompt(cName, newsData, companyResearch);

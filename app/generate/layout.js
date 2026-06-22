@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
+import { Suspense } from "react"
 import { authConfig } from "@/lib/auth.config"
 import { supabase } from "@/lib/supabase"
 
@@ -44,5 +45,5 @@ export default async function GenerateLayout({ children }) {
     // If anything fails (Supabase down, etc.), let users proceed anyway
   }
 
-  return <>{children}</>
+  return <Suspense fallback={null}>{children}</Suspense>
 }
