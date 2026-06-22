@@ -372,7 +372,13 @@ export async function POST(request) {
     switch (dosType) {
       case "company":
         const factList = await extractFacts(companyResearch, newsData);
+        console.log("===== EXTRACTED FACTS =====");
+        console.log(factList);
+        console.log("===========================");
         userPrompt = buildCompanyPrompt(cName, factList, rName, jd);
+        console.log("===== USER PROMPT =====");
+        console.log(userPrompt);
+        console.log("=======================");
         break;
       case "role":
         userPrompt = buildRolePrompt(rName, cName || "", roleResearch, jd, "");
