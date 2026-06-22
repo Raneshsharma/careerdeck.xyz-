@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/components/SessionProvider";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { executePayment } from "@/lib/razorpay-checkout";
 import LandingHeader from "@/components/LandingHeader";
 import Image from "next/image";
@@ -20,10 +20,6 @@ function CheckoutContent() {
   const plan = PLANS[planKey] || PLANS.pro;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (user === null) router.replace("/auth?redirectTo=/checkout?plan=" + planKey);
-  }, [user, router, planKey]);
 
   async function handlePay() {
     setError(null);

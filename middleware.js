@@ -23,45 +23,18 @@ export async function middleware(request) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { pathname, search } = request.nextUrl;
-  const redirectTo = encodeURIComponent(pathname + search);
-
   if (!user) {
+    const { pathname, search } = request.nextUrl;
+    const redirectTo = encodeURIComponent(pathname + search);
     const url = request.nextUrl.clone();
     url.pathname = "/auth";
     url.search = `?redirectTo=${redirectTo}`;
     return NextResponse.redirect(url);
   }
 
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id, onboarded")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile && pathname !== "/onboarding") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/onboarding";
-      url.search = `?redirectTo=${redirectTo}`;
-      return NextResponse.redirect(url);
-    }
-
-    if (profile && !profile.onboarded && pathname !== "/onboarding") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/onboarding";
-      url.search = `?redirectTo=${redirectTo}`;
-      return NextResponse.redirect(url);
-    }
-  }
-
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|logo.png|api/auth|auth).*)",
-    "/",
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/onboarding/:path*", "/checkout/:path*"],
 };
