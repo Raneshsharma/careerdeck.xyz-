@@ -392,7 +392,9 @@ export async function POST(request) {
     switch (dosType) {
       case "company":
         const researchText = buildPlainText(companyResearch, newsData);
-        const { facts } = await extractCompanyFacts(researchText);
+        const facts = await extractCompanyFacts(researchText);
+        console.log("Extracted facts:", facts);
+        console.log("Plain text length:", researchText.length);
         const factList = facts.map((f) => `- ${f}`).join("\n");
         console.log("===== EXTRACTED FACTS =====");
         console.log(factList);
