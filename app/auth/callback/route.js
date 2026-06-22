@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase-server";
 
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || origin;
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/dashboard";
 
@@ -25,14 +26,14 @@ export async function GET(request) {
         if (!profile || !profile.onboarded) {
           const redirectTo = encodeURIComponent(next);
           return NextResponse.redirect(
-            `${origin}/onboarding?redirectTo=${redirectTo}`
+            `${siteUrl}/onboarding?redirectTo=${redirectTo}`
           );
         }
 
-        return NextResponse.redirect(`${origin}${next}`);
+        return NextResponse.redirect(`${siteUrl}${next}`);
       }
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth?error=auth_callback_error`);
+  return NextResponse.redirect(`${siteUrl}/auth?error=auth_callback_error`);
 }

@@ -79,7 +79,7 @@ export default function LandingHeader() {
         ) : (
           <button
             type="button"
-            onClick={() => { const supabase = createClient(); supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback` } }); }}
+            onClick={() => { const supabase = createClient(); const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin; supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${siteUrl}/auth/callback` } }); }}
             className="text-xs font-semibold px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white transition-all duration-200"
           >
             Sign In
