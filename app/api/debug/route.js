@@ -2,7 +2,7 @@ export async function GET() {
   const results = { ok: true, env: {}, checks: {} }
 
   // Env var presence (not values)
-  results.env.NEXTAUTH_URL = process.env.NEXTAUTH_URL || "MISSING"
+  results.env.SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "MISSING"
   results.env.hasSupabaseUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL
   results.env.hasServiceRoleKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY
 

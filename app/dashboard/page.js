@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { useAuth } from "@/components/SessionProvider";
 import Image from "next/image";
 import Link from "next/link";

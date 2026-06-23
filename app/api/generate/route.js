@@ -66,8 +66,8 @@ async function streamOpenRouter(messages, model, apiKey, signal) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": "https://interview-ready.vercel.app",
-      "X-Title": "Interview Ready",
+      "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "https://careerdeck.xyz",
+      "X-Title": "CareerDeck",
     },
     body: JSON.stringify({ model, messages, temperature: 0.3, max_tokens: 16384, stream: true }),
     signal,
@@ -584,12 +584,10 @@ export async function POST(request) {
 // ─── Sanitize user input to prevent prompt injection ────────────────────
 
 function sanitize(str) {
-  const trimmed = (str || "").trim();
-  // Strip common prompt injection patterns
+  const trimmed = (str || "").trim().slice(0, 10000);
   return trimmed
     .replace(/ignore (all )?(previous|above|prior) instructions?/gi, "[filtered]")
     .replace(/system:\s*/gi, "[filtered]")
     .replace(/<\|im_start\|>/gi, "[filtered]")
-    .replace(/<\|im_end\|>/gi, "[filtered]")
-    .slice(0, 10000); // hard cap per field
+    .replace(/<\|im_end\|>/gi, "[filtered]");
 }

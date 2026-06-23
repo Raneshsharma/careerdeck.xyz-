@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-export default function NonReversingReveal({ children, trigger, start, end, className = "" }) {
+export default function NonReversingReveal({ children, trigger, start, end, className = "", id }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function NonReversingReveal({ children, trigger, start, end, clas
   }, [trigger, start, end]);
 
   return (
-    <div ref={ref} className={`opacity-0 ${className}`} style={{ transform: "translateY(40px)" }}>
+      <div ref={ref} id={id} className={`opacity-0 ${className}`} style={{ transform: "translateY(40px)" }}>
       {children}
     </div>
   );

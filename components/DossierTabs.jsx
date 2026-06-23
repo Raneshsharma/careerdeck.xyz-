@@ -1,7 +1,5 @@
 "use client";
 
-import { useRef, useState } from "react";
-
 const TABS = [
   { id: "company", label: "Company", desc: "Deep dive into a company's business model, strategy, and culture." },
   { id: "role", label: "Role", desc: "Understand a role's responsibilities, skills, and career path." },

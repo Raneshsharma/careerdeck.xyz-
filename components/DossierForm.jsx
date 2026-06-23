@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 export default function DossierForm({ onSubmit, generating, dossierType }) {
@@ -9,7 +9,6 @@ export default function DossierForm({ onSubmit, generating, dossierType }) {
   const [jobDescription, setJobDescription] = useState("");
   const [errors, setErrors] = useState({});
   const [shaking, setShaking] = useState(false);
-  const formRef = useRef(null);
 
   const showCompany = dossierType === "company" || dossierType === "jd" || dossierType === "news";
   const showCompanyRequired = dossierType === "company" || dossierType === "jd" || dossierType === "news";
@@ -68,7 +67,7 @@ export default function DossierForm({ onSubmit, generating, dossierType }) {
   const jdCharCount = jobDescription.trim().length;
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className={`space-y-5 ${shaking ? "animate-shake" : ""}`}>
+    <form onSubmit={handleSubmit} className={`space-y-5 ${shaking ? "animate-shake" : ""}`}>
       {/* Company Name */}
       {showCompany && (
         <div>

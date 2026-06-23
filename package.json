@@ -9,8 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@langchain/core": "^1.2.0",
-    "@langchain/openai": "^1.5.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@supabase/mcp-server-supabase": "^0.8.2",
     "@supabase/ssr": "^0.12.0",

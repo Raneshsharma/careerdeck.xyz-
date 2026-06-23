@@ -38,7 +38,7 @@ export async function GET() {
     console.error("Generations fetch error:", err)
   }
 
-  const planLimit = profile?.plan_tier === "free" ? FREE_MONTHLY_LIMIT : 9999
+  const planLimit = (profile?.plan_tier === "free" || !profile?.plan_tier) ? FREE_MONTHLY_LIMIT : 9999
 
   return Response.json({
     profile,

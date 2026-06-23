@@ -41,8 +41,8 @@ export default async function GenerateLayout({ children }) {
 
     if (!profile.onboarded) redirect("/onboarding")
   } catch (err) {
+    if (err?.digest?.startsWith?.("NEXT_REDIRECT")) throw err
     console.error("Generate layout error:", err)
-    // If anything fails (Supabase down, etc.), let users proceed anyway
   }
 
   return <>{children}</>
