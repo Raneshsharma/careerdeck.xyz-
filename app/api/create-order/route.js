@@ -15,9 +15,17 @@ export async function POST(request) {
       return Response.json({ error: "Invalid plan. Use 'pro' or 'enterprise'." }, { status: 400 });
     }
 
+    const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keyId || !keySecret) {
+      console.error("Razorpay env vars missing:", { hasKeyId: !!keyId, hasKeySecret: !!keySecret });
+      return Response.json({ error: "Payment gateway not configured. Contact support." }, { status: 500 });
+    }
+
     const rzp = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
+      key_id: keyId,
+      key_secret: keySecret,
     });
 
     const receipt = `rcpt_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
