@@ -2,9 +2,9 @@ import { createClient } from "@/lib/supabase-server";
 import { supabase } from "@/lib/supabase"
 
 const ALLOWED_INDUSTRIES = [
-  "Technology / SaaS", "Finance & Banking", "Consulting", "Healthcare & Pharma",
-  "Consumer Goods & Retail", "Media & Entertainment", "Energy & Utilities",
-  "Manufacturing", "Real Estate", "Education", "Other",
+  "Technology & IT", "Finance & Banking", "Consulting & Strategy", "Marketing & Digital",
+  "Healthcare & Pharma", "E-commerce & Retail", "Manufacturing & Operations",
+  "Education & EdTech", "Startups & Entrepreneurship", "Other",
 ]
 
 const ALLOWED_EXPERIENCE_LEVELS = [

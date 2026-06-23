@@ -7,16 +7,15 @@ import Image from "next/image"
 import toast from "react-hot-toast"
 
 const INDUSTRIES = [
-  "Technology / SaaS",
+  "Technology & IT",
   "Finance & Banking",
-  "Consulting",
+  "Consulting & Strategy",
+  "Marketing & Digital",
   "Healthcare & Pharma",
-  "Consumer Goods & Retail",
-  "Media & Entertainment",
-  "Energy & Utilities",
-  "Manufacturing",
-  "Real Estate",
-  "Education",
+  "E-commerce & Retail",
+  "Manufacturing & Operations",
+  "Education & EdTech",
+  "Startups & Entrepreneurship",
   "Other",
 ]
 
