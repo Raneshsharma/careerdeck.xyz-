@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/components/SessionProvider";
 import { createClient } from "@/lib/supabase-client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function UserMenu() {
+export default function UserMenu({ refreshTrigger }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -19,7 +20,7 @@ export default function UserMenu() {
         .then((data) => setProfileData(data))
         .catch(() => {});
     }
-  }, [user, loading]);
+  }, [user, loading, refreshTrigger]);
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -32,6 +33,7 @@ export default function UserMenu() {
   if (!user) return null;
 
   const initial = (user?.user_metadata?.full_name || user?.email || "U")[0].toUpperCase();
+  const planTier = profileData?.profile?.plan_tier || "free";
   const used = profileData?.usage?.used ?? 0;
   const limit = profileData?.usage?.limit ?? 3;
   const remaining = Math.max(limit - used, 0);
@@ -73,7 +75,20 @@ export default function UserMenu() {
                 style={{ width: `${usagePercent}%` }}
               />
             </div>
-            <p className="text-xs text-[#94A3B8] mt-1">Plan: Free</p>
+            <p className="text-xs text-[#94A3B8] mt-1">
+              Plan: {planTier === "pro" ? "Pro" : planTier === "enterprise" ? "Enterprise" : "Free"}
+            </p>
+            {planTier === "free" && remaining <= 1 && remaining > 0 && (
+              <p className="text-xs text-amber-600 mt-0.5 font-medium">
+                ⚡ Only {remaining} generation left —{" "}
+                <Link href="/checkout?plan=pro" className="underline hover:text-amber-800">Upgrade</Link>
+              </p>
+            )}
+            {planTier === "free" && remaining === 0 && (
+              <Link href="/checkout?plan=pro" className="mt-1.5 block w-full text-center text-xs font-bold py-1.5 rounded-lg bg-amber-500 text-[#0F172A] hover:bg-amber-400 transition-colors">
+                Upgrade to Pro
+              </Link>
+            )}
           </div>
 
           {/* Profile link */}

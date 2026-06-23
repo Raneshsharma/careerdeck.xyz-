@@ -37,6 +37,7 @@ export default function GeneratePage() {
   const [genId, setGenId] = useState(null);
   const [activeDossierId, setActiveDossierId] = useState(null);
   const [sidebarVersion, setSidebarVersion] = useState(0);
+  const [usageVersion, setUsageVersion] = useState(0);
   const [copied, setCopied] = useState(false);
   const [loadingDossier, setLoadingDossier] = useState(false);
   const abortRef = useRef(null);
@@ -230,18 +231,20 @@ export default function GeneratePage() {
       if (receivedDone && contentAccumulated.length > 0) {
         setActiveDossierId(currentGenId)
         if (currentGenId) {
-          saveContent(currentGenId, contentAccumulated)
-          setSidebarVersion((v) => v + 1)
-        }
+            saveContent(currentGenId, contentAccumulated)
+            setSidebarVersion((v) => v + 1)
+            setUsageVersion((v) => v + 1)
+          }
         if (wasPartial) toast("Partial dossier saved.", { icon: "\u26A0\uFE0F" })
         else toast.success("Dossier generated successfully!")
       } else if (contentAccumulated.length > 0) {
         setWasPartial(true)
         if (currentGenId) {
-          saveContent(currentGenId, contentAccumulated)
-          setActiveDossierId(currentGenId)
-          setSidebarVersion((v) => v + 1)
-        }
+            saveContent(currentGenId, contentAccumulated)
+            setActiveDossierId(currentGenId)
+            setSidebarVersion((v) => v + 1)
+            setUsageVersion((v) => v + 1)
+          }
         toast("Partial output saved.", { icon: "\u26A0\uFE0F" })
       } else {
         setErrorMessage("No content was generated. Please try again.")
@@ -283,7 +286,7 @@ export default function GeneratePage() {
             <Image src="/logo.png" alt="CareerDeck" height={32} width={48} className="h-8 w-auto" />
           </Link>
           <nav className="flex items-center">
-            <UserMenu />
+            <UserMenu refreshTrigger={usageVersion} />
           </nav>
         </div>
       </header>
@@ -339,12 +342,21 @@ export default function GeneratePage() {
             {!loadingDossier && !content && !generating && (
               <>
                 {errorMessage && (
-                  <div className="bg-red-50 border border-red-300 rounded-lg p-4 mb-4 flex items-start gap-3 animate-shake">
-                    <span className="text-red-500 shrink-0 mt-0.5">&#x26A0;&#xFE0F;</span>
-                    <div className="flex-1">
-                      <p className="text-sm text-red-800">{errorMessage}</p>
-                      <button onClick={() => setErrorMessage(null)} className="text-xs text-red-600 underline mt-1 hover:text-red-800">Dismiss</button>
+                  <div className="bg-red-50 border border-red-300 rounded-lg p-4 mb-4 animate-shake">
+                    <div className="flex items-start gap-3">
+                      <span className="text-red-500 shrink-0 mt-0.5">&#x26A0;&#xFE0F;</span>
+                      <div className="flex-1">
+                        <p className="text-sm text-red-800">{errorMessage}</p>
+                        <button onClick={() => setErrorMessage(null)} className="text-xs text-red-600 underline mt-1 hover:text-red-800">Dismiss</button>
+                      </div>
                     </div>
+                    {(errorMessage.includes("used all generations") || errorMessage.includes("Upgrade")) && (
+                      <div className="mt-3 pt-3 border-t border-red-200">
+                        <Link href="/checkout?plan=pro" className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-[#0F172A] text-xs font-bold rounded-lg transition-all duration-200">
+                          Upgrade to Pro ₹499/mo
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 )}
 
