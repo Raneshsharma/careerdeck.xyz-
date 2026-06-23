@@ -25,6 +25,7 @@ create table generations (
   dossier_type text not null,
   company_name text,
   role text,
+  content text,
   created_at timestamp default now()
 );
 
