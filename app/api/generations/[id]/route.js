@@ -71,7 +71,7 @@ export async function GET(request, { params }) {
     return Response.json({ generation: { ...data, content } })
   } catch (err) {
     console.error("Generation fetch error:", err?.message || err, "stack:", err?.stack)
-    return Response.json({ error: "Failed to fetch generation: " + (err?.message || "Unknown") }, { status: 500 })
+    return Response.json({ error: "Failed to fetch generation" }, { status: 500 })
   }
 }
 

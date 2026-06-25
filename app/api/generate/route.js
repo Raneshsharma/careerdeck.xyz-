@@ -294,7 +294,7 @@ export async function POST(request) {
     }
 
     // ── Generation limit check ──
-    const isAdmin = user.email === "raneshsharma33@gmail.com";
+    const isAdmin = user.email === (process.env.ADMIN_EMAIL || "raneshsharma33@gmail.com");
     if (!isAdmin) {
       const profile = await getProfile(user.id).catch(() => null);
       const planLimit = profile?.plan_tier === "free" ? FREE_MONTHLY_LIMIT : 9999;
@@ -506,10 +506,10 @@ export async function POST(request) {
       },
     });
   } catch (e) {
-    console.error("Route handler error:", e.message, e.stack);
+    console.error("Route handler error:", e.message)
     if (acquired) release(request, true);
     return Response.json(
-      { error: e.message || "Internal server error" },
+      { error: "Internal server error" },
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -520,7 +520,11 @@ export async function POST(request) {
 function sanitize(str) {
   const trimmed = (str || "").trim().slice(0, 10000);
   return trimmed
-    .replace(/ignore (all )?(previous|above|prior) instructions?/gi, "[filtered]")
+    .replace(/```/g, "[code]")
+    .replace(/ignore (all )?(previous|above|prior|earlier) instructions?/gi, "[filtered]")
+    .replace(/override (the )?(system|original) instructions?/gi, "[filtered]")
+    .replace(/(forget|disregard) (everything|all rules)/gi, "[filtered]")
+    .replace(/(you are now|act as|pretend to be|you are) (a |an )?(DAN|developer|jailbroken)/gi, "[filtered]")
     .replace(/system:\s*/gi, "[filtered]")
     .replace(/<\|im_start\|>/gi, "[filtered]")
     .replace(/<\|im_end\|>/gi, "[filtered]");

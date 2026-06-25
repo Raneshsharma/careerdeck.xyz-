@@ -1,6 +1,7 @@
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 import { createClient } from "@/lib/supabase-server";
 import { supabase } from "@/lib/supabase";
+import Razorpay from "razorpay";
 
 export async function POST(request) {
   try {
@@ -11,24 +12,29 @@ export async function POST(request) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, plan } = body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      return Response.json(
-        { error: "Missing required fields: razorpay_order_id, razorpay_payment_id, razorpay_signature" },
-        { status: 400 }
-      );
+      return Response.json({ error: "Missing required payment fields" }, { status: 400 });
     }
 
     const secret = process.env.RAZORPAY_KEY_SECRET;
     const payload = `${razorpay_order_id}|${razorpay_payment_id}`;
-    const generated = createHmac("sha256", secret).update(payload).digest("hex");
+    const generated = createHmac("sha256", secret).update(payload).digest();
 
-    if (generated !== razorpay_signature) {
+    const expected = Buffer.from(razorpay_signature, "hex");
+    if (generated.length !== expected.length || !timingSafeEqual(generated, expected)) {
       return Response.json({ error: "Signature verification failed" }, { status: 400 });
     }
 
-    if (plan && ["pro", "pro-annual", "enterprise"].includes(plan)) {
+    const rzp = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      key_secret: secret,
+    });
+    const order = await rzp.orders.fetch(razorpay_order_id);
+    const plan = order.notes?.plan;
+
+    if (plan && ["pro", "pro-annual"].includes(plan)) {
       const { error: dbErr } = await supabase
         .from("profiles")
         .upsert({ id: user.id, plan_tier: plan })
@@ -37,6 +43,7 @@ export async function POST(request) {
 
       if (dbErr) {
         console.error("Failed to update plan_tier:", dbErr.message);
+        return Response.json({ error: "Failed to upgrade account" }, { status: 500 });
       }
     }
 

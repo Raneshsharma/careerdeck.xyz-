@@ -9,7 +9,8 @@ import Image from "next/image";
 function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/dashboard";
+  const rawRedirect = searchParams.get("redirectTo") || "/dashboard";
+  const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect : "/dashboard";
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -93,4 +94,11 @@ export default function AuthPage() {
       <AuthContent />
     </Suspense>
   );
+}
+
+function isValidRedirect(url) {
+  if (!url || typeof url !== "string") return false;
+  if (!url.startsWith("/")) return false;
+  if (url.includes("@") || url.includes("//") || url.includes("\\")) return false;
+  return true;
 }

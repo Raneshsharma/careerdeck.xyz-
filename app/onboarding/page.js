@@ -53,7 +53,8 @@ function OnboardContent() {
       .then((r) => r.json())
       .then((data) => {
         if (data?.profile?.onboarded) {
-          const destination = searchParams.get("redirectTo") || "/dashboard"
+          const rawDest = searchParams.get("redirectTo") || "/dashboard"
+          const destination = isValidRedirect(rawDest) ? rawDest : "/dashboard"
           router.replace(destination)
         }
       })
@@ -90,6 +91,13 @@ function OnboardContent() {
       router.replace(destination)
     } catch (err) {
       toast.error(err.message)
+
+function isValidRedirect(url) {
+  if (!url || typeof url !== "string") return false;
+  if (!url.startsWith("/")) return false;
+  if (url.includes("@") || url.includes("//") || url.includes("\\")) return false;
+  return true;
+}
     } finally {
       setSaving(false)
     }

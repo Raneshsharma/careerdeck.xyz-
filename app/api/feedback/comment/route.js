@@ -1,7 +1,11 @@
+import { createClient } from "@/lib/supabase-server";
 import { supabase } from "@/lib/supabase";
 
 export async function POST(request) {
   try {
+    const supabaseAuth = await createClient();
+    const { data: { user } } = await supabaseAuth.auth.getUser();
+
     const body = await request.json().catch(() => ({}));
     const { dossierId, sectionKey, comment } = body;
 
@@ -17,7 +21,7 @@ export async function POST(request) {
       dossier_id: dossierId,
       section_key: sectionKey,
       comment: comment.trim(),
-      user_id: null,
+      user_id: user?.id || null,
     });
 
     if (error) {

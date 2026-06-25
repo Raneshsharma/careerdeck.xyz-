@@ -47,6 +47,6 @@ export async function POST(request) {
     if (e.statusCode === 401) {
       return Response.json({ error: "Payment gateway auth failed. Check API keys." }, { status: 401 });
     }
-    return Response.json({ error: e.message || "Failed to create order" }, { status: 500 });
+    return Response.json({ error: "Failed to create order" }, { status: 500 });
   }
 }

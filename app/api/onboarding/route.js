@@ -30,6 +30,10 @@ export async function POST(request) {
     return Response.json({ error: "All fields are required" }, { status: 400 })
   }
 
+  if (name.length > 100) {
+    return Response.json({ error: "Name must be ≤100 characters" }, { status: 400 })
+  }
+
   if (!ALLOWED_INDUSTRIES.includes(industry)) {
     return Response.json({ error: "Invalid industry" }, { status: 400 })
   }
