@@ -53,7 +53,7 @@ returns integer as $$
     and created_at >= date_trunc('month', now());
 $$ language sql;
 
--- ── Section Feedback ──
+-- ── Section Feedback (RLS not needed — all access via server admin client) ──
 create table if not exists section_feedback (
   id uuid primary key default gen_random_uuid(),
   user_id text,
