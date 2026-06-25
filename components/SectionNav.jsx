@@ -18,7 +18,6 @@ export default function SectionNav({ content, className = "" }) {
     setHeadings(found);
   }, [content]);
 
-  // Track active section via IntersectionObserver
   useEffect(() => {
     if (headings.length === 0) return;
     const elements = headings
@@ -51,28 +50,50 @@ export default function SectionNav({ content, className = "" }) {
   if (headings.length === 0) return null;
 
   return (
-    <nav className={`no-print bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 p-4 max-h-[calc(100vh-2rem)] overflow-y-auto shadow-sm ${className}`}>
-      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">On this page</h4>
-      <ul className="space-y-0.5">
-        {headings.map((h) => (
-          <li key={h.id} className={h.level === 2 ? "pl-4" : ""}>
-            <a
-              href={`#${h.id}`}
+    <nav className={`no-print ${className}`}>
+      {/* Desktop: vertical sidebar */}
+      <div className="hidden lg:block bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 p-4 max-h-[calc(100vh-2rem)] overflow-y-auto shadow-sm">
+        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">On this page</h4>
+        <ul className="space-y-0.5">
+          {headings.map((h) => (
+            <li key={h.id} className={h.level === 2 ? "pl-4" : ""}>
+              <a
+                href={`#${h.id}`}
+                onClick={(e) => handleClick(e, h.id)}
+                className={`flex items-center gap-2 text-sm py-1.5 rounded px-2 transition-all duration-200 ${
+                  activeId === h.id
+                    ? "text-brand-600 font-semibold bg-brand-50"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                } ${h.level === 1 ? "font-medium" : ""}`}
+              >
+                {activeId === h.id && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
+                )}
+                <span className="truncate">{h.text}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Mobile: horizontal scroll strip */}
+      <div className="lg:hidden">
+        <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
+          {headings.map((h) => (
+            <button
+              key={h.id}
               onClick={(e) => handleClick(e, h.id)}
-              className={`flex items-center gap-2 text-sm py-1.5 rounded px-2 transition-all duration-200 ${
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap min-h-[36px] ${
                 activeId === h.id
-                  ? "text-brand-600 font-semibold bg-brand-50"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-              } ${h.level === 1 ? "font-medium" : ""}`}
+                  ? "bg-brand-500 text-white shadow-sm"
+                  : "bg-white border border-gray-200 text-[#64748B] hover:bg-gray-50"
+              } ${h.level === 2 ? "ml-3" : ""}`}
             >
-              {activeId === h.id && (
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
-              )}
-              <span className="truncate">{h.text}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+              {h.text}
+            </button>
+          ))}
+        </div>
+      </div>
     </nav>
   );
 }

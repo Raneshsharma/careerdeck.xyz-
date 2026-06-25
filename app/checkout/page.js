@@ -54,7 +54,7 @@ function CheckoutContent() {
           <button
             onClick={handlePay}
             disabled={loading || !user}
-            className="w-full mt-8 py-3.5 rounded-2xl text-sm font-bold bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] shadow-[0_4px_14px_rgba(242,140,40,0.3)] transition-all duration-200 disabled:opacity-50"
+            className="w-full mt-8 min-h-[48px] py-3.5 rounded-2xl text-base font-bold bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] shadow-[0_4px_14px_rgba(242,140,40,0.3)] transition-all duration-200 disabled:opacity-50"
           >
             {loading ? "Processing..." : !user ? "Redirecting to login..." : `Pay ${plan.price}`}
           </button>

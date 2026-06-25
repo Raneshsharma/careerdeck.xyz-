@@ -37,19 +37,19 @@ export default function LandingHeader() {
           priority
         />
       </Link>
-      <nav className="flex items-center gap-6">
-        <Link href="#section-steps" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+      <nav className="flex items-center gap-3 sm:gap-6">
+        <Link href="#section-steps" className="hidden sm:inline text-xs text-gray-400 hover:text-gray-600 transition-colors">
           How It Works
         </Link>
-        <Link href="#section-dossiers" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+        <Link href="#section-dossiers" className="hidden sm:inline text-xs text-gray-400 hover:text-gray-600 transition-colors">
           Dossiers
         </Link>
-        <Link href="#section-pricing" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+        <Link href="#section-pricing" className="hidden sm:inline text-xs text-gray-400 hover:text-gray-600 transition-colors">
           Pricing
         </Link>
         <Link
           href="/auth"
-          className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200"
+          className="text-xs font-semibold px-3 sm:px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200"
         >
           Generate
         </Link>

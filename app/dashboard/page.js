@@ -12,6 +12,9 @@ import SectionNav from "@/components/SectionNav";
 import HistorySidebar from "@/components/HistorySidebar";
 import NonReversingReveal from "@/components/NonReversingReveal";
 import UserMenu from "@/components/UserMenu";
+import MobileNavbar from "@/components/MobileNavbar";
+import BottomNav from "@/components/BottomNav";
+import HistoryButton from "@/components/HistoryButton";
 
 const DOSSIER_LABELS = {
   company: "Company Dossier",
@@ -279,19 +282,28 @@ export default function GeneratePage() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between h-16">
+      <MobileNavbar usageVersion={usageVersion} />
+
+      {/* ── Desktop Header ── */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100 hidden lg:flex">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between h-16 w-full">
           <Link href="/" className="flex items-center">
             <Image src="/logo.png" alt="CareerDeck" height={32} width={48} className="h-8 w-auto" />
           </Link>
-          <nav className="flex items-center">
+          <nav className="flex items-center gap-6">
+            <Link href="/dashboard" className="text-sm font-medium text-[#0F172A]">Dashboard</Link>
+            <Link href="/pricing" className="text-sm text-[#64748B] hover:text-[#0F172A]">Pricing</Link>
             <UserMenu refreshTrigger={usageVersion} />
           </nav>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-12 pb-20 lg:pb-12">
+        {/* ── Mobile: History button ── */}
+        <div className="lg:hidden flex items-center justify-between mb-4">
+          <h1 className="text-lg font-extrabold text-[#0F172A]">{DOSSIER_LABELS[dossierType]}</h1>
+          <HistoryButton onSelect={loadDossier} activeId={activeDossierId} onDelete={handleDeleteDossier} sidebarVersion={sidebarVersion} />
+        </div>
         {/* ── Full-width toolbar ── */}
         {content && !generating && (
           <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-sm border-b border-gray-200 mb-6 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 no-print">
@@ -317,9 +329,16 @@ export default function GeneratePage() {
           </div>
         )}
 
+        {/* Mobile: Section Nav (horizontal scroll below toolbar) */}
+        {content && !generating && (
+          <div className="lg:hidden mb-4">
+            <SectionNav content={content} />
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* ── Left: History Sidebar ── */}
-          <aside className="w-full lg:w-72 shrink-0">
+          {/* ── Left: History Sidebar (desktop only) ── */}
+          <aside className="hidden lg:block w-72 shrink-0">
             <div className="lg:sticky lg:top-24">
               <HistorySidebar
                 key={sidebarVersion}
@@ -457,7 +476,7 @@ export default function GeneratePage() {
 
           {/* ── Right: Amber banner + TOC ── */}
           {content && !generating && (
-            <aside className="w-full lg:w-56 shrink-0">
+            <aside className="hidden lg:block w-56 shrink-0">
               <div className="space-y-4">
                 {wasPartial && (
                   <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 no-print">
@@ -474,11 +493,13 @@ export default function GeneratePage() {
         </div>
       </main>
 
-      <footer className="bg-white border-t border-gray-100 mt-16 no-print">
+      <footer className="bg-white border-t border-gray-100 mt-16 no-print hidden lg:block">
         <div className="max-w-7xl mx-auto px-8 py-6 text-center text-xs text-gray-400">
           <p><strong className="text-gray-500">CareerDeck</strong> — Verify critical facts before your interview. Good luck!</p>
         </div>
       </footer>
+
+      <BottomNav />
     </div>
   );
 }

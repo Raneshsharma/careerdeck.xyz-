@@ -160,7 +160,7 @@ export default function DossierForm({ onSubmit, generating, dossierType }) {
       <button
         type="submit"
         disabled={generating}
-        className="w-full py-3.5 px-6 rounded-xl bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 text-white font-semibold text-base transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+        className="w-full min-h-[48px] py-3.5 px-6 rounded-xl bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 text-white font-semibold text-base transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
       >
         {generating ? (
           <span className="flex items-center justify-center gap-2">

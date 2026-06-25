@@ -71,7 +71,7 @@ export default function PricingSection() {
           </p>
         </NonReversingReveal>
 
-        <div className="grid md:grid-cols-3 gap-6 mt-14">
+        <div className="grid md:grid-cols-3 gap-6 mt-14 max-w-md md:max-w-none mx-auto">
           {TIERS.map((tier) => (
             <NonReversingReveal key={tier.name} id={`pricing-${tier.name}`}>
               <div
