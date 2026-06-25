@@ -5,9 +5,7 @@ import { buildJDPrompt } from "@/lib/prompt-jd";
 import { buildNewsPrompt } from "@/lib/prompt-news";
 import { extractCompanyFacts, extractRoleFacts, extractJDFacts, extractNewsFacts } from "@/lib/extract-facts-structured";
 import {
-  fetchCompanyNews,
   researchCompanyWikipedia,
-  researchRole,
 } from "@/lib/research";
 import { tryAcquire, release, cancel } from "@/lib/rate-limiter";
 import {
@@ -223,59 +221,7 @@ async function processAnthropicStream(body, emitter) {
   emitter.emit("done", {});
 }
 
-// ─── Helper: format research data for prompt injection ──────────────────
-
-function formatResearchSnippets(data) {
-  if (!data || !data.data || data.data.length === 0) return "";
-  return data.data
-    .map((d) => `  - "${d.snippet}" [source: ${d.source}]`)
-    .join("\n");
-}
-
-function buildResearchInjection(research) {
-  if (!research) return "";
-
-  if (research.extract) {
-    return `\nRESEARCH DATA (verified by Wikipedia — use these EXACT facts, cite them):\n${research.extract}\n[Source: ${research.pageUrl}]\n`;
-  }
-
-  let text = "\nRESEARCH DATA (verified by SerpAPI — use these EXACT numbers, cite them):\n";
-
-  if (research.financials?.data?.length) {
-    const top = research.financials.data.slice(0, 2);
-    text += "\nFinancial (revenue, profit, growth, market cap):\n";
-    text += top.map((d) => `  - ${d.snippet} [${d.source}]`).join("\n") + "\n";
-  }
-
-  if (research.competitors?.data?.length) {
-    const top = research.competitors.data.slice(0, 2);
-    text += "\nCompetitors & Market Share:\n";
-    text += top.map((d) => `  - ${d.snippet} [${d.source}]`).join("\n") + "\n";
-  }
-
-  if (research.industry?.data?.length) {
-    const top = research.industry.data.slice(0, 2);
-    text += "\nIndustry (market size, growth rates):\n";
-    text += top.map((d) => `  - ${d.snippet} [${d.source}]`).join("\n") + "\n";
-  }
-
-  if (research.profile?.data?.length) {
-    const top = research.profile.data.slice(0, 2);
-    text += "\nCompany Profile (founding, CEO, employees):\n";
-    text += top.map((d) => `  - ${d.snippet} [${d.source}]`).join("\n") + "\n";
-  }
-
-  return text;
-}
-
-function buildSalaryInjection(salaryData) {
-  if (!salaryData || !salaryData.data || salaryData.data.length === 0) return "";
-
-  const top = salaryData.data.slice(0, 2);
-  let text = "\nSALARY & COMPENSATION DATA (verified — CITE SPECIFIC NUMBERS):\n";
-  text += top.map((d) => `  - ${d.snippet} [${d.source}]`).join("\n") + "\n";
-  return text;
-}
+// ─── Helper: build plain text from research ────────────────────────────
 
 function buildPlainText(research, news) {
   if (research?.extract) {
@@ -401,43 +347,23 @@ export async function POST(request) {
         return Response.json({ error: `Unknown dossier type: ${dosType}` }, { status: 400 });
     }
 
-    // Run research in parallel: company research + news + optional salary
-    const daysBack = dosType === "news" ? 30 : 180;
-
+    // Research: Wikipedia only (free, no API key needed)
     let companyResearch = null;
-    let roleResearch = null;
-    let newsData = null;
-
-    if (cName && (dosType === "company" || dosType === "jd" || dosType === "news")) {
-      const [research, news] = await Promise.all([
-        researchCompanyWikipedia(cName).catch(() => null),
-        fetchCompanyNews(cName, daysBack).catch(() => null),
-      ]);
-      companyResearch = research;
-      newsData = news;
-    } else if (cName && dosType === "role") {
-      // Only fetch news for role with company context
-      newsData = await fetchCompanyNews(cName, daysBack).catch(() => null);
-    }
-
-    if (rName) {
-      roleResearch = await researchRole(rName, cName || "").catch(() => null);
+    if (cName) {
+      companyResearch = await researchCompanyWikipedia(cName).catch(() => null);
     }
 
     // Build prompt
-    const researchInjection = buildResearchInjection(companyResearch);
-    const salaryInjection = buildSalaryInjection(roleResearch?.salary);
-
     let userPrompt;
     switch (dosType) {
       case "company":
-        const researchText = buildPlainText(companyResearch, newsData);
+        const researchText = buildPlainText(companyResearch, null);
         console.log("=== PLAIN TEXT LENGTH:", researchText.length);
         console.log("=== FIRST 200 CHARS:", researchText.substring(0, 200));
         const facts = await extractCompanyFacts(researchText);
         if (!facts || facts.length === 0) {
           console.log("=== EXTRACTOR RETURNED EMPTY, USING FALLBACK ===");
-          const fallbackText = buildPlainText(companyResearch, newsData);
+          const fallbackText = buildPlainText(companyResearch, null);
           if (fallbackText) {
             facts.push(...fallbackText.split("\n\n").filter(Boolean));
           }
@@ -452,7 +378,7 @@ export async function POST(request) {
         console.log("=======================");
         break;
       case "role":
-        const roleText = buildRoleText(roleResearch, jd);
+        const roleText = buildRoleText(null, jd);
         let roleFacts = await extractRoleFacts(roleText);
         if (!roleFacts || roleFacts.length === 0) {
           const fallback = roleText.split("\n\n").filter(Boolean);
@@ -462,27 +388,27 @@ export async function POST(request) {
         userPrompt = buildRolePrompt(rName, cName || "", roleFactStr, jd, "");
         break;
       case "jd":
-        const jdText = buildJDText(jd, companyResearch, newsData);
+        const jdText = buildJDText(jd, companyResearch, null);
         let jdFacts = await extractJDFacts(jdText);
         if (!jdFacts || jdFacts.length === 0) {
           const jdFallback = jdText.split("\n\n").filter(Boolean);
           jdFacts = jdFallback.length > 0 ? jdFallback : [];
         }
         const jdFactStr = jdFacts.length > 0 ? jdFacts.map((f) => `- ${f}`).join("\n") : "";
-        userPrompt = buildJDPrompt(cName, rName, jd, newsData, jdFactStr);
+        userPrompt = buildJDPrompt(cName, rName, jd, null, jdFactStr);
         break;
       case "news":
-        const newsText = buildNewsText(newsData, companyResearch);
+        const newsText = buildNewsText(null, companyResearch);
         let newsFacts = await extractNewsFacts(newsText);
         if (!newsFacts || newsFacts.length === 0) {
           const nsFallback = newsText.split("\n").filter(Boolean);
           newsFacts = nsFallback.length > 0 ? nsFallback : [];
         }
         const nsFactStr = newsFacts.length > 0 ? newsFacts.map((f) => `- ${f}`).join("\n") : "";
-        userPrompt = buildNewsPrompt(cName, rName || "", newsData, nsFactStr);
+        userPrompt = buildNewsPrompt(cName, rName || "", null, nsFactStr);
         break;
       default:
-        userPrompt = buildCompanyPrompt(cName, newsData, companyResearch);
+        userPrompt = buildCompanyPrompt(cName, "", companyResearch);
     }
 
     const messages = [
@@ -549,14 +475,8 @@ export async function POST(request) {
       .finally(() => stopHeartbeat());
 
     // Emit research status
-    const totalSnippets =
-      (companyResearch?.financials?.snippetCount || 0) +
-      (companyResearch?.competitors?.snippetCount || 0) +
-      (companyResearch?.industry?.snippetCount || 0) +
-      (companyResearch?.profile?.snippetCount || 0) +
-      (newsData?.length || 0);
-    if (totalSnippets > 0) {
-      try { emitter.emit("news-status", { count: totalSnippets, daysBack }); } catch {}
+    if (companyResearch?.extract) {
+      try { emitter.emit("news-status", { count: 1, daysBack: 0 }); } catch {}
     }
 
     request.signal.addEventListener("abort", () => {

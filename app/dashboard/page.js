@@ -25,7 +25,7 @@ const DOSSIER_LABELS = {
 
 const INFO_CARDS = [
   { stat: "4", label: "Dossier Types", desc: "Company, Role, JD, News" },
-  { stat: "3+", label: "Data Sources", desc: "SerpAPI, OpenAI, real-time news" },
+  { stat: "3+", label: "Data Sources", desc: "Wikipedia, OpenAI, real-time" },
   { stat: "21", label: "Sections Deep", desc: "From strategy to interview questions" },
   { stat: "90s", label: "Generation Time", desc: "From input to complete dossier" },
 ];

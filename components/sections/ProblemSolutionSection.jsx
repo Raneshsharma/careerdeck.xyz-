@@ -100,7 +100,7 @@ export default function ProblemSolutionSection() {
             </div>
 
             <p className="mt-6 text-xs text-[#94A3B8]">
-              All generated in real time with live SerpAPI &amp; GPT-4o-mini.
+              All generated in real time with Wikipedia research &amp; GPT-4o-mini.
             </p>
 
             <div className="mt-6">

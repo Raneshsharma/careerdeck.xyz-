@@ -66,7 +66,7 @@ export default function PricingSection() {
             Simple pricing
           </h2>
           <p className="mt-4 text-xl sm:text-2xl text-[#64748B] max-w-[600px] mx-auto">
-            All tiers include real-time SerpAPI research and GPT-4o-mini generation.
+            All tiers include real-time research and GPT-4o-mini generation.
             No hidden fees, no surprise charges.
           </p>
         </NonReversingReveal>
