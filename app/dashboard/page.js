@@ -42,6 +42,7 @@ export default function GeneratePage() {
   const [sidebarVersion, setSidebarVersion] = useState(0);
   const [usageVersion, setUsageVersion] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [sourceMetadata, setSourceMetadata] = useState(null);
   const [loadingDossier, setLoadingDossier] = useState(false);
   const abortRef = useRef(null);
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
@@ -215,6 +216,8 @@ export default function GeneratePage() {
               resetStallTimer()
             } else if (eventType === "news-status") {
               setNewsCount(parsed.count)
+            } else if (eventType === "sources") {
+              setSourceMetadata(parsed.sources)
             } else if (eventType === "done") {
               receivedDone = true
             } else if (eventType === "error") {
@@ -469,7 +472,7 @@ export default function GeneratePage() {
                     </div>
                   </div>
                 )}
-                <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} hideToolbar hideShortBanner />
+                <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} hideToolbar hideShortBanner genId={genId} sourceMetadata={sourceMetadata} />
               </>
             )}
           </div>

@@ -479,6 +479,20 @@ export async function POST(request) {
       try { emitter.emit("news-status", { count: 1, daysBack: 0 }); } catch {}
     }
 
+    // Emit source metadata for citations
+    const sourceMetadata = [];
+    if (companyResearch?.extract) {
+      sourceMetadata.push({
+        source: "Wikipedia",
+        preview: companyResearch.extract.substring(0, 200),
+        text: companyResearch.extract,
+        url: companyResearch.pageUrl,
+      });
+    }
+    if (sourceMetadata.length > 0) {
+      try { emitter.emit("sources", { sources: sourceMetadata }); } catch {}
+    }
+
     request.signal.addEventListener("abort", () => {
       abort.abort();
       cancel(request);

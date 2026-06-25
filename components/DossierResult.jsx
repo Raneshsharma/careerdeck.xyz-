@@ -2,8 +2,15 @@
 
 import { useMemo, useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
+import SourceTiles from "@/components/SourceTiles";
+import SectionVoting from "@/components/SectionVoting";
+import SectionFeedback from "@/components/SectionFeedback";
 
-export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner }) {
+function slugify(text) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner, genId, sourceMetadata }) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
   const resultRef = useRef(null);
@@ -31,6 +38,15 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
   };
 
   const wordCount = content.split(/\s+/).filter(Boolean).length;
+
+  const sections = useMemo(() => {
+    const parts = content.split(/(?=^## )/m);
+    return parts.map((section) => {
+      const match = section.match(/^## (.+)/m);
+      const title = match ? match[1].trim() : "";
+      return { title, id: slugify(title), body: section.trim() };
+    }).filter((s) => s.body);
+  }, [content]);
 
   return (
     <div ref={resultRef} className={`transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
@@ -71,27 +87,24 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
         <article className="dossier-markdown">
-          <ReactMarkdown
-            components={{
-              h1: ({ children, ...props }) => {
-                const text = String(children);
-                const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-                return <h1 id={id} {...props}>{children}</h1>;
-              },
-              h2: ({ children, ...props }) => {
-                const text = String(children);
-                const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-                return <h2 id={id} {...props}>{children}</h2>;
-              },
-              h3: ({ children, ...props }) => {
-                const text = String(children);
-                const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-                return <h3 id={id} {...props}>{children}</h3>;
-              },
-            }}
-          >
-            {content}
-          </ReactMarkdown>
+          {sections.map((section, idx) => (
+            <div key={section.id || idx} id={section.id}>
+              <ReactMarkdown
+                components={{
+                  h2: ({ children, ...props }) => <h2 id={section.id} {...props}>{children}</h2>,
+                }}
+              >
+                {section.body}
+              </ReactMarkdown>
+              {section.title && (
+                <div className="mb-8">
+                  <SourceTiles sources={sourceMetadata} />
+                  <SectionVoting dossierId={genId} sectionKey={section.title} />
+                  <SectionFeedback dossierId={genId} sectionKey={section.title} />
+                </div>
+              )}
+            </div>
+          ))}
         </article>
       </div>
     </div>

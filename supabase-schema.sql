@@ -52,3 +52,23 @@ returns integer as $$
   where user_id = user_uuid
     and created_at >= date_trunc('month', now());
 $$ language sql;
+
+-- ── Section Feedback ──
+create table if not exists section_feedback (
+  id uuid primary key default gen_random_uuid(),
+  user_id text,
+  dossier_id uuid references generations(id) on delete cascade,
+  section_key text not null,
+  vote integer not null check (vote in (1, -1)),
+  created_at timestamp default now(),
+  unique (user_id, dossier_id, section_key)
+);
+
+create table if not exists section_comments (
+  id uuid primary key default gen_random_uuid(),
+  user_id text,
+  dossier_id uuid references generations(id) on delete cascade,
+  section_key text not null,
+  comment text not null,
+  created_at timestamp default now()
+);
