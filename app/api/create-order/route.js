@@ -1,8 +1,8 @@
 import Razorpay from "razorpay";
 
 const PLANS = {
-  pro: { amount: 49900, name: "Pro – ₹499/mo" },
-  enterprise: { amount: 149900, name: "Enterprise – ₹1,499/mo" },
+  pro: { amount: 14900, name: "Pro – ₹149/mo" },
+  "pro-annual": { amount: 119900, name: "Pro Annual – ₹1,199/yr" },
 };
 
 export async function POST(request) {

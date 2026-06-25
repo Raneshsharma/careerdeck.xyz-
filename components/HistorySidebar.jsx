@@ -85,14 +85,12 @@ export default function HistorySidebar({ onSelect, activeId, onDelete }) {
 
       {!loading && !error && generations.length === 0 && (
         <div className="text-center py-6">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-3">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
-            <line x1="12" y1="18" x2="12" y2="12" />
-            <line x1="9" y1="15" x2="15" y2="15" />
           </svg>
           <p className="text-sm text-gray-400 font-medium">No dossiers yet</p>
-          <p className="text-xs text-gray-300 mt-0.5">Create your first one above</p>
+          <p className="text-xs text-gray-300 mt-0.5">Generate your first one to see it here</p>
         </div>
       )}
 

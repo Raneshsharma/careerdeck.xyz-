@@ -28,7 +28,7 @@ export async function POST(request) {
       return Response.json({ error: "Signature verification failed" }, { status: 400 });
     }
 
-    if (plan && ["pro", "enterprise"].includes(plan)) {
+    if (plan && ["pro", "pro-annual", "enterprise"].includes(plan)) {
       const { error: dbErr } = await supabase
         .from("profiles")
         .upsert({ id: user.id, plan_tier: plan })

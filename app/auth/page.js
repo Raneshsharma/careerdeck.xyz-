@@ -51,6 +51,17 @@ function AuthContent() {
           <p className="mt-2 text-[#64748B] text-sm">
             Sign in to generate interview prep dossiers
           </p>
+
+          <div className="mt-6 bg-white border border-gray-200/80 rounded-xl p-4 text-left">
+            <p className="text-sm text-[#475569] italic leading-relaxed">
+              &ldquo;CareerDeck helped me prep for my Amazon interview in 30 minutes instead of 3 hours. Got the offer.&rdquo;
+            </p>
+            <p className="text-xs text-[#94A3B8] mt-2 font-medium">— Riya M., IIM Bangalore &bull; MBA 2025</p>
+          </div>
+
+          <p className="mt-4 text-xs text-[#94A3B8]">
+            Trusted by 500+ MBA students and early‑career professionals
+          </p>
         </div>
 
         <button

@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import SourceTiles from "@/components/SourceTiles";
 import SectionVoting from "@/components/SectionVoting";
 import SectionFeedback from "@/components/SectionFeedback";
+import Link from "next/link";
 
 function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -106,6 +107,20 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
             </div>
           ))}
         </article>
+
+        {/* Post‑dossier upgrade CTA */}
+        <div className="mt-8 pt-6 border-t border-gray-100 text-center no-print">
+          <p className="text-sm text-[#64748B] mb-3">Want unlimited dossiers and PDF exports?</p>
+          <Link
+            href="/checkout?plan=pro"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] text-sm font-bold transition-all duration-200 shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
+          >
+            Upgrade to Pro — just ₹149/mo
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -8,8 +8,8 @@ import LandingHeader from "@/components/LandingHeader";
 import Image from "next/image";
 
 const PLANS = {
-  pro: { name: "Pro", price: "₹499", amount: 49900, period: "/month", desc: "20 dossiers/month, all 4 types, full research depth, high priority" },
-  enterprise: { name: "Enterprise", price: "₹1,499", amount: 149900, period: "/month", desc: "Unlimited dossiers, all types, API access, instant generation" },
+  pro: { name: "Pro Monthly", price: "₹149", amount: 14900, period: "/month", desc: "20 dossiers/month, all 4 types, full research depth, PDF export, priority speed, email support" },
+  "pro-annual": { name: "Pro Annual", price: "₹1,199", amount: 119900, period: "/year", desc: "Everything in Pro Monthly, 20 dossiers/month, 2 months free, cancel anytime" },
 };
 
 function CheckoutContent() {
