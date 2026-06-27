@@ -1,10 +1,11 @@
--- CareerDeck Supabase Schema (corrected: text ids for Google OAuth compatibility)
--- Run this in the Supabase SQL Editor at:
--- https://supabase.com/dashboard/project/iqzkcrvmcvlmwfweltie/sql/new
+-- CareerDeck Supabase Schema (text ids for OAuth compatibility)
+-- Run in Supabase SQL Editor: https://supabase.com/dashboard/project/iqzkcrvmcvlmwfweltie/sql/new
+-- NOTE: Lines 5-7 are for fresh install ONLY. Skip them for existing databases.
 
-drop function if exists get_generations_this_month;
-drop table if exists generations;
-drop table if exists profiles;
+-- Fresh install only (removes all data):
+-- drop function if exists get_generations_this_month;
+-- drop table if exists generations;
+-- drop table if exists profiles;
 
 create table profiles (
   id text primary key,
@@ -72,3 +73,16 @@ create table if not exists section_comments (
   comment text not null,
   created_at timestamp default now()
 );
+
+-- ── RLS Migration (safe to run on existing DB — no data loss) ─────────────
+alter table if exists profiles enable row level security;
+drop policy if exists "Users can read own profile" on profiles;
+create policy "Users can read own profile" on profiles for select using (auth.uid()::text = id);
+
+alter table if exists generations enable row level security;  
+drop policy if exists "Users can read own generations" on generations;
+create policy "Users can read own generations" on generations for select using (auth.uid()::text = user_id);
+drop policy if exists "Users can delete own generations" on generations;
+create policy "Users can delete own generations" on generations for delete using (auth.uid()::text = user_id);
+drop policy if exists "Users can insert own generations" on generations;
+create policy "Users can insert own generations" on generations for insert with check (auth.uid()::text = user_id);
