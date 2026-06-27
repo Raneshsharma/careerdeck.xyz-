@@ -1,26 +1,28 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase-client";
 import LandingPage from "@/components/LandingPage";
 
-export const dynamic = "force-dynamic";
+export default function Home() {
+  const [checking, setChecking] = useState(true);
+  const router = useRouter();
 
-async function getSession() {
-  try {
-    const { createClient } = await import("@/lib/supabase-server");
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
-  } catch (e) {
-    console.error("Home page session error:", e.message);
-    return null;
-  }
-}
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        router.replace("/dashboard");
+      } else {
+        setChecking(false);
+      }
+    }).catch(() => {
+      setChecking(false);
+    });
+  }, [router]);
 
-export default async function Home() {
-  const user = await getSession();
-
-  if (user) {
-    const { redirect } = await import("next/navigation");
-    redirect("/dashboard");
-  }
+  if (checking) return null;
 
   return <LandingPage />;
 }
