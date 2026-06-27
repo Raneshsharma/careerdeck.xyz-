@@ -21,7 +21,11 @@ export async function middleware(request) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch { /* proceed — session cookie may be stale */ }
 
   if (!user) {
     const { pathname, search } = request.nextUrl;

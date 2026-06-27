@@ -17,7 +17,7 @@ function AuthContent() {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) router.replace(redirectTo);
-    });
+    }).catch(() => {});
   }, [router, redirectTo]);
 
   async function handleSignIn() {

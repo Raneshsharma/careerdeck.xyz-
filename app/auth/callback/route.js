@@ -15,9 +15,11 @@ export async function GET(request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      let user = null;
+      try {
+        const { data } = await supabase.auth.getUser();
+        user = data.user;
+      } catch { /* session may not be ready */ }
 
       if (user) {
         const { data: profile } = await supabase

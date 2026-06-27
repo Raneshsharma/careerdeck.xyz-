@@ -38,10 +38,10 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
     try { await navigator.clipboard.writeText(content); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
   };
 
-  const wordCount = content.split(/\s+/).filter(Boolean).length;
+  const wordCount = (content || "").split(/\s+/).filter(Boolean).length;
 
   const sections = useMemo(() => {
-    const parts = content.split(/(?=^## )/m);
+    const parts = (content || "").split(/(?=^## )/m);
     return parts.map((section) => {
       const match = section.match(/^## (.+)/m);
       const title = match ? match[1].trim() : "";

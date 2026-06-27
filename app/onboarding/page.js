@@ -26,6 +26,13 @@ const EXPERIENCE_LEVELS = [
   "Executive (10+ yrs)",
 ]
 
+function isValidRedirect(url) {
+  if (!url || typeof url !== "string") return false;
+  if (!url.startsWith("/")) return false;
+  if (url.includes("@") || url.includes("//") || url.includes("\\")) return false;
+  return true;
+}
+
 function OnboardContent() {
   const { user, loading } = useAuth()
   const router = useRouter()
@@ -91,13 +98,6 @@ function OnboardContent() {
       router.replace(destination)
     } catch (err) {
       toast.error(err.message)
-
-function isValidRedirect(url) {
-  if (!url || typeof url !== "string") return false;
-  if (!url.startsWith("/")) return false;
-  if (url.includes("@") || url.includes("//") || url.includes("\\")) return false;
-  return true;
-}
     } finally {
       setSaving(false)
     }

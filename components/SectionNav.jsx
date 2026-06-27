@@ -7,7 +7,7 @@ export default function SectionNav({ content, className = "" }) {
   const [activeId, setActiveId] = useState(null);
 
   useEffect(() => {
-    const lines = content.split("\n");
+    const lines = (content || "").split("\n");
     const found = [];
     lines.forEach((line) => {
       const h1 = line.match(/^#\s+(.+)/);

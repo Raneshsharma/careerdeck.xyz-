@@ -17,9 +17,9 @@ export default function SessionProvider({ children }) {
     const supabase = createClient();
 
     supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
+      setUser(user ?? null);
       setLoading(false);
-    });
+    }).catch(() => { setLoading(false); });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
