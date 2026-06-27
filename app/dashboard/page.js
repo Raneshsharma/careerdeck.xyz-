@@ -49,7 +49,7 @@ function DashboardContent() {
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
 
   const { user, loading } = useAuth();
-  const tourLoaded = useRef(false);
+  const tourLoaded = useRef(true);
 
   useEffect(() => {
     if (user && shouldShowTour() && !tourLoaded.current) {

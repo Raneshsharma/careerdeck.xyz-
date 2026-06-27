@@ -30,7 +30,6 @@ export default function RootLayout({ children }) {
     <html lang="en" className={inter.className}>
       <body className="min-h-screen antialiased" suppressHydrationWarning>
         <SessionProvider>
-          <ErrorBoundary>
           <Toaster
             position="top-right"
             toastOptions={{
@@ -42,7 +41,6 @@ export default function RootLayout({ children }) {
             }}
           />
           {children}
-          </ErrorBoundary>
         </SessionProvider>
       </body>
     </html>

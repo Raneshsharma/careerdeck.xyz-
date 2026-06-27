@@ -2,6 +2,9 @@
 
 import { useEffect, useRef } from "react";
 
+let gsapModule = null;
+let scrollTriggerModule = null;
+
 export default function NonReversingReveal({ children, trigger, start, end, className = "", id }) {
   const ref = useRef(null);
 
@@ -12,8 +15,10 @@ export default function NonReversingReveal({ children, trigger, start, end, clas
 
     let st;
     try {
-      const { gsap } = require("gsap");
-      const { ScrollTrigger } = require("gsap/ScrollTrigger");
+      if (!gsapModule) gsapModule = require("gsap");
+      if (!scrollTriggerModule) scrollTriggerModule = require("gsap/ScrollTrigger");
+      const { gsap } = gsapModule;
+      const { ScrollTrigger } = scrollTriggerModule;
       gsap.registerPlugin(ScrollTrigger);
 
       st = ScrollTrigger.create({
