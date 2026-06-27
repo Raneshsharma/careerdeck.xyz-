@@ -85,13 +85,13 @@ export default function MobileNavbar({ usageVersion }) {
                   Sign Out
                 </button>
               ) : (
-                <button
-                  onClick={() => { const supabase = createClient(); const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin; supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${siteUrl}/auth/callback` } }); }}
+                <Link
+                  href="/auth"
                   className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 text-sm font-medium text-brand-500 w-full"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
                   Sign In
-                </button>
+                </Link>
               )}
             </nav>
           </div>
