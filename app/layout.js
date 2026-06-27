@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import SessionProvider from "@/components/SessionProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import ErrorBoundary from "@/components/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
