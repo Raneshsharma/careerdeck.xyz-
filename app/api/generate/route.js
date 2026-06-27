@@ -4,9 +4,7 @@ import { buildRolePrompt } from "@/lib/prompt-role";
 import { buildJDPrompt } from "@/lib/prompt-jd";
 import { buildNewsPrompt } from "@/lib/prompt-news";
 import { extractCompanyFacts, extractRoleFacts, extractJDFacts, extractNewsFacts } from "@/lib/extract-facts-structured";
-import {
-  researchCompanyWikipedia,
-} from "@/lib/research";
+import { researchCompany } from "@/lib/research";
 import { tryAcquire, release, cancel } from "@/lib/rate-limiter";
 import {
   FREE_MONTHLY_LIMIT,
@@ -224,8 +222,8 @@ async function processAnthropicStream(body, emitter) {
 // ─── Helper: build plain text from research ────────────────────────────
 
 function buildPlainText(research, news) {
-  if (research?.extract) {
-    let text = research.extract;
+  if (research?.text) {
+    let text = research.text;
     if (Array.isArray(news) && news.length) {
       text += "\n\n--- RECENT NEWS ---\n" + news.map((d) => `${d.title}: ${d.snippet}`).join("\n");
     }
@@ -262,7 +260,7 @@ function buildRoleText(roleResearch, jd) {
 
 function buildJDText(jd, research, news) {
   const parts = [jd];
-  if (research?.extract) parts.push("Company Context: " + research.extract);
+  if (research?.text) parts.push("Company Context: " + research.text);
   if (Array.isArray(news) && news.length) {
     parts.push("Company News: " + news.map((d) => d.title + ": " + d.snippet).join(" | "));
   }
@@ -274,7 +272,7 @@ function buildNewsText(news, research) {
   if (Array.isArray(news) && news.length) {
     parts.push(news.map((d) => `[${d.date || "?"}] ${d.title}: ${d.snippet}`).join("\n"));
   }
-  if (research?.extract) parts.push("Company Profile: " + research.extract);
+  if (research?.text) parts.push("Company Profile: " + research.text);
   return parts.join("\n\n");
 }
 
@@ -347,10 +345,10 @@ export async function POST(request) {
         return Response.json({ error: `Unknown dossier type: ${dosType}` }, { status: 400 });
     }
 
-    // Research: Wikipedia only (free, no API key needed)
-    let companyResearch = null;
+    // Research: multi-source pipeline (Wikipedia → DuckDuckGo → GNews → Google CSE → Meta → Crunchbase)
+    let companyResearch = { text: "", sources: [] };
     if (cName) {
-      companyResearch = await researchCompanyWikipedia(cName).catch(() => null);
+      companyResearch = await researchCompany(cName, jd).catch(() => ({ text: "", sources: [] }));
     }
 
     // Build prompt
@@ -475,22 +473,13 @@ export async function POST(request) {
       .finally(() => stopHeartbeat());
 
     // Emit research status
-    if (companyResearch?.extract) {
-      try { emitter.emit("news-status", { count: 1, daysBack: 0 }); } catch {}
+    if (companyResearch?.text) {
+      try { emitter.emit("news-status", { count: companyResearch.sources.length, daysBack: 0 }); } catch {}
     }
 
-    // Emit source metadata for citations
-    const sourceMetadata = [];
-    if (companyResearch?.extract) {
-      sourceMetadata.push({
-        source: "Wikipedia",
-        preview: companyResearch.extract.substring(0, 200),
-        text: companyResearch.extract,
-        url: companyResearch.pageUrl,
-      });
-    }
-    if (sourceMetadata.length > 0) {
-      try { emitter.emit("sources", { sources: sourceMetadata }); } catch {}
+    // Emit source metadata for citations (multi-source)
+    if (companyResearch?.sources?.length > 0) {
+      try { emitter.emit("sources", { sources: companyResearch.sources }); } catch {}
     }
 
     request.signal.addEventListener("abort", () => {
