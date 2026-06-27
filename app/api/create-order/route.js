@@ -12,7 +12,7 @@ export async function POST(request) {
     const selectedPlan = PLANS[plan];
 
     if (!selectedPlan) {
-      return Response.json({ error: "Invalid plan. Use 'pro' or 'enterprise'." }, { status: 400 });
+      return Response.json({ error: "Invalid plan. Use 'pro' or 'pro-annual'." }, { status: 400 });
     }
 
     const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;

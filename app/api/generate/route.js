@@ -356,24 +356,15 @@ export async function POST(request) {
     switch (dosType) {
       case "company":
         const researchText = buildPlainText(companyResearch, null);
-        console.log("=== PLAIN TEXT LENGTH:", researchText.length);
-        console.log("=== FIRST 200 CHARS:", researchText.substring(0, 200));
         const facts = await extractCompanyFacts(researchText);
         if (!facts || facts.length === 0) {
-          console.log("=== EXTRACTOR RETURNED EMPTY, USING FALLBACK ===");
           const fallbackText = buildPlainText(companyResearch, null);
           if (fallbackText) {
             facts.push(...fallbackText.split("\n\n").filter(Boolean));
           }
         }
         const factList = facts.map((f) => `- ${f}`).join("\n");
-        console.log("===== EXTRACTED FACTS =====");
-        console.log(factList);
-        console.log("===========================");
         userPrompt = buildCompanyPrompt(cName, factList, rName, jd);
-        console.log("===== USER PROMPT =====");
-        console.log(userPrompt);
-        console.log("=======================");
         break;
       case "role":
         const roleText = buildRoleText(null, jd);

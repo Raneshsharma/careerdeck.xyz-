@@ -19,6 +19,10 @@ export async function POST(request) {
     }
 
     const secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!secret) {
+      console.error("RAZORPAY_KEY_SECRET not configured");
+      return Response.json({ error: "Payment gateway not configured" }, { status: 500 });
+    }
     const payload = `${razorpay_order_id}|${razorpay_payment_id}`;
     const generated = createHmac("sha256", secret).update(payload).digest();
 
