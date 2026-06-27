@@ -1,12 +1,26 @@
-import { createClient } from "@/lib/supabase-server";
-import { redirect } from "next/navigation";
 import LandingPage from "@/components/LandingPage";
 
-export default async function Home() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export const dynamic = "force-dynamic";
 
-  if (user) redirect("/dashboard");
+async function getSession() {
+  try {
+    const { createClient } = await import("@/lib/supabase-server");
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    return user;
+  } catch (e) {
+    console.error("Home page session error:", e.message);
+    return null;
+  }
+}
+
+export default async function Home() {
+  const user = await getSession();
+
+  if (user) {
+    const { redirect } = await import("next/navigation");
+    redirect("/dashboard");
+  }
 
   return <LandingPage />;
 }
