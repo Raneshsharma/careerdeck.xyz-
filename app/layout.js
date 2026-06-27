@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import SessionProvider from "@/components/SessionProvider";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -27,8 +28,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={inter.className}>
-      <body className="min-h-screen antialiased">
+      <body className="min-h-screen antialiased" suppressHydrationWarning>
         <SessionProvider>
+          <ErrorBoundary>
           <Toaster
             position="top-right"
             toastOptions={{
@@ -40,6 +42,7 @@ export default function RootLayout({ children }) {
             }}
           />
           {children}
+          </ErrorBoundary>
         </SessionProvider>
       </body>
     </html>
