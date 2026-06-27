@@ -14,7 +14,7 @@ import NonReversingReveal from "@/components/NonReversingReveal";
 import UserMenu from "@/components/UserMenu";
 import MobileNavbar from "@/components/MobileNavbar";
 import BottomNav from "@/components/BottomNav";
-import HistoryButton from "@/components/HistoryButton";
+import OnboardingTour, { shouldShowTour } from "@/components/OnboardingTour";
 
 const DOSSIER_LABELS = {
   company: "Company Dossier",
@@ -30,7 +30,7 @@ const INFO_CARDS = [
   { stat: "90s", label: "Generation Time", desc: "From input to complete dossier" },
 ];
 
-export default function GeneratePage() {
+function DashboardContent() {
   const [dossierType, setDossierType] = useState("company");
   const [content, setContent] = useState("");
   const [generating, setGenerating] = useState(false);
@@ -43,11 +43,21 @@ export default function GeneratePage() {
   const [usageVersion, setUsageVersion] = useState(0);
   const [copied, setCopied] = useState(false);
   const [sourceMetadata, setSourceMetadata] = useState(null);
+  const [tourVisible, setTourVisible] = useState(false);
   const [loadingDossier, setLoadingDossier] = useState(false);
   const abortRef = useRef(null);
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
 
   const { user, loading } = useAuth();
+  const tourLoaded = useRef(false);
+
+  useEffect(() => {
+    if (user && shouldShowTour() && !tourLoaded.current) {
+      tourLoaded.current = true;
+      const t = setTimeout(() => setTourVisible(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [user]);
 
   const wordCount = useMemo(() => content.split(/\s+/).filter(Boolean).length, [content]);
   const minRead = useMemo(() => Math.ceil(wordCount / 250), [wordCount]);
@@ -296,7 +306,9 @@ export default function GeneratePage() {
           <nav className="flex items-center gap-6">
             <Link href="/dashboard" className="text-sm font-medium text-[#0F172A]">Dashboard</Link>
             <Link href="/pricing" className="text-sm text-[#64748B] hover:text-[#0F172A]">Pricing</Link>
-            <UserMenu refreshTrigger={usageVersion} />
+            <span data-tour="user-menu">
+              <UserMenu refreshTrigger={usageVersion} />
+            </span>
           </nav>
         </div>
       </header>
@@ -341,7 +353,7 @@ export default function GeneratePage() {
 
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* ── Left: History Sidebar (desktop only) ── */}
-          <aside className="hidden lg:block w-72 shrink-0">
+          <aside className="hidden lg:block w-72 shrink-0" data-tour="history">
             <div className="lg:sticky lg:top-24">
               <HistorySidebar
                 key={sidebarVersion}
@@ -382,6 +394,7 @@ export default function GeneratePage() {
                   </div>
                 )}
 
+                <span data-tour="form">
                 <NonReversingReveal id="form-card" className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
                   <div className="mb-6">
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] tracking-tight">{DOSSIER_LABELS[dossierType]}</h1>
@@ -397,6 +410,7 @@ export default function GeneratePage() {
                     <DossierForm onSubmit={handleSubmit} generating={generating} dossierType={dossierType} />
                   </div>
                 </NonReversingReveal>
+                </span>
 
                 <NonReversingReveal id="generate-stats" className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {INFO_CARDS.map((card) => (
@@ -503,6 +517,10 @@ export default function GeneratePage() {
       </footer>
 
       <BottomNav />
+
+      {tourVisible && (
+        <OnboardingTour onComplete={() => setTourVisible(false)} />
+      )}
     </div>
   );
 }
@@ -529,3 +547,5 @@ function renderMarkdownPreview(md) {
 function escapeHTML(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
+
+export default DashboardContent;
