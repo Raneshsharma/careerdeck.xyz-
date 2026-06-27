@@ -277,6 +277,15 @@ function DashboardContent() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-12 pb-20 lg:pb-12">
+        <div className="lg:hidden flex items-center justify-between mb-4">
+          <h1 className="text-lg font-extrabold text-[#0F172A]">{DOSSIER_LABELS[dossierType]}</h1>
+          <HistoryButton onSelect={loadDossier} activeId={activeDossierId} onDelete={handleDeleteDossier} sidebarVersion={sidebarVersion} />
+        </div>
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <aside className="hidden lg:block w-72 shrink-0" data-tour="history">
+            <div className="lg:sticky lg:top-24"><HistorySidebar key={sidebarVersion} onSelect={loadDossier} activeId={activeDossierId} onDelete={handleDeleteDossier} /></div>
+          </aside>
+          <div className="flex-1 min-w-0 max-w-2xl">
         {loadingDossier && <div className="text-center py-16"><div className="w-14 h-14 rounded-full border-[3px] border-gray-200 border-t-brand-500 animate-spin mx-auto mb-6 bg-transparent" /><p className="text-sm text-gray-400 animate-pulse">Loading...</p></div>}
 
         {!loadingDossier && !content && !generating && (
@@ -315,6 +324,8 @@ function DashboardContent() {
             <button onClick={handleCancel} className="mt-8 text-xs text-gray-400 hover:text-red-500 transition-colors">Cancel generation</button>
           </div></div>
         )}
+          </div>
+        </div>
       </main>
 
       <footer className="bg-white border-t border-gray-100 mt-16 no-print hidden lg:block">
