@@ -260,9 +260,69 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-[#0F172A]">Dashboard OK</h1>
-      <p className="text-sm text-[#64748B] mt-2">{user ? "Authenticated" : "Loading..."}</p>
+    <div className="min-h-screen bg-[#FAFAFA]">
+      <MobileNavbar usageVersion={usageVersion} />
+
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100 hidden lg:flex">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between h-16 w-full">
+          <Link href="/" className="flex items-center">
+            <Image src="/logo.png" alt="CareerDeck" height={32} width={48} className="h-8 w-auto" />
+          </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/dashboard" className="text-sm font-medium text-[#0F172A]">Dashboard</Link>
+            <Link href="/pricing" className="text-sm text-[#64748B] hover:text-[#0F172A]">Pricing</Link>
+            <span data-tour="user-menu"><UserMenu refreshTrigger={usageVersion} /></span>
+          </nav>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-12 pb-20 lg:pb-12">
+        {loadingDossier && <div className="text-center py-16"><div className="w-14 h-14 rounded-full border-[3px] border-gray-200 border-t-brand-500 animate-spin mx-auto mb-6 bg-transparent" /><p className="text-sm text-gray-400 animate-pulse">Loading...</p></div>}
+
+        {!loadingDossier && !content && !generating && (
+          <>
+            {errorMessage && (
+              <div className="bg-red-50 border border-red-300 rounded-lg p-4 mb-4 animate-shake">
+                <div className="flex items-start gap-3">
+                  <span className="text-red-500 shrink-0 mt-0.5">&#x26A0;&#xFE0F;</span>
+                  <div className="flex-1"><p className="text-sm text-red-800">{errorMessage}</p><button onClick={() => setErrorMessage(null)} className="text-xs text-red-600 underline mt-1 hover:text-red-800">Dismiss</button></div>
+                </div>
+                {(errorMessage.includes("used all generations") || errorMessage.includes("Upgrade")) && (
+                  <div className="mt-3 pt-3 border-t border-red-200"><Link href="/checkout?plan=pro" className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-[#0F172A] text-xs font-bold rounded-lg">Upgrade to Pro ₹149/mo</Link></div>
+                )}
+              </div>
+            )}
+            <span data-tour="form">
+            <NonReversingReveal id="form-card" className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+              <div className="mb-6"><h1 className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] tracking-tight">{DOSSIER_LABELS[dossierType]}</h1>
+              <p className="text-sm text-[#64748B] mt-1">{dossierType === "company" && "Deep dive into a company's business model, strategy, culture, and interview prep."}{dossierType === "role" && "Understand a role's responsibilities, skills, career path, and interview expectations."}{dossierType === "jd" && "Decode a specific job description — hidden expectations, STAR blueprints, and hiring manager perspective."}{dossierType === "news" && "Last 30 days of high-signal developments, analyzed for business and interview relevance."}</p></div>
+              <DossierTabs selected={dossierType} onChange={(t) => { setDossierType(t); setErrorMessage(null) }} disabled={generating} />
+              <div className="mt-6"><DossierForm onSubmit={handleSubmit} generating={generating} dossierType={dossierType} /></div>
+            </NonReversingReveal>
+            </span>
+          </>
+        )}
+
+        {content && !generating && (
+          <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} hideToolbar hideShortBanner genId={genId} sourceMetadata={sourceMetadata} />
+        )}
+
+        {generating && (
+          <div className="max-w-2xl"><div className="text-center">
+            <div className="w-14 h-14 rounded-full border-[3px] border-gray-200 border-t-brand-500 animate-spin mx-auto mb-5 bg-transparent" />
+            <h2 className="text-xl font-bold text-[#0F172A] mb-1">Building Your {DOSSIER_LABELS[dossierType]}</h2>
+            <p className="text-sm text-[#64748B] mb-8">Gathering intelligence, analyzing data, and structuring your dossier</p>
+            <button onClick={handleCancel} className="mt-8 text-xs text-gray-400 hover:text-red-500 transition-colors">Cancel generation</button>
+          </div></div>
+        )}
+      </main>
+
+      <footer className="bg-white border-t border-gray-100 mt-16 no-print hidden lg:block">
+        <div className="max-w-7xl mx-auto px-8 py-6 text-center text-xs text-gray-400">
+          <p><strong className="text-gray-500">CareerDeck</strong> — Verify critical facts before your interview. Good luck!</p>
+        </div>
+      </footer>
+      <BottomNav />
     </div>
   );
 }
