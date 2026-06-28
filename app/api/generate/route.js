@@ -65,7 +65,7 @@ async function streamOpenRouter(messages, model, apiKey, signal) {
       "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "https://careerdeck.xyz",
       "X-Title": "CareerDeck",
     },
-    body: JSON.stringify({ model, messages, temperature: 0.3, max_tokens: 16384, stream: true }),
+    body: JSON.stringify({ model, messages, temperature: 0.3, max_tokens: 8192, stream: true }),
     signal,
   });
   if (!res.ok) {
