@@ -108,6 +108,16 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
       </div>
       )}
 
+      {/* Top action bar — quick back to generator */}
+      <div className="mb-4 no-print">
+        <button
+          onClick={onReset}
+          className="w-full min-h-[44px] py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all duration-200 shadow-sm"
+        >
+          &larr; Generate Another Dossier
+        </button>
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
         <article className="dossier-markdown">
           {sections.map((section, idx) => (
