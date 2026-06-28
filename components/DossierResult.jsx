@@ -121,6 +121,32 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
             </svg>
           </Link>
         </div>
+
+        {/* Bottom action bar — Generate Another + Copy + Download */}
+        <div className="mt-8 pt-6 border-t border-gray-100 no-print">
+          <button
+            onClick={onReset}
+            className="w-full min-h-[48px] mb-3 py-3 rounded-xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] font-bold text-sm transition-all duration-200 shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
+          >
+            Generate Another Dossier
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleCopy}
+              className={`flex-1 min-h-[44px] py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                copied ? "bg-green-50 text-green-700 border border-green-200" : "bg-gray-100 text-[#64748B] hover:bg-gray-200 border border-transparent"
+              }`}
+            >
+              {copied ? "✓ Copied!" : "📋 Copy Dossier"}
+            </button>
+            <button
+              onClick={handleDownload}
+              className="flex-1 min-h-[44px] py-2.5 rounded-xl bg-gray-100 text-[#64748B] hover:bg-gray-200 border border-transparent text-sm font-medium transition-all duration-200"
+            >
+              📥 Download .md
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
