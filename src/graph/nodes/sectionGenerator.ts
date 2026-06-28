@@ -6,12 +6,30 @@ import { CacheLevel } from "../../cache/types";
 import { getSectionDependency } from "../../cache/dependencyMap";
 
 interface SectionPrompt {
+  SECTION_ID: string;
   buildPrompt: (
     knowledge: CompanyKnowledgeBase,
     companyName: string,
     role?: string | undefined,
   ) => { systemPrompt: string; userPrompt: string };
-  SECTION_ID: string;
+  buildAnalystPrompt?: (
+    knowledge: CompanyKnowledgeBase,
+    companyName: string,
+    role?: string | undefined,
+  ) => { systemPrompt: string; userPrompt: string };
+  buildWriterPrompt?: (
+    analysis: Record<string, unknown>,
+    companyName: string,
+    role?: string | undefined,
+  ) => { systemPrompt: string; userPrompt: string };
+}
+
+function parseStructuredAnalysis(rawResponse: string): Record<string, unknown> {
+  try {
+    const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return JSON.parse(jsonMatch[0]);
+  } catch { /* fall through */ }
+  return { raw_analysis: rawResponse };
 }
 
 export function createSectionGenerator(prompt: SectionPrompt) {
@@ -27,7 +45,6 @@ export function createSectionGenerator(prompt: SectionPrompt) {
     const companyName = state.normalizedCompanyName || state.companyName;
     const role = state.role;
 
-    // Build a version-tagged cache key using dependent domain versions
     const dep = getSectionDependency(prompt.SECTION_ID);
     const domainVersions = state.domainVersions;
     let versionTag = "";
@@ -38,7 +55,6 @@ export function createSectionGenerator(prompt: SectionPrompt) {
         .join(";");
     }
 
-    // L4: Check section cache with version tag
     if (versionTag) {
       const cached = await CacheManager.get<string>(
         companyName,
@@ -51,10 +67,24 @@ export function createSectionGenerator(prompt: SectionPrompt) {
     }
 
     try {
-      const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
-      const content = await generateSection(systemPrompt, userPrompt);
+      let content: string;
 
-      // L4: Store in section cache
+      if (prompt.buildAnalystPrompt && prompt.buildWriterPrompt) {
+        // ── Two-pass: Business Analyst → Executive Writer ──
+        const { systemPrompt: analystSys, userPrompt: analystUser } =
+          prompt.buildAnalystPrompt(knowledge, companyName, role);
+        const analystRaw = await generateSection(analystSys, analystUser);
+        const analysis = parseStructuredAnalysis(analystRaw);
+
+        const { systemPrompt: writerSys, userPrompt: writerUser } =
+          prompt.buildWriterPrompt(analysis, companyName, role);
+        content = await generateSection(writerSys, writerUser);
+      } else {
+        // ── Legacy single-pass ──
+        const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
+        content = await generateSection(systemPrompt, userPrompt);
+      }
+
       if (versionTag && content) {
         await CacheManager.set(
           companyName,
