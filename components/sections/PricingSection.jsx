@@ -94,10 +94,9 @@ export default function PricingSection() {
           <span className={`text-sm font-medium transition-colors ${!annual ? "text-[#0F172A]" : "text-[#94A3B8]"}`}>Monthly</span>
           <button
             onClick={() => setAnnual(!annual)}
-            className="relative w-11 h-6 rounded-full transition-colors duration-200 overflow-hidden flex-shrink-0"
-            style={{ backgroundColor: annual ? "#F28C28" : "#D1D5DB" }}
+            className={`relative w-12 h-7 rounded-full transition-colors duration-200 flex-shrink-0 ${annual ? "bg-[#F28C28]" : "bg-gray-300"}`}
           >
-            <span className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200" style={{ transform: annual ? "translateX(20px)" : "translateX(2px)" }} />
+            <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ${annual ? "translate-x-5" : "translate-x-0"}`} />
           </button>
           <span className={`text-sm font-medium transition-colors ${annual ? "text-[#0F172A]" : "text-[#94A3B8]"}`}>
             Annual <span className="text-xs text-emerald-600 font-semibold ml-1">Save ₹600</span>
