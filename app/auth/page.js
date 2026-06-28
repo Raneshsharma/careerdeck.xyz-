@@ -95,7 +95,8 @@ function AuthContent() {
   async function handleReset(e) {
     e.preventDefault();
     setError(null);
-    if (!resetEmail) { setError("Enter your email address"); return; }
+    setSuccess(null);
+    if (!resetEmail || !resetEmail.includes("@")) { setError("Enter a valid email address"); return; }
     setLoading(true);
     try {
       const supabase = createClient();
@@ -103,10 +104,10 @@ function AuthContent() {
       const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
         redirectTo: `${siteUrl}/auth/confirm`,
       });
-      if (err) { setError(err.message); setLoading(false); return; }
+      if (err) { setError(err.message || "Failed to send reset link"); setLoading(false); return; }
       setSuccess("Reset link sent! Check your email.");
-      setLoading(false);
-    } catch { setError("Connection failed. Try again."); setLoading(false); }
+    } catch (e) { setError("Connection failed. Try again."); }
+    setLoading(false);
   }
 
   // ── Google OAuth ──
