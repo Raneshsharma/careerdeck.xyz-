@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import NonReversingReveal from "@/components/NonReversingReveal";
 import HeroDashboardMockup from "@/components/HeroDashboardMockup";

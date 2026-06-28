@@ -22,6 +22,6 @@ export async function GET(request) {
     return Response.json({ likes, dislikes });
   } catch (e) {
     console.error("Tally error:", e);
-    return Response.json({ likes: 0, dislikes: 0 });
+    return Response.json({ likes: 0, dislikes: 0 }, { status: 500 });
   }
 }

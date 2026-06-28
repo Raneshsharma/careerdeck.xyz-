@@ -84,8 +84,8 @@ export async function PATCH(request, { params }) {
   const { id } = params
   const { content } = await request.json()
 
-  if (!content) {
-    return Response.json({ error: "Content is required" }, { status: 400 })
+  if (!content || content.length > 500000) {
+    return Response.json({ error: "Content required and must be ≤500,000 characters" }, { status: 400 })
   }
 
   try {

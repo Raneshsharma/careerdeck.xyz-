@@ -4,7 +4,6 @@ import { useAuth } from "@/components/SessionProvider";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense } from "react";
 import { executePayment } from "@/lib/razorpay-checkout";
-import LandingHeader from "@/components/LandingHeader";
 import Image from "next/image";
 
 const PLANS = {

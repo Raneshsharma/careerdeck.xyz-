@@ -4,7 +4,7 @@ export async function GET() {
   const supabaseAuth = await createClient();
   const { data: { user } } = await supabaseAuth.auth.getUser();
   if (!user || user.email !== (process.env.ADMIN_EMAIL || "raneshsharma33@gmail.com")) {
-    return Response.json({ error: "Not found" }, { status: 404 });
+    return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const results = { ok: true, env: {}, checks: {} };
