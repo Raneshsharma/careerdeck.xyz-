@@ -35,6 +35,7 @@ function DashboardContent() {
   const [activeDossierId, setActiveDossierId] = useState(null);
   const [sidebarVersion, setSidebarVersion] = useState(0);
   const [usageVersion, setUsageVersion] = useState(0);
+  const [profileData, setProfileData] = useState(null);
   const [copied, setCopied] = useState(false);
   const [sourceMetadata, setSourceMetadata] = useState(null);
   const [tourVisible, setTourVisible] = useState(false);
@@ -43,6 +44,9 @@ function DashboardContent() {
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
 
   const { user, loading } = useAuth();
+  useEffect(() => {
+    if (user) { fetch("/api/profile").then(r => r.json()).then(d => setProfileData(d)).catch(() => {}); }
+  }, [user, usageVersion]);
   const tourLoaded = useRef(false);
 
   useEffect(() => {
@@ -306,7 +310,7 @@ function DashboardContent() {
         )}
 
         {content && !generating && (
-          <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} hideToolbar hideShortBanner genId={genId} sourceMetadata={sourceMetadata} />
+          <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} hideToolbar hideShortBanner genId={genId} sourceMetadata={sourceMetadata} isFreeUser={!profileData?.profile?.plan_tier || profileData?.profile?.plan_tier === "free"} />
         )}
 
         {generating && (

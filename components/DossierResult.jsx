@@ -11,7 +11,7 @@ function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner, genId, sourceMetadata }) {
+export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner, genId, sourceMetadata, isFreeUser = true }) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
   const resultRef = useRef(null);
@@ -28,6 +28,28 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
     const a = document.createElement("a");
     a.href = url;
     a.download = "careerdeck-dossier.md";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportWord = () => {
+    const htmlContent = (content || "")
+      .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+      .replace(/^## (.+)$/gm, "<h2>$1</h2>")
+      .replace(/^# (.+)$/gm, "<h1>$1</h1>")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      .replace(/^- (.+)$/gm, "<li>$1</li>")
+      .replace(/\n\n/g, "</p><p>")
+      .replace(/\n/g, "<br>");
+    const doc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>CareerDeck Dossier</title></head><body><p>${htmlContent}</p></body></html>`;
+    const blob = new Blob([doc], { type: "application/msword" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "careerdeck-dossier.doc";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -108,7 +130,8 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
           ))}
         </article>
 
-        {/* Post‑dossier upgrade CTA */}
+        {/* Post‑dossier upgrade CTA — only for free users */}
+        {isFreeUser && (
         <div className="mt-8 pt-6 border-t border-gray-100 text-center no-print">
           <p className="text-sm text-[#64748B] mb-3">Want unlimited dossiers and PDF exports?</p>
           <Link
@@ -121,6 +144,7 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
             </svg>
           </Link>
         </div>
+        )}
 
         {/* Bottom action bar — Generate Another + Copy + Download */}
         <div className="mt-8 pt-6 border-t border-gray-100 no-print">
@@ -130,20 +154,26 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
           >
             Generate Another Dossier
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={handleCopy}
-              className={`flex-1 min-h-[44px] py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+              className={`flex-1 min-w-[120px] min-h-[44px] py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                 copied ? "bg-green-50 text-green-700 border border-green-200" : "bg-gray-100 text-[#64748B] hover:bg-gray-200 border border-transparent"
               }`}
             >
-              {copied ? "✓ Copied!" : "📋 Copy Dossier"}
+              {copied ? "✓ Copied!" : "📋 Copy"}
             </button>
             <button
               onClick={handleDownload}
-              className="flex-1 min-h-[44px] py-2.5 rounded-xl bg-gray-100 text-[#64748B] hover:bg-gray-200 border border-transparent text-sm font-medium transition-all duration-200"
+              className="flex-1 min-w-[120px] min-h-[44px] py-2.5 rounded-xl bg-gray-100 text-[#64748B] hover:bg-gray-200 border border-transparent text-sm font-medium transition-all duration-200"
             >
-              📥 Download .md
+              📥 Markdown
+            </button>
+            <button
+              onClick={handleExportWord}
+              className="flex-1 min-w-[120px] min-h-[44px] py-2.5 rounded-xl bg-gray-100 text-[#64748B] hover:bg-gray-200 border border-transparent text-sm font-medium transition-all duration-200"
+            >
+              📄 Word Doc
             </button>
           </div>
         </div>
