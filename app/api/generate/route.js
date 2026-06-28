@@ -348,7 +348,7 @@ export async function POST(request) {
     const isAdmin = user.email === (process.env.ADMIN_EMAIL || "raneshsharma33@gmail.com");
     if (!isAdmin) {
       const profile = await getProfile(user.id).catch(() => null);
-      const planLimit = profile?.plan_tier === "free" ? FREE_MONTHLY_LIMIT : 9999;
+      const planLimit = profile?.plan_tier === "free" ? FREE_MONTHLY_LIMIT : Infinity;
       const usedThisMonth = await getGenerationsThisMonth(user.id).catch(() => 0);
       if (usedThisMonth >= planLimit) {
         return Response.json(

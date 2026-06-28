@@ -24,14 +24,23 @@ export default function SectionVoting({ dossierId, sectionKey }) {
     const newVote = prevVote === vote ? null : vote;
     setUserVote(newVote);
 
-    const { likes: l, dislikes: d } = await fetch("/api/feedback/vote", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dossierId, sectionKey, vote: newVote ?? vote }),
-    }).then((r) => r.json()).catch(() => ({ likes, dislikes }));
-
-    setLikes(l ?? likes);
-    setDislikes(d ?? dislikes);
+    if (newVote !== null) {
+      const { likes: l, dislikes: d } = await fetch("/api/feedback/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dossierId, sectionKey, vote: newVote }),
+      }).then((r) => r.json()).catch(() => ({ likes, dislikes }));
+      setLikes(l ?? likes);
+      setDislikes(d ?? dislikes);
+    } else {
+      const { likes: l, dislikes: d } = await fetch("/api/feedback/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dossierId, sectionKey, vote: 0 }),
+      }).then((r) => r.json()).catch(() => ({ likes, dislikes }));
+      setLikes(l ?? likes);
+      setDislikes(d ?? dislikes);
+    }
     setLoading(false);
   }
 

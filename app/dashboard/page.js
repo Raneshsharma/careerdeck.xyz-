@@ -331,6 +331,10 @@ function DashboardContent() {
         </div>
       </footer>
       <BottomNav />
+
+      {tourVisible && (
+        <OnboardingTour onComplete={() => setTourVisible(false)} />
+      )}
     </div>
   );
 }
