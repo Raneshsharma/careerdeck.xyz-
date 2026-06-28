@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@langchain/core": "^1.2.1",
+    "@langchain/langgraph": "^1.4.7",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@supabase/mcp-server-supabase": "^0.8.2",
     "@supabase/ssr": "^0.12.0",
@@ -20,11 +22,16 @@
     "react-dom": "^18.3.0",
     "react-hot-toast": "^2.4.1",
     "react-markdown": "^9.0.0",
+    "server-only": "^0.0.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/node": "^26.0.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.0",
-    "tailwindcss": "^3.4.0"
+    "tailwindcss": "^3.4.0",
+    "typescript": "^6.0.3"
   }
 }
