@@ -101,7 +101,7 @@ export default function UserMenu({ refreshTrigger }) {
 
           {/* Sign out */}
           <button
-            onClick={() => { createClient().auth.signOut().then(() => router.push("/")); }}
+            onClick={() => { createClient().auth.signOut().then(() => router.push("/")).catch(() => router.push("/")); }}
             className="w-full text-left text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 py-1.5 px-2 rounded-lg transition-colors mt-0.5"
           >
             Sign Out

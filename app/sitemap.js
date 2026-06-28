@@ -1,8 +1,8 @@
 export default function sitemap() {
-  const baseUrl = "https://careerdeck.xyz";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://careerdeck.xyz";
+  const now = new Date();
   return [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${baseUrl}/auth`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${baseUrl}/pricing`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    { url: baseUrl, lastModified: now, changeFrequency: "weekly", priority: 1 },
+    { url: `${baseUrl}/pricing`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
   ];
 }

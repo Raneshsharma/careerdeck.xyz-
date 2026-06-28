@@ -40,11 +40,13 @@ function AuthContent() {
     if (!password || password.length < 6) { setError("Password must be at least 6 characters"); return; }
     if (password !== confirmPassword) { setError("Passwords do not match"); return; }
     setLoading(true);
-    const supabase = createClient();
-    const { error: err } = await supabase.auth.updateUser({ password });
+    try {
+      const supabase = createClient();
+      const { error: err } = await supabase.auth.updateUser({ password });
     if (err) { setError(err.message); setLoading(false); return; }
     setSuccess("Password updated! Redirecting...");
     setTimeout(() => router.replace("/dashboard"), 1500);
+    } catch { setError("Update failed. Try again."); setLoading(false); }
   }
 
   // ── Email/Password Sign In ──
@@ -53,10 +55,12 @@ function AuthContent() {
     setError(null);
     if (!email || !password) { setError("Please fill in all fields"); return; }
     setLoading(true);
-    const supabase = createClient();
-    const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    if (err) { setError(err.message); setLoading(false); return; }
-    router.replace(redirectTo);
+    try {
+      const supabase = createClient();
+      const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (err) { setError(err.message); setLoading(false); return; }
+      router.replace(redirectTo);
+    } catch { setError("Connection failed. Try again."); setLoading(false); }
   }
 
   // ── Email/Password Sign Up ──
@@ -70,9 +74,10 @@ function AuthContent() {
     if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
     if (password !== confirmPassword) { setError("Passwords do not match"); return; }
     setLoading(true);
-    const supabase = createClient();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-    const { error: err } = await supabase.auth.signUp({
+    try {
+      const supabase = createClient();
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      const { error: err } = await supabase.auth.signUp({
       email: email.trim(),
       password,
       options: {
@@ -83,6 +88,7 @@ function AuthContent() {
     if (err) { setError(err.message); setLoading(false); return; }
     setSuccess("Account created! Check your email for a confirmation link.");
     setLoading(false);
+    } catch { setError("Connection failed. Try again."); setLoading(false); }
   }
 
   // ── Password Reset ──
@@ -91,27 +97,31 @@ function AuthContent() {
     setError(null);
     if (!resetEmail) { setError("Enter your email address"); return; }
     setLoading(true);
-    const supabase = createClient();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-    const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
-      redirectTo: `${siteUrl}/auth/confirm`,
-    });
-    if (err) { setError(err.message); setLoading(false); return; }
-    setSuccess("Reset link sent! Check your email.");
-    setLoading(false);
+    try {
+      const supabase = createClient();
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+        redirectTo: `${siteUrl}/auth/confirm`,
+      });
+      if (err) { setError(err.message); setLoading(false); return; }
+      setSuccess("Reset link sent! Check your email.");
+      setLoading(false);
+    } catch { setError("Connection failed. Try again."); setLoading(false); }
   }
 
   // ── Google OAuth ──
   async function handleGoogleSignIn() {
     setLoading(true);
     setError(null);
-    const supabase = createClient();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-    const { error: err } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(redirectTo)}` },
-    });
-    if (err) { setError(err.message); setLoading(false); }
+    try {
+      const supabase = createClient();
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(redirectTo)}` },
+      });
+      if (err) { setError(err.message); setLoading(false); }
+    } catch { setError("Connection failed. Try again."); setLoading(false); }
   }
 
   function switchTab(t) { setTab(t); setError(null); setSuccess(null); }

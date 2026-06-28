@@ -57,7 +57,7 @@ export default function RootLayout({ children }) {
           </Script>
         </>
       )}
-      <Script id="json-ld" type="application/ld+json" strategy="beforeInteractive">
+      <Script id="json-ld" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
@@ -72,7 +72,11 @@ export default function RootLayout({ children }) {
             priceCurrency: "INR",
             description: "Free tier with 3 dossiers per month",
           },
-          author: { "@type": "Organization", name: "CareerDeck", url: SITE_URL },
+          author: { "@type": "Organization", name: "CareerDeck", url: SITE_URL, sameAs: [
+            "https://www.linkedin.com/company/careerdeck",
+            "https://twitter.com/careerdeckhq",
+            "https://www.instagram.com/careerdeck"
+          ]},
           inLanguage: ["en", "hi"],
           countriesSupported: "IN",
           keywords: "interview preparation, MBA, placement, career, company research, AI, India",

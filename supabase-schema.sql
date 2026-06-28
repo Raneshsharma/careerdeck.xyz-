@@ -86,3 +86,9 @@ drop policy if exists "Users can delete own generations" on generations;
 create policy "Users can delete own generations" on generations for delete using (auth.uid()::text = user_id);
 drop policy if exists "Users can insert own generations" on generations;
 create policy "Users can insert own generations" on generations for insert with check (auth.uid()::text = user_id);
+
+create table if not exists newsletter_subscribers (
+  id serial primary key,
+  email text not null unique,
+  created_at timestamp default now()
+);

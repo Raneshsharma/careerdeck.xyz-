@@ -94,7 +94,8 @@ function OnboardContent() {
         throw new Error(err.error || "Failed to save")
       }
       toast.success("Profile saved!")
-      const destination = searchParams.get("redirectTo") || "/dashboard"
+      const rawDest = searchParams.get("redirectTo") || "/dashboard"
+      const destination = isValidRedirect(rawDest) ? rawDest : "/dashboard"
       router.replace(destination)
     } catch (err) {
       toast.error(err.message)

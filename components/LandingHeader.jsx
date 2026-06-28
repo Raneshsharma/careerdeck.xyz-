@@ -57,7 +57,7 @@ export default function LandingHeader() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => { createClient().auth.signOut().then(() => router.push("/")); }}
+              onClick={() => { createClient().auth.signOut().then(() => router.push("/")).catch(() => router.push("/")); }}
               className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
             >
               Sign Out

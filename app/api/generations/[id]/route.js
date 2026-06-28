@@ -43,7 +43,6 @@ export async function GET(request, { params }) {
     }
 
     const { id } = params
-    console.log("GET generation id:", id)
 
     const { data, error } = await supabase
       .from("generations")

@@ -1,9 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import NonReversingReveal from "@/components/NonReversingReveal";
 import Link from "next/link";
 
 export default function CTASection() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState(null);
+
+  async function handleSubscribe(e) {
+    e.preventDefault();
+    if (!email || !email.includes("@")) { setStatus("error"); return; }
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/newsletter", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+      setStatus(res.ok ? "success" : "error");
+    } catch { setStatus("error"); }
+  }
   return (
     <section id="section-cta" className="relative bg-[#FAFAFA] py-16 border-t border-gray-100/60">
       <div className="max-w-3xl mx-auto px-8 text-center">
@@ -35,16 +48,22 @@ export default function CTASection() {
             <div className="flex gap-2">
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200/80 bg-white text-[#0F172A] text-sm placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#F28C28]/30 focus:border-[#F28C28]/50 transition-all"
               />
-              <Link
-                href="/auth"
-                className="inline-flex items-center px-5 py-2.5 rounded-xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] text-sm font-bold transition-all duration-200 shrink-0"
+              <button
+                type="button"
+                onClick={handleSubscribe}
+                disabled={status === "sending"}
+                className="inline-flex items-center px-5 py-2.5 rounded-xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] text-sm font-bold transition-all duration-200 shrink-0 disabled:opacity-50"
               >
-                Get Started
-              </Link>
+                {status === "sending" ? "..." : status === "success" ? "✓ Done" : "Subscribe"}
+              </button>
             </div>
+            {status === "success" && <p className="text-xs text-emerald-600 mt-2">Welcome aboard! Check your inbox.</p>}
+            {status === "error" && <p className="text-xs text-red-500 mt-2">Please enter a valid email.</p>}
           </div>
         </NonReversingReveal>
 
@@ -54,7 +73,8 @@ export default function CTASection() {
           <Link href="/auth" className="hover:text-[#64748B] transition-colors">Sign In</Link>
         </div>
         <p className="mt-4 text-xs text-[#94A3B8]">
-          &copy; {new Date().getFullYear()} CareerDeck. Verify critical facts before your interview.
+          © {new Date().getFullYear()} CareerDeck. Verify critical facts before your interview.<br />
+          <span className="text-[#B0B7C3]">Updated: June 2026</span>
         </p>
       </div>
     </section>
