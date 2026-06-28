@@ -36,8 +36,9 @@ export default function ProfilePage() {
 
   if (!user) return null
 
-  const planName = profile?.plan_tier === "free" ? "Free" : "Pro"
-  const planColor = profile?.plan_tier === "free" ? "bg-gray-100 text-gray-700" : "bg-amber-100 text-amber-700"
+  const planName = profile?.plan_tier === "free" ? "Free" : profile?.plan_tier === "pro" ? "Pro" : profile?.plan_tier === "pro-annual" ? "Pro Annual" : "Free"
+  const isPro = profile?.plan_tier && profile?.plan_tier !== "free"
+  const planColor = isPro ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-[#0F172A]" : "bg-gray-100 text-gray-700"
   const used = usage?.used ?? 0
   const limit = usage?.limit ?? 3
   const remaining = Math.max(limit - used, 0)
@@ -82,8 +83,11 @@ export default function ProfilePage() {
             </div>
 
             {/* Plan & Usage Card */}
-            <div className="bg-white rounded-2xl border border-gray-200/80 p-8 shadow-sm">
-              <h2 className="text-lg font-bold text-[#0F172A] mb-6">Plan & Usage</h2>
+            <div className={`bg-white rounded-2xl border p-8 shadow-sm ${isPro ? "border-amber-400/50 shadow-[0_0_20px_rgba(242,140,40,0.1)]" : "border-gray-200/80"}`}>
+              <h2 className="text-lg font-bold text-[#0F172A] mb-6 flex items-center gap-2">
+                Plan & Usage
+                {isPro && <span className="text-lg">👑</span>}
+              </h2>
 
               <div className="flex items-center gap-3 mb-6">
                 <span className={`text-xs font-semibold px-3 py-1 rounded-full ${planColor}`}>{planName}</span>

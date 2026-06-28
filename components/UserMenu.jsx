@@ -34,6 +34,8 @@ export default function UserMenu({ refreshTrigger }) {
 
   const initial = (user?.user_metadata?.full_name || user?.email || "U")[0].toUpperCase();
   const planTier = profileData?.profile?.plan_tier || "free";
+  const isPro = planTier !== "free";
+  const planDisplay = planTier === "pro" ? "Pro" : planTier === "pro-annual" ? "Pro Annual" : "Free";
   const used = profileData?.usage?.used ?? 0;
   const limit = profileData?.usage?.limit ?? 3;
   const remaining = Math.max(limit - used, 0);
@@ -43,7 +45,7 @@ export default function UserMenu({ refreshTrigger }) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white text-xs font-bold hover:ring-2 hover:ring-amber-300 transition-all"
+        className={`w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white text-xs font-bold hover:ring-2 hover:ring-amber-300 transition-all ${isPro ? "ring-2 ring-amber-400 shadow-[0_0_8px_rgba(242,140,40,0.4)]" : ""}`}
       >
         {initial}
       </button>
@@ -52,12 +54,13 @@ export default function UserMenu({ refreshTrigger }) {
         <div className="absolute right-0 top-10 w-64 bg-white rounded-xl shadow-lg border border-gray-200 p-4 z-50">
           {/* User info */}
           <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
-            <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${isPro ? "bg-gradient-to-br from-amber-400 to-yellow-500 shadow-[0_0_10px_rgba(242,140,40,0.3)]" : "bg-amber-500"}`}>
               {initial}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-[#0F172A] truncate">
+              <p className="text-sm font-semibold text-[#0F172A] truncate flex items-center gap-1">
                 {profileData?.profile?.name || user?.user_metadata?.full_name || user?.email}
+                {isPro && <span title="Premium">👑</span>}
               </p>
               <p className="text-xs text-[#64748B] truncate">{user?.email}</p>
             </div>
@@ -75,8 +78,13 @@ export default function UserMenu({ refreshTrigger }) {
                 style={{ width: `${usagePercent}%` }}
               />
             </div>
-            <p className="text-xs text-[#94A3B8] mt-1">
-              Plan: {planTier === "pro" ? "Pro" : planTier === "enterprise" ? "Enterprise" : "Free"}
+            <p className="text-xs mt-1 flex items-center gap-1">
+              <span className={isPro ? "text-amber-600 font-semibold" : "text-[#94A3B8]"}>
+                {isPro ? "👑 " : ""}Plan: {planDisplay}
+              </span>
+              {isPro && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gradient-to-r from-amber-400 to-yellow-500 text-[#0F172A]">PRO</span>
+              )}
             </p>
             {planTier === "free" && remaining <= 1 && remaining > 0 && (
               <p className="text-xs text-amber-600 mt-0.5 font-medium">
