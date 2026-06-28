@@ -27,11 +27,12 @@ function AuthContent() {
   const [showReset, setShowReset] = useState(false);
 
   useEffect(() => {
+    if (isReset) return;
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) router.replace(redirectTo);
     }).catch(() => {});
-  }, [router, redirectTo]);
+  }, [router, redirectTo, isReset]);
 
   // ── Set new password (after reset) ──
   async function handleSetNewPassword(e) {
@@ -102,7 +103,7 @@ function AuthContent() {
       const supabase = createClient();
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
       const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
-        redirectTo: `${siteUrl}/auth/confirm`,
+        redirectTo: `${siteUrl}/auth?reset=true`,
       });
       if (err) throw err;
       setSuccess("Reset link sent! Check your email (and spam folder).");
