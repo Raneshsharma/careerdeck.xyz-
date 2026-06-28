@@ -66,13 +66,13 @@ export default function HeroSection() {
                 href="/auth"
                 className="inline-flex items-center justify-center gap-2 h-12 px-6 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-xl transition-all duration-200 text-sm shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] hover:-translate-y-0.5"
               >
-                Generate Your First Dossier &rarr;
+                Start Preparing Free →
               </Link>
               <Link
                 href="/auth"
                 className="inline-flex items-center justify-center h-12 px-6 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200/80 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 text-sm shadow-sm"
               >
-                View Sample Report
+                See Sample Dossier
               </Link>
             </div>
 

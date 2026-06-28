@@ -23,22 +23,22 @@ export default function CTASection() {
         <NonReversingReveal id="cta-content">
           <div className="w-12 h-[5px] bg-[#F28C28] rounded-full mx-auto mb-8" />
           <h2 className="text-4xl sm:text-5xl font-extrabold text-[#0F172A] tracking-tight leading-tight">
-            Your next interview deserves more than a Wikipedia rabbit hole
+            Your placement interview deserves better than a last-minute Google search
           </h2>
           <p className="mt-5 text-lg text-[#64748B] max-w-md mx-auto">
-            Join 500+ MBA students and early-career professionals who prep with CareerDeck.
+            Join 500+ MBA students and graduates across India who prep with CareerDeck.
           </p>
           <div className="mt-10">
             <Link
               href="/auth"
               className="inline-flex items-center gap-2 px-8 py-4 bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] font-bold rounded-2xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
             >
-              Generate Your First Dossier
+              Start Preparing Free
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
-            <p className="mt-4 text-sm text-[#94A3B8]">No account needed. Takes 90 seconds.</p>
+            <p className="mt-4 text-sm text-[#94A3B8]">No credit card. Free forever. Takes 90 seconds.</p>
           </div>
         </NonReversingReveal>
 

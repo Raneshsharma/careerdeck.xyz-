@@ -17,7 +17,7 @@ export default function StepsSection() {
             Three steps to interview-ready
           </h2>
           <p className="mt-4 text-xl sm:text-2xl text-[#64748B] max-w-[600px] mx-auto leading-relaxed">
-            From zero to prepared in under two minutes.
+            Free AI interview prep for MBA, engineering, and graduate students in India
           </p>
         </NonReversingReveal>
 

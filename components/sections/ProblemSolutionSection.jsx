@@ -29,13 +29,13 @@ export default function ProblemSolutionSection() {
               The Old Way
             </p>
             <h2 className="text-[32px] sm:text-[40px] font-extrabold text-[#0F172A] leading-[1.05] tracking-tight">
-              6&ndash;10 hours per company.
+              6&ndash;8 hours of research per company.
               <br />
-              <span className="text-[#64748B]">Still walking in blind.</span>
+              <span className="text-[#64748B]">Still walking into placements blind.</span>
             </h2>
             <p className="mt-4 text-base text-[#64748B] leading-relaxed max-w-md">
-              Most candidates juggle Crunchbase, SEC filings, news tabs, and forums&mdash;ending up with
-              15 browser tabs and no structured prep plan.
+              Most MBA students juggle Crunchbase, annual reports, news, and LinkedIn&mdash;ending up with
+              15 browser tabs and no structured interview prep.
             </p>
             <ul className="mt-6 space-y-3">
               {pains.map((item) => (
@@ -80,7 +80,7 @@ export default function ProblemSolutionSection() {
             </h2>
             <p className="mt-4 text-base text-[#64748B] leading-relaxed max-w-md">
               CareerDeck researches across 50+ data points per company&mdash;then assembles everything
-              into a structured, interview-ready dossier.
+              into a structured, placement-ready dossier.
             </p>
 
             {/* Metrics grid — creative number-heavy layout */}
