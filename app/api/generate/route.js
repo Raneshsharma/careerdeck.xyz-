@@ -99,6 +99,34 @@ async function streamAnthropic(messages, model, apiKey, signal) {
     const err = await res.text();
     throw new Error(`Anthropic error ${res.status}: ${err}`);
   }
+    return res.body;
+}
+
+async function streamGemini(messages, model, apiKey, signal) {
+  const systemMsg = messages.find((m) => m.role === "system")?.content || "";
+  const userMsg = messages.find((m) => m.role === "user")?.content || "";
+
+  const body = {
+    contents: [{ role: "user", parts: [{ text: userMsg }] }],
+    generationConfig: { temperature: 0.3, maxOutputTokens: 16384 },
+  };
+  if (systemMsg) {
+    body.systemInstruction = { parts: [{ text: systemMsg }] };
+  }
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal,
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini error ${res.status}: ${err}`);
+  }
   return res.body;
 }
 
@@ -212,6 +240,31 @@ async function processAnthropicStream(body, emitter) {
             const content = parsed.delta?.text;
             if (content) emitter.emit("chunk", { content });
           }
+        } catch { /* skip */ }
+      }
+    }
+  } catch (e) { emitter.error(e.message); return; }
+  emitter.emit("done", {});
+}
+
+async function processGeminiStream(body, emitter) {
+  const decoder = new TextDecoder();
+  const reader = body.getReader();
+  let buffer = "";
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
+      for (const line of lines) {
+        if (!line.startsWith("data: ")) continue;
+        const data = line.slice(6).trim();
+        try {
+          const parsed = JSON.parse(data);
+          const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) emitter.emit("chunk", { content: text });
         } catch { /* skip */ }
       }
     }
@@ -410,6 +463,13 @@ export async function POST(request) {
     let streamFn, model, apiKey, procFn;
 
     switch (provider) {
+      case "gemini":
+        apiKey = process.env.GEMINI_API_KEY;
+        model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+        if (!apiKey) return Response.json({ error: "GEMINI_API_KEY not configured" }, { status: 500 });
+        streamFn = (s) => streamGemini(messages, model, apiKey, s);
+        procFn = processGeminiStream;
+        break;
       case "openrouter":
         apiKey = process.env.OPENROUTER_API_KEY;
         model = process.env.OPENROUTER_MODEL || "openai/gpt-4o";
