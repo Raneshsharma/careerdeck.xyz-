@@ -22,6 +22,7 @@ import type { CompanyKnowledgeBase } from "../knowledge/types";
 import type { RawResolvedFacts } from "../knowledge/conflictResolver";
 import type { DomainVersions } from "../cache/versioning";
 import type { CacheMetrics } from "../cache/metrics";
+import type { CoreFacts } from "../knowledge/coreFactsExtractor";
 
 /**
  * Shared state for the Company Dossier graph.
@@ -167,6 +168,12 @@ export const CompanyStateAnnotation = Annotation.Root({
 
   // ── Domain versioning (per-domain hashes for incremental regeneration) ───
   domainVersions: Annotation<DomainVersions | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  // ── Core Facts Evidence Graph ────────────────────────────────────────────
+  coreFacts: Annotation<CoreFacts | null>({
     reducer: (_previous, next) => next ?? _previous,
     default: () => null,
   }),

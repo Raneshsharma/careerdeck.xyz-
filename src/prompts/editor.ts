@@ -64,6 +64,7 @@ export function buildEditorPrompt(
   originalSection: string,
   companyName: string,
   crossSectionContext?: string,
+  coreFactsSummary?: string,
 ): { systemPrompt: string; userPrompt: string } {
   const coreFacts = {
     identity: {
@@ -114,6 +115,9 @@ export function buildEditorPrompt(
   const crossRef = crossSectionContext
     ? `\nCROSS-SECTION CONTEXT (what other sections say — check for contradictions):\n${crossSectionContext}`
     : "";
+  const coreRef = coreFactsSummary
+    ? `\nIMMUTABLE CORE FACTS (authoritative — NO section may contradict these):\n${coreFactsSummary}`
+    : "";
 
   return {
     systemPrompt: SYSTEM_PROMPT,
@@ -123,7 +127,7 @@ KB (your ONLY source):
 ${kb}
 
 ORIGINAL SECTION:
-${originalSection}${crossRef}
+${originalSection}${crossRef}${coreRef}
 
 STEPS:
 1. Cross-check every factual claim in the section against CORE_FACTS above. Remove any contradiction.

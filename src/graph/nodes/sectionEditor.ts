@@ -1,4 +1,5 @@
 import type { CompanyState } from "../state";
+import type { CoreFacts } from "../../knowledge/coreFactsExtractor";
 import { generateSection } from "../../prompts/llm";
 import { buildEditorPrompt, type EditorResult } from "../../prompts/editor";
 import { validateSection } from "../../prompts/validator";
@@ -85,6 +86,25 @@ export function createSectionEditor(sectionId: string, sectionName: string) {
 
     const companyName = state.normalizedCompanyName || state.companyName;
     const crossContext = buildCrossSectionContext(state, sectionId);
+    const coreFacts: CoreFacts | null = state.coreFacts ?? null;
+    const coreFactsStr = coreFacts
+      ? JSON.stringify({
+          companyName: coreFacts.companyName,
+          industry: coreFacts.industry,
+          sector: coreFacts.sector,
+          ceo: coreFacts.ceo,
+          revenue: coreFacts.revenue,
+          marketCap: coreFacts.marketCap,
+          employees: coreFacts.employees,
+          businessModel: coreFacts.businessModel,
+          namedProducts: coreFacts.namedProducts,
+          brandStrength: coreFacts.brandStrength,
+          scaleAdvantage: coreFacts.scaleAdvantage,
+          switchingCosts: coreFacts.switchingCosts,
+          networkEffects: coreFacts.networkEffects,
+          moatSummary: coreFacts.moatSummary,
+        }, null, 2)
+      : undefined;
 
     try {
       const { systemPrompt, userPrompt } = buildEditorPrompt(
@@ -93,6 +113,7 @@ export function createSectionEditor(sectionId: string, sectionName: string) {
         original,
         companyName,
         crossContext,
+        coreFactsStr,
       );
       const rawResponse = await generateSection(systemPrompt, userPrompt);
 

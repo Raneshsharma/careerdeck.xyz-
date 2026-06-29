@@ -49,6 +49,7 @@ import { generateExecutiveSummary } from "./nodes/genExecutiveSummary";
 import { generateSWOT } from "./nodes/genSWOT";
 import { generatePortersFiveForces } from "./nodes/genPortersFiveForces";
 import { generateInterviewPlaybook } from "./nodes/genInterviewPlaybook";
+import { extractCoreFactsNode } from "./nodes/extractCoreFacts";
 import { routeAfterValidation } from "./edges/conditional";
 
 /**
@@ -86,13 +87,15 @@ for (const n of ["wikipediaExtraction","googleExtraction","yahooExtraction","gne
 // Layer 4: Knowledge Resolution
 g.addNode("resolveConflicts", resolveConflictsNode);
 g.addNode("buildKnowledge", buildKnowledgeNode);
+g.addNode("extractCoreFacts", extractCoreFactsNode);
 g.addEdge("mergeExtractedFacts", "resolveConflicts");
 g.addEdge("resolveConflicts", "buildKnowledge");
+g.addEdge("buildKnowledge", "extractCoreFacts");
 
 // Layer 5: 13 Section Generators
 const sections = ["genCompanyOverview","genWhyExists","genBusinessModel","genProducts","genJourney","genIndustry","genCompetitors","genMoat","genFinancials","genStrategy","genCulture","genEmployeeInsights","genInterviewQuestions"];
 const genNodes = [generateCompanyOverview, generateWhyExists, generateBusinessModel, generateProducts, generateJourney, generateIndustry, generateCompetitors, generateMoat, generateFinancials, generateStrategy, generateCulture, generateEmployeeInsights, generateInterviewQuestions];
-sections.forEach((n, i) => { g.addNode(n, genNodes[i]); g.addEdge("buildKnowledge", n); });
+sections.forEach((n, i) => { g.addNode(n, genNodes[i]); g.addEdge("extractCoreFacts", n); });
 
 // Layer 6: 13 Reviewers
 const reviews = ["reviewCompanyOverview","reviewWhyExists","reviewBusinessModel","reviewProducts","reviewJourney","reviewIndustry","reviewCompetitors","reviewMoat","reviewFinancials","reviewStrategy","reviewCulture","reviewEmployeeInsights","reviewInterviewQuestions"];
@@ -102,7 +105,7 @@ reviews.forEach((n, i) => { g.addNode(n, revNodes[i]); g.addEdge(sections[i], n)
 // Premium Synthesis Modules
 const premium = ["genExecutiveSummary","genSWOT","genPortersFiveForces","genInterviewPlaybook"];
 const premNodes = [generateExecutiveSummary, generateSWOT, generatePortersFiveForces, generateInterviewPlaybook];
-premium.forEach((n, i) => { g.addNode(n, premNodes[i]); g.addEdge("buildKnowledge", n); g.addEdge(n, END); });
+premium.forEach((n, i) => { g.addNode(n, premNodes[i]); g.addEdge("extractCoreFacts", n); g.addEdge(n, END); });
 
 export const companyGraph = g.compile();
 export type CompanyGraph = typeof companyGraph;
