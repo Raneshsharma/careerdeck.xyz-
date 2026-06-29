@@ -12,6 +12,7 @@ import {
   getProfile,
   recordGeneration,
 } from "@/lib/generation-limits";
+import { companyGraph } from "@/src/graph/companyGraph";
 
 export const maxDuration = 300;
 
@@ -397,6 +398,73 @@ export async function POST(request) {
       default:
         return Response.json({ error: `Unknown dossier type: ${dosType}` }, { status: 400 });
     }
+
+    // ── LANGGRAPH PIPELINE: company dossier type uses the full 6-layer graph ──
+    if (dosType === "company") {
+      const emitter = createSSEEmitter();
+      const { stream } = emitter;
+      const stopHeartbeat = startHeartbeat(emitter);
+
+      const genId = await recordGeneration(user.id, dosType, cName, rName);
+      if (genId) {
+        try { emitter.emit("gen-id", { id: genId }); } catch {}
+      }
+
+      const initialState = {
+        companyName: cName,
+        role: rName || undefined,
+        jobDescription: jd || undefined,
+        dossierType: dosType,
+      };
+
+      // Run graph asynchronously — emit sections as they complete
+      Promise.resolve()
+        .then(async () => {
+          const result = await companyGraph.invoke(initialState);
+
+          const sections = result.reviewedSections || {};
+          const sectionIds = Object.keys(sections);
+
+          if (sectionIds.length === 0) {
+            emitter.emit("chunk", {
+              content: "Insufficient company data provided. Try a different company name.",
+            });
+          } else {
+            for (const id of sectionIds) {
+              const content = sections[id];
+              if (content?.trim()) {
+                try { emitter.emit("chunk", { content }); } catch {}
+              }
+            }
+          }
+
+          try { emitter.emit("done", {}); } catch {}
+          try { emitter.close(); } catch {}
+          release(request, false);
+          stopHeartbeat();
+        })
+        .catch((e) => {
+          console.error("Graph execution error:", e.message);
+          emitter.emit("error", { message: e.message });
+          try { emitter.close(); } catch {}
+          release(request, true);
+          stopHeartbeat();
+        });
+
+      request.signal.addEventListener("abort", () => {
+        cancel(request);
+      });
+
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+        },
+      });
+    }
+
+    // ── LEGACY PIPELINE: role, jd, news dossier types ──
 
     // Research: multi-source pipeline (Wikipedia → DuckDuckGo → GNews → Google CSE → Meta → Crunchbase)
     let companyResearch = { text: "", sources: [] };
