@@ -70,15 +70,22 @@ export function createSectionGenerator(prompt: SectionPrompt) {
       let content: string;
 
       if (prompt.buildAnalystPrompt && prompt.buildWriterPrompt) {
-        // ── Two-pass: Business Analyst → Executive Writer ──
-        const { systemPrompt: analystSys, userPrompt: analystUser } =
-          prompt.buildAnalystPrompt(knowledge, companyName, role);
-        const analystRaw = await generateSection(analystSys, analystUser);
-        const analysis = parseStructuredAnalysis(analystRaw);
+        try {
+          // ── Two-pass: Business Analyst → Executive Writer ──
+          const { systemPrompt: analystSys, userPrompt: analystUser } =
+            prompt.buildAnalystPrompt(knowledge, companyName, role);
+          const analystRaw = await generateSection(analystSys, analystUser);
+          const analysis = parseStructuredAnalysis(analystRaw);
 
-        const { systemPrompt: writerSys, userPrompt: writerUser } =
-          prompt.buildWriterPrompt(analysis, companyName, role);
-        content = await generateSection(writerSys, writerUser);
+          const { systemPrompt: writerSys, userPrompt: writerUser } =
+            prompt.buildWriterPrompt(analysis, companyName, role);
+          content = await generateSection(writerSys, writerUser);
+        } catch (twoPassError) {
+          console.error(`${prompt.SECTION_ID}: two-pass failed, falling back to single-pass:`, twoPassError);
+          // Fallback to legacy single-pass
+          const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
+          content = await generateSection(systemPrompt, userPrompt);
+        }
       } else {
         // ── Legacy single-pass ──
         const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
