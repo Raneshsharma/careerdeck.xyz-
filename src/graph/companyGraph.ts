@@ -53,8 +53,9 @@ import { generatePortersFiveForces } from "./nodes/genPortersFiveForces";
 import { generateInterviewPlaybook } from "./nodes/genInterviewPlaybook";
 import { extractCoreFactsNode } from "./nodes/extractCoreFacts";
 import { finalReportValidatorNode } from "./nodes/finalReportValidator";
-import { routeAfterValidation } from "./edges/conditional";
+import { routeAfterValidation, routeAfterFinalValidation } from "./edges/conditional";
 import { competitorIntelligenceNode } from "./nodes/competitorIntelligence";
+import { correctionPassNode } from "./nodes/correctionPass";
 
 /**
  * 6-layer architecture + 4 premium synthesis modules.
@@ -114,7 +115,11 @@ reviews.forEach((n, i) => { g.addNode(n, revNodes[i]); g.addEdge(sections[i], n)
 g.addNode("finalValidator", finalReportValidatorNode);
 reviews.forEach((n) => g.addEdge(n, "finalValidator"));
 g.addEdge("competitorIntel", "finalValidator");
-g.addEdge("finalValidator", END);
+
+// Self-Healing Validation & Correction Loop
+g.addNode("correctionPass", correctionPassNode);
+g.addConditionalEdges("finalValidator", routeAfterFinalValidation, { __end__: END, correctionPass: "correctionPass" });
+g.addEdge("correctionPass", "finalValidator");
 
 // Premium Synthesis Modules
 const premium = ["genExecutiveSummary","genSWOT","genPortersFiveForces","genInterviewPlaybook"];

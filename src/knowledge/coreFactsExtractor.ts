@@ -33,10 +33,10 @@ export interface CoreFacts {
   namedBrands: string[];
 
   // Competitive Position
-  brandStrength: { score: number; assessment: string };
-  scaleAdvantage: { score: number; assessment: string };
-  switchingCosts: { score: number; assessment: string };
-  networkEffects: { score: number; assessment: string };
+  brandStrength: { score: number | null; assessment: string };
+  scaleAdvantage: { score: number | null; assessment: string };
+  switchingCosts: { score: number | null; assessment: string };
+  networkEffects: { score: number | null; assessment: string };
   moatSummary: string;
 
   // News evidence

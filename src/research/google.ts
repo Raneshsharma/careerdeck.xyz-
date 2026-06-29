@@ -19,7 +19,11 @@ async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response
 async function fetchGoogleResults(companyName: string): Promise<GoogleSearchResult> {
   const apiKey = process.env.GOOGLE_CSE_API_KEY;
   const cx = process.env.GOOGLE_CSE_ID;
-  if (!apiKey || !cx) throw new Error("Google CSE API key or ID not configured");
+  const serpApiKey = process.env.SERP_API_KEY;
+
+  if (!apiKey && !cx && !serpApiKey) {
+    throw new Error("Neither Google CSE keys nor SerpAPI key is configured");
+  }
 
   const queries = [
     `${companyName} official website`,
@@ -33,18 +37,42 @@ async function fetchGoogleResults(companyName: string): Promise<GoogleSearchResu
   const seen = new Set<string>();
 
   for (const q of queries) {
-    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(q)}&num=3`;
+    let url: string;
+    let isSerp = false;
+
+    if (serpApiKey) {
+      url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(q)}&api_key=${serpApiKey}&num=3`;
+      isSerp = true;
+    } else {
+      url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(q)}&num=3`;
+    }
+
     const res = await fetchWithTimeout(url);
     if (!res.ok) continue;
     const data = await res.json();
-    for (const item of (data.items ?? [])) {
-      if (!seen.has(item.link)) {
-        seen.add(item.link);
-        allItems.push({
-          title: item.title ?? "",
-          link: item.link ?? "",
-          snippet: item.snippet ?? "",
-        });
+
+    if (isSerp) {
+      const results = data.organic_results ?? [];
+      for (const item of results) {
+        if (item.link && !seen.has(item.link)) {
+          seen.add(item.link);
+          allItems.push({
+            title: item.title ?? "",
+            link: item.link ?? "",
+            snippet: item.snippet ?? item.snippet_highlighted ?? "",
+          });
+        }
+      }
+    } else {
+      for (const item of (data.items ?? [])) {
+        if (item.link && !seen.has(item.link)) {
+          seen.add(item.link);
+          allItems.push({
+            title: item.title ?? "",
+            link: item.link ?? "",
+            snippet: item.snippet ?? "",
+          });
+        }
       }
     }
   }

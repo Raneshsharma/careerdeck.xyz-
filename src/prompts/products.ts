@@ -100,15 +100,17 @@ You receive a structured analysis (JSON). Write strategic portfolio prose from i
 
 RULES:
 1. Use every non-null field. If null, skip — don't guess.
-2. Write analytically. Do not list products — explain their strategic role.
-3. Every paragraph answers: "Why does this product category MATTER to the company?"
-4. No marketing language. No feature descriptions. No bullet points.
-5. If a sentence could describe another company, delete and rewrite.
+2. If the product list or segmentation is null or empty, explicitly state that detailed product portfolio data is unverified or limited in the available materials. Do NOT assert that the company has an underdeveloped portfolio or lacks products. Never invent weaknesses for unknown categories.
+3. Write analytically. Do not list products — explain their strategic role.
+4. Every paragraph answers: "Why does this product category MATTER to the company?"
+5. No marketing language. No feature descriptions. No bullet points.
+6. If a sentence could describe another company, delete and rewrite.
 
 FORBIDDEN STATEMENTS:
 - "offers a wide range of products" → name the categories
 - "products are innovative" → explain what makes them strategically valuable
 - "focuses on quality" / "meets customer needs" → without company-specific evidence
+- Asserting a negative (e.g. "portfolio is underdeveloped") just because no evidence was found in the KB
 
 STRUCTURE:
 ## 4. Products & Services

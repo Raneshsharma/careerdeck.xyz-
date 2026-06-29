@@ -18,27 +18,57 @@ async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response
 
 async function fetchGNewsData(companyName: string): Promise<GNewsResult | null> {
   const apiKey = process.env.GNEWS_API_KEY;
-  if (!apiKey) throw new Error("GNEWS_API_KEY not configured");
+  const serpApiKey = process.env.SERP_API_KEY;
+
+  if (!apiKey && !serpApiKey) {
+    throw new Error("Neither GNEWS_API_KEY nor SERP_API_KEY is configured");
+  }
 
   const q = encodeURIComponent(companyName.trim());
-  const url = `https://gnews.io/api/v4/search?q=${q}&lang=en&max=10&token=${apiKey}`;
-  const res = await fetchWithTimeout(url);
-  if (!res.ok) throw new Error(`GNews returned ${res.status}`);
-  const data = await res.json();
-  if (!data.articles || data.articles.length === 0) return null;
+  let url: string;
+  let isSerp = false;
 
-  return {
-    articles: data.articles.map((a: Record<string, unknown>) => ({
-      title: String(a.title ?? ""),
-      description: String(a.description ?? ""),
-      url: String(a.url ?? ""),
-      publishedAt: String(a.publishedAt ?? ""),
-      source: {
-        name: String(((a.source as Record<string, unknown>)?.name) ?? ""),
-        url: String(((a.source as Record<string, unknown>)?.url) ?? ""),
-      },
-    })),
-  };
+  if (serpApiKey) {
+    url = `https://serpapi.com/search.json?engine=google_news&q=${q}&api_key=${serpApiKey}`;
+    isSerp = true;
+  } else {
+    url = `https://gnews.io/api/v4/search?q=${q}&lang=en&max=10&token=${apiKey}`;
+  }
+
+  const res = await fetchWithTimeout(url);
+  if (!res.ok) throw new Error(`News search returned ${res.status}`);
+  const data = await res.json();
+
+  if (isSerp) {
+    const results = data.news_results ?? [];
+    if (results.length === 0) return null;
+    return {
+      articles: results.map((a: Record<string, unknown>) => ({
+        title: String(a.title ?? ""),
+        description: String(a.snippet ?? a.title ?? ""),
+        url: String(a.link ?? ""),
+        publishedAt: String(a.date ?? ""),
+        source: {
+          name: String((a.source as Record<string, unknown>)?.name ?? ""),
+          url: "",
+        },
+      })),
+    };
+  } else {
+    if (!data.articles || data.articles.length === 0) return null;
+    return {
+      articles: data.articles.map((a: Record<string, unknown>) => ({
+        title: String(a.title ?? ""),
+        description: String(a.description ?? ""),
+        url: String(a.url ?? ""),
+        publishedAt: String(a.publishedAt ?? ""),
+        source: {
+          name: String(((a.source as Record<string, unknown>)?.name) ?? ""),
+          url: String(((a.source as Record<string, unknown>)?.url) ?? ""),
+        },
+      })),
+    };
+  }
 }
 
 export async function researchGNews(

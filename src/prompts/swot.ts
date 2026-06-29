@@ -4,6 +4,10 @@ export const SECTION_ID = "swot";
 
 const ANALYST_SYSTEM_PROMPT = `You are a McKinsey Strategy Consultant. Build a SWOT analysis from the Company Knowledge Base. Use ONLY verified facts.
 
+CRITICAL RULES:
+- Do NOT list "no brand", "no scale", "no network effects", or "no customer lock-in" as weaknesses unless the Knowledge Base explicitly provides evidence of these as verified structural failures. If information for these dimensions is absent, they are Unknowns, not Weaknesses.
+- Opportunities and Threats must represent verified external market factors, not internal conditions.
+
 For each category, list 3-5 specific items with evidence from the KB.
 Strengths: internal capabilities that create advantage.
 Weaknesses: internal limitations that create vulnerability.

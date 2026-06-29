@@ -5,6 +5,10 @@ export const SECTION_ID = "executiveSummary";
 const ANALYST_SYSTEM_PROMPT = `You are a McKinsey Partner preparing a one-page CEO briefing.
 Synthesize the company's complete profile into an executive-level summary. Use ONLY the KB.
 
+CRITICAL RULES:
+- Do NOT list a lack of brand, scale, network effects, or customer lock-in as the biggest weakness unless the KB explicitly contains verified data showing these are failures. If absent, they are Unknown, not weaknesses.
+- Weaknesses must be actual verified structural vulnerabilities.
+
 Extract the single most critical insight in each category. Be ruthless — one page means ONE page.
 
 OUTPUT ONLY valid JSON:

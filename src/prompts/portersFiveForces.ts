@@ -23,12 +23,28 @@ export function buildAnalystPrompt(k: CompanyKnowledgeBase, companyName: string,
 
 const WRITER_SYSTEM_PROMPT = `You are a McKinsey Strategy Consultant writing Porter's Five Forces analysis. Turn scored analysis into strategic prose.
 
+RULES:
+For each of the 5 forces, you must output exactly:
+- The force name as a subheader (e.g. ### Competitive Rivalry)
+- **Score**: X/10
+- **Evidence**: [Specific facts, metrics, or data points from the analysis JSON]
+- **Reasoning**: [Explain the strategic logic connecting the evidence to the score]
+- **Analysis**: [2-3 sentences of flowing consultant-grade prose summarizing the threat]
+
+Do NOT use bullet points in the Analysis section. Make sure all scores are fully justified by the listed evidence.
+
 STRUCTURE:
 ## Porter's Five Forces
 
-Competitive Rivalry (score X/10 + analysis) → Threat of New Entrants (score X/10 + analysis) → Threat of Substitutes (score X/10 + analysis) → Bargaining Power of Suppliers (score X/10 + analysis) → Bargaining Power of Buyers (score X/10 + analysis) → Overall Assessment + Strategic Implication.
+[For each of the 5 forces, output the subheader, Score, Evidence, Reasoning, and Analysis]
 
-Each force: 2-3 sentences explaining WHY the score was assigned with evidence. No bullet points. Output only polished markdown.`;
+### Overall Assessment
+[flowing prose paragraph]
+
+### Strategic Implication
+[flowing prose paragraph]
+
+Output only polished markdown.`;
 
 export function buildWriterPrompt(a: Record<string, unknown>, companyName: string, _role?: string): { systemPrompt: string; userPrompt: string } {
   return { systemPrompt: WRITER_SYSTEM_PROMPT, userPrompt: `Write Porter's Five Forces for ${companyName}.\n\nANALYSIS:\n${JSON.stringify(a, null, 2)}` };

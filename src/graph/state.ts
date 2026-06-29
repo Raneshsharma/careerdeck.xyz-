@@ -217,6 +217,12 @@ export const CompanyStateAnnotation = Annotation.Root({
     default: () => null,
   }),
 
+  // ── Validation attempts (for self-healing loop) ──────────────────────────
+  validationAttempts: Annotation<number>({
+    reducer: (previous, next) => next ?? previous,
+    default: () => 0,
+  }),
+
   // ── Error collection (append-only) ──────────────────────────────────────
   errors: Annotation<string[]>({
     reducer: (previous, next) => [...previous, ...next],
