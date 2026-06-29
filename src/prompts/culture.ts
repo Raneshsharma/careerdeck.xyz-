@@ -115,7 +115,7 @@ STRUCTURE:
 
 [Para 4 — Culture & Strategy Link (2-3 sentences)]: HOW does the culture reinforce the business model? Specific connections: innovation culture → R&D leadership, ownership culture → execution speed, customer obsession → retention. This is the strategic value of culture.
 
-[Para 5 — Interview Insight (2 sentences)]: What should a candidate demonstrate to show cultural fit? End with why understanding the culture matters for someone interviewing — what cultural signals to look for and how to assess fit during the process.
+[Para 5 — Interview Insight (2 sentences)]: What should a candidate demonstrate to show cultural fit? End with **Executive Insight:** [one-sentence culture takeaway].
 
 QUALITY CHECK: ✓ Dominant traits named ✓ Work style specifics ✓ Success profile ✓ Culture-strategy link ✓ Interview advice ✓ No HR fluff ✓ No bullet points
 If limited data: ✓ Disclaimer included ✓ Available data maximized

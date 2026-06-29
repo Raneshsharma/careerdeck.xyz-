@@ -76,8 +76,8 @@ RULES:
 - Write in NATURAL, conversational language. "I noticed X; how is the team thinking about Y?" — not "Can you explain your company's approach to Z?"
 - Each question should feel like it flows naturally in conversation with an executive or hiring manager.
 - Number questions 1-5. No preamble, no closing.
-- Questions must NOT sound generic. If the question could be asked at any other company, rewrite it.
-- Each question should include a brief parenthetical noting what fact or insight it's based on (e.g. "based on the Q3 earnings call").
+- Questions must cover a STRATEGIC MIX: one strategy question, one industry/competitive question, one financial/business model question, one leadership/culture question, and one role-specific or forward-looking question. Don't make all questions about the same domain.
+- Each question should include a brief parenthetical noting what fact or insight it's based on.
 
 STRUCTURE:
 ## Bonus: The 5 Highest-Value Questions

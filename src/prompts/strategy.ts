@@ -140,7 +140,7 @@ STRUCTURE:
 
 [Para 6 — Risks + Evolution (2-3 sentences)]: What business challenges are these priorities designed to address? If priorities have shifted over time, explain what the shift signals about strategic direction.
 
-[Para 7 — Future Outlook + Strategic Insight (2-3 sentences)]: How do these priorities position the company for the next 3-5 years? What KPIs indicate success? End with the single most important strategic takeaway and why understanding these priorities matters for someone interviewing at the company.
+[Para 7 — Future Outlook + Strategic Insight (2-3 sentences)]: How do these priorities position the company for the next 3-5 years? What KPIs indicate success? End with why understanding these priorities matters for someone interviewing. **Executive Insight:** [one-sentence takeaway].
 
 QUALITY CHECK: ✓ Top 2-3 priorities named with evidence ✓ Why-they-matter explained per priority ✓ Investments connected to priorities ✓ Risks addressed ✓ Success metrics ✓ Evolution discussed ✓ Strategic insight ✓ No bullet points ✓ No unsupported claims
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.

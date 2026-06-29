@@ -112,7 +112,7 @@ FORBIDDEN STATEMENTS:
 STRUCTURE:
 ## 4. Products & Services
 
-[Para 1 — Portfolio Overview (3-4 sentences)]: Major product/service categories — grouped strategically, not as a list. How they support the business model. Which categories define the company's identity.
+[Para 1 — Portfolio Overview (3-4 sentences)]: Major product/service categories — grouped strategically as an ECOSYSTEM, not a list. How they support each other. Which categories define the company's identity. Show how products interlock: Core product → Customer acquisition, Secondary product → Higher frequency, Subscription/ecosystem → Retention, Enterprise services → Revenue diversification.
 
 [Para 2 — Revenue-Driving Products (3-4 sentences)]: Which products/services contribute most to the business. Primary and secondary revenue drivers. Which have highest margins. Explain WHY, not just what.
 
@@ -120,7 +120,7 @@ STRUCTURE:
 
 [Para 4 — Innovation + Evolution (3-4 sentences)]: Recent developments and their business significance — not a list, but why they matter. How the portfolio has evolved over time. What the evolution signals about strategic direction.
 
-[Para 5 — Future Opportunities + Role Connection (2-3 sentences)]: Where the portfolio is likely headed based on evidence. End with why understanding this portfolio matters for someone interviewing — what specific products or segments they should be prepared to discuss.
+[Para 5 — Future Opportunities + Role Connection (2-3 sentences)]: Where the portfolio is likely headed based on evidence. End with why understanding this portfolio matters for someone interviewing. **Executive Insight:** [one-sentence strategic takeaway about the product portfolio].
 
 QUALITY CHECK: ✓ Categories named strategically ✓ Revenue drivers identified ✓ Customer segments connected ✓ Innovation explained ✓ Evolution discussed ✓ Role Connection included ✓ No bullet points ✓ No generic statements
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.

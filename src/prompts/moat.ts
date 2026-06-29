@@ -130,7 +130,7 @@ STRUCTURE:
 
 [Para 5 — Threats + Evolution (2-3 sentences)]: What could weaken this moat? Top 2-3 threats with severity. Has the moat shifted over time? What does the evolution tell you about strategic direction?
 
-[Para 6 — Strategic Insight (2-3 sentences)]: The single most important competitive takeaway. How durable is this moat over 5-10 years? End with why understanding these competitive advantages matters for someone interviewing at the company — what specific strengths or competitive dynamics they should be prepared to discuss.
+[Para 6 — Strategic Insight (2-3 sentences)]: The single most important competitive takeaway. How durable is this moat over 5-10 years? End with why understanding these competitive advantages matters for someone interviewing at the company. **Executive Insight:** [one-sentence takeaway].
 
 QUALITY CHECK: ✓ Top moats named with scores ✓ Why-they-work explained per moat ✓ Durable vs temporary distinguished ✓ Reinforcement mechanisms ✓ Threats assessed ✓ Evolution discussed ✓ Strategic insight ✓ No bullet points ✓ No unsupported claims
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.

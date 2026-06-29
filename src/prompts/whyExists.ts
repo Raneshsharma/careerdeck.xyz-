@@ -111,7 +111,7 @@ STRUCTURE:
 
 [Para 3 — Evolution + Business Impact (3-4 sentences)]: How has the purpose shifted over time? Products→Solutions? Domestic→Global? Hardware→Services? Explain WHY the evolution occurred. How does purpose influence actual business decisions — innovation, investments, hiring, customer experience?
 
-[Para 4 — Differentiation + Strategic Insight (2-3 sentences)]: Why does this purpose matter in today's market? How does it differentiate the company? End with the single most important purpose-driven insight and why understanding this matters for someone interviewing at the company — what purpose-related questions or strategic conversations they should be prepared for.
+[Para 4 — Differentiation + Strategic Insight (2-3 sentences)]: Why does this purpose matter in today's market? How does it differentiate the company? End with why understanding this matters for someone interviewing. **Executive Insight:** [one-sentence purpose takeaway].
 
 QUALITY CHECK: ✓ Founding purpose explained ✓ Current problem solved ✓ Purpose evolution with WHY ✓ Business decisions connected to purpose ✓ Differentiation ✓ Strategic insight ✓ No copied mission statements ✓ No bullet points ✓ No aspirational fluff
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.

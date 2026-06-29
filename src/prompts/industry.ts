@@ -135,7 +135,7 @@ STRUCTURE:
 
 [Para 4 — Value Chain + Company Position (3-4 sentences)]: Who captures the most value in this industry — and why? How well positioned is the company? What industry-driven opportunities and risks does the company face?
 
-[Para 5 — Future Outlook + Strategic Insight (2-3 sentences)]: Where is the industry heading in 3-5 years? Biggest opportunity and biggest risk. End with the single most important industry insight and why understanding these dynamics matters for someone interviewing at the company.
+[Para 5 — Future Outlook + Strategic Insight (2-3 sentences)]: Where is the industry heading in 3-5 years? Biggest opportunity and biggest risk. End with why understanding these dynamics matters for someone interviewing. **Executive Insight:** [one-sentence industry takeaway].
 
 QUALITY CHECK: ✓ Industry defined with precision ✓ Growth drivers explained with WHY ✓ Challenges analyzed ✓ Trends interpreted ✓ Value chain assessed ✓ Company position evaluated ✓ Future outlook ✓ Strategic insight ✓ No bullet points ✓ Focus on industry, not company
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.

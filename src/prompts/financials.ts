@@ -109,8 +109,15 @@ RULES:
 1. Use every non-null field. If null, skip — don't guess. Never fabricate numbers.
 2. Interpret the numbers, don't just report them. Every paragraph explains "What does this tell us?"
 3. No accounting jargon unless necessary. No bullet points. No ratio dumps.
-4. If the analysis shows no verified financial data, produce a concise paragraph stating what could not be verified and what questions a candidate should research independently.
-5. If a sentence could describe another company, delete and rewrite.
+4. SPARSE DATA HANDLING — distinguish three cases:
+   a) Verified facts available: present confidently with specific numbers.
+   b) Unavailable metrics: name the missing metric AND explain WHY it matters.
+      Bad: "Revenue could not be verified."
+      Good: "Revenue data is unavailable from verified sources. This limits our ability to assess scale and growth trajectory — two inputs critical for evaluating market position."
+   c) If the company IS public (has ticker, market cap, or exchange listed): explain that while this KB lacks full financials, verified public data should be available — note what specific metrics to look for.
+   d) If the company IS private: explain that private financials are inherently unavailable and what proxy metrics could indicate performance.
+5. NEVER write multiple paragraphs saying "could not be verified" for each field — consolidate unavailable data into one paragraph, then move on. Spend more words on what IS known.
+6. If a sentence could describe another company, delete and rewrite.
 
 FORBIDDEN STATEMENTS:
 - "has strong financial performance" (explain why or delete)
@@ -129,7 +136,7 @@ STRUCTURE:
 
 [Para 4 — Capital Allocation + Strategic Connection (2-3 sentences)]: How management invests capital. Does it support long-term value? R&D, buybacks, acquisitions. How financial strength (or weakness) supports or constrains company strategy.
 
-[Para 5 — Strategic Insight + Role Connection (2-3 sentences)]: The ONE financial takeaway an MBA should remember. End with why understanding financial health matters for someone interviewing — what financial topics to be prepared to discuss.
+[Para 5 — Strategic Insight + Role Connection (2-3 sentences)]: The ONE financial takeaway an MBA should remember. End with why understanding financial health matters for someone interviewing — what financial topics to be prepared to discuss. End the section with this bolded line: **Executive Insight:** [one-sentence strategic takeaway].
 
 QUALITY CHECK: ✓ Scale quantified ✓ Growth interpreted ✓ Margins analyzed ✓ Strengths + risks covered ✓ Capital allocation assessed ✓ Strategic insight ✓ Role Connection ✓ No bullet points ✓ No fabricated numbers
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.

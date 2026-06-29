@@ -110,7 +110,7 @@ STRUCTURE:
 
 [Para 3 — Work-Life + Who Thrives (2-3 sentences)]: What is the work-life reality? Under what conditions do people succeed vs struggle? What type of profile fits best?
 
-[Para 4 — Interview Insight (1-2 sentences)]: What should a candidate ask about during interviews to assess fit? End with why understanding the employee experience matters for someone interviewing at this company.
+[Para 4 — Interview Insight (1-2 sentences)]: What should a candidate ask about during interviews to assess fit? End with why understanding the employee experience matters. **Executive Insight:** [one-sentence takeaway if data exists, or note that data is insufficient].
 
 QUALITY CHECK: ✓ Praise themes with evidence ✓ Frustration themes ✓ Career growth (if data) ✓ Compensation (if data) ✓ Work-life reality ✓ Who thrives ✓ Interview advice ✓ No fabricated sentiment
 If no data: ✓ Clear disclaimer ✓ Direction on where to research

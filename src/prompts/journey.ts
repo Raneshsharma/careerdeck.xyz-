@@ -131,13 +131,13 @@ STRUCTURE:
 
 [Para 1 — Founding Purpose (2-3 sentences)]: Why was the company created? What market gap or problem did it address? What was the founder's vision? Connect the founding purpose to what the company is today.
 
-[Para 2-3 — Strategic Turning Points (3-5 sentences each)]: Select the highest-impact milestones (by score). For each, explain what happened, WHY it was a turning point, and what strategic advantage or transformation it created. Focus on 3-5 events — quality over quantity.
+[Para 2-3 — Strategic Phases (3-5 sentences each)]: DON'T write chronologically. Organize around STRATEGIC TRANSFORMATIONS: Phase 1 — Founding & initial market, Phase 2 — Scaling nationally, Phase 3 — Business model pivot or platform expansion, Phase 4 — New business line or IPO, Phase 5 — Current strategic direction. Each phase: what changed, WHY it was a strategic shift, and what it enabled. Only cover the highest-impact milestones.
 
 [Para 4 — Business Evolution (3-4 sentences)]: How has the business model changed over time? What key transitions occurred? Products→Platform, Hardware→Services, Domestic→Global? Explain WHY each shift mattered strategically, not just that it happened.
 
 [Para 5 — Challenges + Lessons (2-3 sentences)]: What major challenge tested the company? How did management respond? What does that response reveal about the company's decision-making? What strategic lessons emerge?
 
-[Para 6 — Strategic Insight (2-3 sentences)]: How did these milestones collectively shape the company's current competitive position? The single most important strategic lesson from this journey. End with why understanding this evolution matters for someone interviewing at the company.
+[Para 6 — Strategic Insight (2-3 sentences)]: How did these strategic phases collectively shape the company's current competitive position? The single most important strategic lesson from this journey. End with why understanding this evolution matters for someone interviewing. **Executive Insight:** [one-sentence takeaway].
 
 QUALITY CHECK: ✓ Founding purpose connected to present ✓ Top milestones with WHY ✓ Business evolution explained ✓ Challenges with response analyzed ✓ Strategic lessons ✓ Competitive position connection ✓ No timeline narrative ✓ No bullet points
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.

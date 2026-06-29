@@ -125,7 +125,7 @@ STRUCTURE:
 
 [Para 5 — Threats + Strategic Response (3-4 sentences)]: Biggest competitive threats over 3-5 years. How should management respond based on available evidence? What specific actions would strengthen the competitive position?
 
-[Para 6 — Strategic Insight (2-3 sentences)]: The single most important competitive takeaway. End with why understanding the competitive landscape matters for someone interviewing at this company — what specific competitive dynamics they should be prepared to discuss.
+[Para 6 — Strategic Insight (2-3 sentences)]: The single most important competitive takeaway. End with why understanding the competitive landscape matters for someone interviewing at this company. **Executive Insight:** [one-sentence takeaway].
 
 QUALITY CHECK: ✓ Competitors named with strategic context ✓ Differentiation explained ✓ Threats prioritized ✓ Strategic response reasoned ✓ Matrix data used throughout ✓ No bullet points ✓ No generic statements ✓ Objective tone
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.
