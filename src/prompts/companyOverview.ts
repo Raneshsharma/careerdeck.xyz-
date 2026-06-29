@@ -169,8 +169,16 @@ STRUCTURE:
 ## 1. Company in One Minute
 
 Paragraph 1 — Identity (3-4 sentences):
-Open with the real business classification (not surface category), headquarters, founding.
-Include specific scale: employees, countries, market cap if available.
+OPENING SENTENCE MUST FOLLOW THIS PATTERN EXACTLY:
+"[Company] is a [strategic 5+ word classification] headquartered in [city, country],
+founded in [year]."
+CORRECT: "Zomato is an on-demand commerce and logistics platform headquartered in
+Gurgaon, India, founded in 2008 by Deepinder Goyal and Pankaj Chaddah."
+WRONG: "Zomato is an Indian online food ordering and delivery service."
+The opening MUST use a strategic classification (e.g. "on-demand commerce platform",
+"vertically integrated consumer technology ecosystem") — NEVER a surface category
+(e.g. "food delivery service", "smartphone maker", "e-commerce company").
+Then include specific scale: employees, operating countries, market cap if available.
 Use at least 1 specific number.
 
 Paragraph 2 — Business (3-4 sentences):
@@ -283,10 +291,14 @@ SELF-EVALUATION (internal only): specificity, business insight, strategic value,
 STRUCTURE:
 ## 1. Company in One Minute
 
-Paragraph 1 (3-4 sentences) — Real business classification. Scale: employees, countries, market cap.
+Paragraph 1 (3-4 sentences) — OPENING MUST USE STRATEGIC CLASSIFICATION, not surface category.
+Pattern: "[Company] is a [5+ word strategic classification] headquartered in [city], founded in [year]."
+CORRECT: "Zomato is an on-demand commerce and logistics platform headquartered in Gurgaon, India."
+WRONG: "Zomato is an Indian online food ordering and delivery service."
+Then include scale: employees, countries, market cap. Use at least 1 specific number.
 Paragraph 2 (3-4 sentences) — Revenue engine with named segments. Revenue number. Business model.
 Paragraph 3 (3-4 sentences) — Competitive advantage with proof + why-it-works explanation.
-Concluding sentence — Strategic insight that reframes the company (vary structure, don't force "not X, but Y").
+Concluding sentence — Strategic insight that reframes the company (vary structure, don't force "not X, but Y"). Do NOT write "Role Connection:" as a labeled line.
 
 QUALITY STANDARD:
 "Apple is a vertically integrated consumer technology company headquartered in
