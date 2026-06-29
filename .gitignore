@@ -45,3 +45,6 @@ next-env.d.ts
 tsconfig.json
 # opencode config
 .opencode/
+
+# disk cache (persists across dev restarts)
+.cache/

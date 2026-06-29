@@ -1,5 +1,6 @@
 export { CacheManager } from "./cacheManager";
 export { memoryCache } from "./memoryCache";
+export { diskCache } from "./diskCache";
 export { CacheLevel, buildCacheKey, CACHE_TTL } from "./types";
 export type { CacheEntry, CacheProvider } from "./types";
 export { CacheMetricsTracker } from "./metrics";

@@ -29,6 +29,7 @@ export const CACHE_TTL: Record<CacheLevel, Record<string, number>> = {
     yahoo: 24 * 60 * 60 * 1000,
     gnews: 30 * 60 * 1000,
     duckduckgo: 24 * 60 * 60 * 1000,
+    googleNewsRss: 30 * 60 * 1000,
     websiteDiscovery: 7 * 24 * 60 * 60 * 1000,
     websitePages: 7 * 24 * 60 * 60 * 1000,
   },

@@ -21,4 +21,5 @@ export { researchGNews } from "./gnews";
 export { researchDuckDuckGo } from "./duckduckgo";
 export { discoverCompanyWebsite, fetchCompanyWebsite } from "./website";
 export { researchGoogleNewsRss } from "./googleNewsRss";
+export type { GoogleNewsRssResult, GoogleNewsRssItem } from "./types";
 export { researchSecEdgar } from "./secEdgar";

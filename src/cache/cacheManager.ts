@@ -1,5 +1,6 @@
 import { CacheLevel, buildCacheKey, CACHE_TTL } from "./types";
 import { memoryCache } from "./memoryCache";
+import { diskCache } from "./diskCache";
 import { CacheMetricsTracker, type CacheLevelMetrics } from "./metrics";
 
 const LEVEL_METRICS_MAP: Record<CacheLevel, CacheLevelMetrics> = {
@@ -11,7 +12,8 @@ const LEVEL_METRICS_MAP: Record<CacheLevel, CacheLevelMetrics> = {
 
 export class CacheManager {
   /**
-   * Get a value from cache. Returns null if not found or expired.
+   * Get a value from cache (memory → disk fallback).
+   * Returns null if not found or expired.
    */
   static async get<T>(
     companyName: string,
@@ -19,18 +21,32 @@ export class CacheManager {
     resource: string,
   ): Promise<T | null> {
     const key = buildCacheKey(companyName, level, resource);
-    const result = await memoryCache.get<T>(key);
     const metricLevel = LEVEL_METRICS_MAP[level];
-    if (result !== null) {
+
+    // Fast path: memory cache
+    const memResult = await memoryCache.get<T>(key);
+    if (memResult !== null) {
       CacheMetricsTracker.recordHit(metricLevel);
-    } else {
-      CacheMetricsTracker.recordMiss(metricLevel);
+      return memResult;
     }
-    return result;
+
+    // Fallback: disk cache (survives restarts)
+    const diskResult = await diskCache.get<T>(key);
+    if (diskResult !== null) {
+      // Warm up memory for subsequent lookups
+      const ttlMap = CACHE_TTL[level];
+      const ttl = ttlMap[resource] ?? ttlMap["default"] ?? 24 * 60 * 60 * 1000;
+      await memoryCache.set(key, diskResult, ttl);
+      CacheMetricsTracker.recordHit(metricLevel);
+      return diskResult;
+    }
+
+    CacheMetricsTracker.recordMiss(metricLevel);
+    return null;
   }
 
   /**
-   * Set a value in cache with source-specific TTL.
+   * Set a value in both memory and disk cache with source-specific TTL.
    */
   static async set<T>(
     companyName: string,
@@ -41,7 +57,10 @@ export class CacheManager {
     const key = buildCacheKey(companyName, level, resource);
     const ttlMap = CACHE_TTL[level];
     const ttl = ttlMap[resource] ?? ttlMap["default"] ?? 24 * 60 * 60 * 1000;
-    await memoryCache.set(key, value, ttl);
+    await Promise.all([
+      memoryCache.set(key, value, ttl),
+      diskCache.set(key, value, ttl),
+    ]);
     CacheMetricsTracker.recordSet(LEVEL_METRICS_MAP[level]);
   }
 
@@ -71,7 +90,19 @@ export class CacheManager {
     resource: string,
   ): Promise<boolean> {
     const key = buildCacheKey(companyName, level, resource);
-    return memoryCache.has(key);
+    const memHas = await memoryCache.has(key);
+    if (memHas) return true;
+    const diskHas = await diskCache.has(key);
+    if (diskHas) {
+      const value = await diskCache.get(key);
+      if (value !== null) {
+        const ttlMap = CACHE_TTL[level];
+        const ttl = ttlMap[resource] ?? ttlMap["default"] ?? 24 * 60 * 60 * 1000;
+        await memoryCache.set(key, value, ttl);
+      }
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -83,7 +114,10 @@ export class CacheManager {
     resource: string,
   ): Promise<void> {
     const key = buildCacheKey(companyName, level, resource);
-    await memoryCache.delete(key);
+    await Promise.all([
+      memoryCache.delete(key),
+      diskCache.delete(key),
+    ]);
     CacheMetricsTracker.recordInvalidation();
   }
 
@@ -91,6 +125,9 @@ export class CacheManager {
    * Clear all cache entries.
    */
   static async clear(): Promise<void> {
-    await memoryCache.clear();
+    await Promise.all([
+      memoryCache.clear(),
+      diskCache.clear(),
+    ]);
   }
 }
