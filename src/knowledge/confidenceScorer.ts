@@ -44,6 +44,92 @@ function fieldConfidence(
   return Math.min(1, Math.round(score * 100) / 100);
 }
 
+function computeCompetitiveAdvantage(resolved: RawResolvedFacts): CompanyKnowledgeBase["competitive_advantage"] {
+  const desc = resolved.company.description.value ?? "";
+  const segments = resolved.business.businessSegments.value.join(" ").toLowerCase();
+  const segmentsStr = resolved.business.businessSegments.value.join(" ");
+  const products = resolved.products.items.value;
+  const brands = resolved.products.brands.value;
+  const hasRevenue = resolved.financials.revenue.value != null;
+  const hasEmployees = resolved.financials.employees.value != null;
+  const countries = resolved.business.countries.value;
+  const desc_lower = desc.toLowerCase();
+
+  // Brand strength signals
+  const brandSignals = [
+    /leader|leading|largest|dominant|top|best|trusted|major|strong|innovative/.test(desc_lower),
+    brands.length > 0,
+    products.length > 0,
+    desc.length > 100,
+    resolved.website.metaDescription.value != null,
+  ];
+  const brandConfidence = Math.min(1, Math.round((brandSignals.filter(Boolean).length / brandSignals.length) * 100) / 100);
+
+  // Scale advantage signals
+  const scaleSignals = [
+    hasRevenue,
+    hasEmployees,
+    countries.length > 1,
+    resolved.financials.marketCap.value != null,
+  ];
+  const scaleConfidence = Math.min(1, Math.round((scaleSignals.filter(Boolean).length / scaleSignals.length) * 100) / 100);
+
+  // Switching cost signals
+  const switchSignals = [
+    /subscription|saas|enterprise|platform|contract/i.test(segments),
+    /software|api|suite|integrat/i.test(segments),
+    brands.length > 2,
+    /ecosystem|vendor|lock.in/i.test(segments),
+  ];
+  const switchConfidence = Math.min(1, Math.round((switchSignals.filter(Boolean).length / switchSignals.length) * 100) / 100);
+
+  // Network effects signals
+  const networkSignals = [
+    /marketplace|platform|network|two.sided|ecosystem/i.test(segments),
+    /user|seller|buyer|creator|provider/i.test(segmentsStr),
+    /community|demand|supply|liquidity/i.test(desc_lower),
+    resolved.website.wikipedia.value != null && segments.length > 0,
+  ];
+  const networkConfidence = Math.min(1, Math.round((networkSignals.filter(Boolean).length / networkSignals.length) * 100) / 100);
+
+  function assessment(conf: number, high: string, mid: string, low: string): string {
+    if (conf >= 0.7) return high;
+    if (conf >= 0.4) return mid;
+    return low;
+  }
+
+  return {
+    brand: {
+      confidence: brandConfidence,
+      assessment: assessment(brandConfidence,
+        "Strong — consistently verified across multiple high-quality sources",
+        "Moderate — supported by some evidence",
+        "Limited or unverified — no reliable evidence for brand strength claims"),
+    },
+    scale: {
+      confidence: scaleConfidence,
+      assessment: assessment(scaleConfidence,
+        "Strong — revenue, employees, and geographic spread verified",
+        "Moderate — some scale indicators present",
+        "Limited — few scale indicators available"),
+    },
+    switching_costs: {
+      confidence: switchConfidence,
+      assessment: assessment(switchConfidence,
+        "Present — business model shows customer lock-in mechanisms",
+        "Partial — some switching cost signals detected",
+        "Unclear — no strong switching cost evidence"),
+    },
+    network_effects: {
+      confidence: networkConfidence,
+      assessment: assessment(networkConfidence,
+        "Present — marketplace/platform dynamics verified",
+        "Partial — some network effect signals detected",
+        "Unclear — no strong network effect evidence"),
+    },
+  };
+}
+
 export function scoreConfidence(
   resolved: RawResolvedFacts,
   news: ExtractedNewsArticle[],
@@ -129,6 +215,7 @@ export function scoreConfidence(
       ogImage: pv(resolved.website.ogImage),
     },
     news,
+    competitive_advantage: computeCompetitiveAdvantage(resolved),
     metadata: {
       resolved_at: now,
       sources_used: [],

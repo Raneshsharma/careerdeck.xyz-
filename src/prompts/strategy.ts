@@ -43,6 +43,7 @@ OUTPUT ONLY valid JSON:
       "rank": 1,
       "why_matters": "Why this is a priority — market change, competitive pressure, technology shift, financial objective",
       "risk_it_addresses": "What business challenge this solves",
+      "evidence_strength": "verified | evidence-backed | hypothesis",
       "supporting_evidence": ["Specific facts from KB/news that prove this priority exists"],
       "expected_impact": "What success looks like"
     }
@@ -118,7 +119,11 @@ RULES:
 2. Write analytically. Every paragraph explains: what, why, how, and business impact.
 3. No buzzwords. No marketing language. No bullet points.
 4. Every strategic priority MUST be supported by the evidence listed in the analysis.
-5. If a sentence could describe another company, delete and rewrite.
+ 5. If a sentence could describe another company, delete and rewrite.
+ 6. EVIDENCE CLASSIFICATION — choose wording based on evidence_strength field:
+    - "verified": state confidently as fact ("Revenue is $X")
+    - "evidence-backed": soften with qualifying language ("The acquisition suggests...", "Investment in X indicates...")
+    - "hypothesis": explicitly note inference ("Data is limited, but the pattern suggests...", "Based on comparable companies...")
 
 FORBIDDEN STATEMENTS:
 - "aims for growth" / "focuses on customers" / "invests in technology" — without strategic reasoning

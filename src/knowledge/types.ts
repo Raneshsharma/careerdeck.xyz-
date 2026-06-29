@@ -80,6 +80,12 @@ export interface CompanyKnowledgeBase {
     ogImage: ProvenancedValue;
   };
   news: ExtractedNewsArticle[];
+  competitive_advantage: {
+    brand: { confidence: number; assessment: string };
+    scale: { confidence: number; assessment: string };
+    switching_costs: { confidence: number; assessment: string };
+    network_effects: { confidence: number; assessment: string };
+  };
   metadata: {
     resolved_at: string;
     sources_used: string[];

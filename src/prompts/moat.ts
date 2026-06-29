@@ -88,6 +88,7 @@ export function buildAnalystPrompt(
       history: knowledge.history,
       industry: knowledge.financials?.industry?.value ?? null,
       recentNews: knowledge.news?.slice(0, 5).map((n) => n.title) ?? [],
+      competitiveAdvantage: knowledge.competitive_advantage,
     },
     null,
     2,

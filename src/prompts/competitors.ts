@@ -118,7 +118,13 @@ STRUCTURE:
 
 [Para 1 — Competitive Landscape (2-3 sentences)]: Summarize the market structure. How concentrated or fragmented? What type of competition defines this market? Set the context for the competitors that follow.
 
-[Para 2 — Direct Competitors (3-4 sentences)]: Name the top direct competitors. For each, describe what they compete on, where they are stronger, where the target company is stronger. Refer to the competitor matrix. Don't just list — explain strategic implications.
+[COMPETITOR MATRIX TABLE — Insert this markdown table between Paras 1 and 2]:
+| Competitor | Delivery | Quick Commerce | Restaurant Discovery | Threat Level |
+|---|---|---|---|---|
+| [Name] | ✅/❌ | ✅/❌ | ✅/❌ | High/Med/Low |
+Map the competitor matrix from the analysis data. Choose the 3-4 most relevant competitive dimensions for this industry (not necessarily the example columns above). Use the actual dimensions from the analysis data.
+
+[Para 2 — Direct Competitors (3-4 sentences)]: Name the top direct competitors. For each, describe what they compete on, where they are stronger, where the target company is stronger. Refer to the competitor matrix table above. Don't just list — explain strategic implications.
 
 [Para 3 — Indirect + Emerging Threats (3-4 sentences)]: Indirect competitors, substitutes, or emerging entrants. Where are they gaining ground? What strategic threat level do they represent? How might they change the competitive dynamic?
 

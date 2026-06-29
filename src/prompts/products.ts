@@ -16,19 +16,20 @@ RULES:
 
 INTERNAL REASONING (do NOT expose):
 1. What are the company's major product categories? Group into strategic buckets.
-2. Which generate the majority of revenue? Rank if known.
-3. Which are strategically important? (brand builders, market leaders, high-margin, ecosystem enablers)
-4. Who is the target customer per category? (consumers, enterprises, SMEs, developers, governments)
-5. How do products support the business model? (revenue, retention, cross-sell, ecosystem, positioning)
-6. Which are growing fastest? (emerging categories — AI, cloud, digital, subscriptions)
-7. How has the portfolio evolved? (hardware→services, single product→platform, domestic→global)
-8. What gaps or future opportunities exist?
+2. For each product, identify its BUSINESS FUNCTION: Is it for Acquisition (new users), Engagement (usage frequency), Retention (lock-in), Monetization (direct revenue), or B2B Expansion?
+3. Which generate the majority of revenue? Rank if known.
+4. Which are strategically important? (brand builders, market leaders, high-margin, ecosystem enablers)
+5. Who is the target customer per category? (consumers, enterprises, SMEs, developers, governments)
+6. How do products support the business model? (revenue, retention, cross-sell, ecosystem, positioning)
+7. Which are growing fastest? (emerging categories — AI, cloud, digital, subscriptions)
+8. How has the portfolio evolved? (hardware→services, single product→platform, domestic→global)
+9. What gaps or future opportunities exist?
 
 OUTPUT ONLY valid JSON:
 {
   "portfolio_overview": {
     "major_categories": [
-      { "name": "Category name", "description": "Strategic role", "key_products": ["product1 from KB or null"] }
+      { "name": "Category name", "description": "Strategic role", "business_function": "Acquisition | Engagement | Retention | Monetization | B2B Expansion", "key_products": ["product1 from KB or null"] }
     ],
     "evidence": ["kb field paths"]
   },

@@ -24,7 +24,8 @@ async function fetchYahooData(companyName: string): Promise<YahooFinanceResult |
   );
   if (!searchRes.ok) throw new Error(`Yahoo Search returned ${searchRes.status}`);
   const searchData = await searchRes.json();
-  const symbol = searchData.quotes?.[0]?.symbol;
+  const quote = searchData.quotes?.[0];
+  const symbol = quote?.symbol;
   if (!symbol) return null;
 
   const modules = ["assetProfile", "summaryDetail", "defaultKeyStatistics", "financialData"].join(",");
@@ -40,6 +41,7 @@ async function fetchYahooData(companyName: string): Promise<YahooFinanceResult |
   const profile = result.assetProfile || {};
   return {
     symbol,
+    exchange: quote?.exchange ?? null,
     assetProfile: {
       longBusinessSummary: profile.longBusinessSummary,
       sector: profile.sector,

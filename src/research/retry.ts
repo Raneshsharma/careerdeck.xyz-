@@ -20,6 +20,10 @@ function isNonRetryable(error: Error): boolean {
   return false;
 }
 
+function isRateLimited(error: Error): boolean {
+  return error.message.includes("429") || error.message.includes("Too Many Requests");
+}
+
 export async function withRetry<T>(
   fn: () => Promise<T>,
   options: Partial<RetryOptions> = {},
@@ -35,7 +39,10 @@ export async function withRetry<T>(
       if (attempt >= maxAttempts || isNonRetryable(lastError)) {
         throw lastError;
       }
-      const delay = baseDelayMs * Math.pow(2, attempt - 1);
+      // Rate-limited (429): wait significantly longer
+      const delay = isRateLimited(lastError)
+        ? 5000 * Math.pow(2, attempt - 1)
+        : baseDelayMs * Math.pow(2, attempt - 1);
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }

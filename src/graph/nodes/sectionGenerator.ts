@@ -66,6 +66,23 @@ export function createSectionGenerator(prompt: SectionPrompt) {
       }
     }
 
+    // Enrich prompts with CoreFacts (authoritative knowledge graph)
+    const coreFactsSuffix = state.coreFacts
+      ? `\n\nCORE FACTS (authoritative knowledge graph — sections MUST NOT contradict these):\n${JSON.stringify({
+          brandStrength: state.coreFacts.brandStrength,
+          scaleAdvantage: state.coreFacts.scaleAdvantage,
+          switchingCosts: state.coreFacts.switchingCosts,
+          networkEffects: state.coreFacts.networkEffects,
+          moatSummary: state.coreFacts.moatSummary,
+          revenue: state.coreFacts.revenue,
+          marketCap: state.coreFacts.marketCap,
+          employees: state.coreFacts.employees,
+          businessModel: state.coreFacts.businessModel,
+          namedProducts: state.coreFacts.namedProducts,
+          namedBrands: state.coreFacts.namedBrands,
+        }, null, 2)}`
+      : "";
+
     try {
       let content: string;
 
@@ -74,22 +91,22 @@ export function createSectionGenerator(prompt: SectionPrompt) {
           // ── Two-pass: Business Analyst → Executive Writer ──
           const { systemPrompt: analystSys, userPrompt: analystUser } =
             prompt.buildAnalystPrompt(knowledge, companyName, role);
-          const analystRaw = await generateSection(analystSys, analystUser);
+          const analystRaw = await generateSection(analystSys, analystUser + coreFactsSuffix);
           const analysis = parseStructuredAnalysis(analystRaw);
 
           const { systemPrompt: writerSys, userPrompt: writerUser } =
             prompt.buildWriterPrompt(analysis, companyName, role);
-          content = await generateSection(writerSys, writerUser);
+          content = await generateSection(writerSys, writerUser + coreFactsSuffix);
         } catch (twoPassError) {
           console.error(`${prompt.SECTION_ID}: two-pass failed, falling back to single-pass:`, twoPassError);
           // Fallback to legacy single-pass
           const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
-          content = await generateSection(systemPrompt, userPrompt);
+          content = await generateSection(systemPrompt, userPrompt + coreFactsSuffix);
         }
       } else {
         // ── Legacy single-pass ──
         const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
-        content = await generateSection(systemPrompt, userPrompt);
+        content = await generateSection(systemPrompt, userPrompt + coreFactsSuffix);
       }
 
       if (versionTag && content) {

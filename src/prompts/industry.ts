@@ -21,7 +21,7 @@ INTERNAL REASONING (do NOT expose):
 3. What are the biggest growth drivers? (AI, urbanization, digital adoption, regulation, electrification, premiumization, cloud migration, health awareness, consumer income)
 4. What are the biggest industry challenges? (competition, margin pressure, regulation, technology disruption, supply chain, customer acquisition, climate risk, geopolitics, talent shortage)
 5. How is the industry changing? (offline→digital, products→services, ownership→subscription, local→global, hardware→software, traditional→AI)
-6. Who captures the most value? (manufacturers, platforms, retailers, suppliers, brands, cloud providers, marketplaces)
+6. Who captures the value? Analyze the industry ECONOMICS: What are the margin profiles across the value chain? Do restaurants/platforms/delivery partners/customers each capture value? Who has pricing power? Where are profits concentrated?
 7. How well positioned is the company?
 8. What is the ONE industry insight an MBA should remember?
 
@@ -57,6 +57,12 @@ OUTPUT ONLY valid JSON:
   "value_chain": {
     "who_captures_value": "Manufacturers | Platforms | Retailers | Suppliers | Brands | Cloud providers | Marketplaces",
     "explanation": "Why does value accrue to these players?",
+    "industry_economics": {
+      "margin_profile": "Gross/operating margin range across the industry — where the company fits",
+      "profit_concentration": "Where are profits concentrated in the value chain — suppliers, platforms, distributors?",
+      "pricing_power": "Which players have pricing power and why",
+      "pressure_points": "Where is margin under pressure"
+    },
     "evidence": ["kb field paths"]
   },
   "company_position": {

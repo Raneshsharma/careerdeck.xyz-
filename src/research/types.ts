@@ -41,6 +41,7 @@ export interface WebsitePagesResult {
 
 export interface YahooFinanceResult {
   symbol: string;
+  exchange: string | null;
   assetProfile: {
     longBusinessSummary?: string;
     sector?: string;

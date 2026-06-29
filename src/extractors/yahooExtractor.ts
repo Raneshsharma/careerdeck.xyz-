@@ -7,9 +7,19 @@ function parseRawNumber(value: { raw?: number; fmt?: string } | undefined): numb
     return value.raw;
   }
   if (value.fmt) {
-    const parsed = parseFloat(value.fmt.replace(/[$,%£€¥]/g, "").replace(/,/g, ""));
+    const parsed = parseFloat(value.fmt.replace(/[$,%£€¥₹]/g, "").replace(/,/g, ""));
     if (!isNaN(parsed) && isFinite(parsed)) return parsed;
   }
+  return null;
+}
+
+function extractCurrencyCode(fmt: string | undefined): string | null {
+  if (!fmt) return null;
+  const codeMatch = fmt.match(/[A-Z]{3}/);
+  if (codeMatch) return codeMatch[0];
+  const symbolMap: Record<string, string> = { "$": "USD", "€": "EUR", "£": "GBP", "¥": "JPY", "₹": "INR" };
+  const symbol = fmt.match(/[^\d\s.,BMTbmt%/]/);
+  if (symbol && symbolMap[symbol[0]]) return symbolMap[symbol[0]];
   return null;
 }
 
@@ -32,9 +42,9 @@ export function extractYahooFacts(result: YahooFinanceResult): ExtractedFinancia
 
   return {
     revenue: parseRawNumber(f?.totalRevenue),
-    revenueCurrency: f?.totalRevenue?.fmt?.match(/[A-Z]{3}/)?.[0] ?? null,
+    revenueCurrency: extractCurrencyCode(f?.totalRevenue?.fmt),
     marketCap: parseRawNumber(k?.marketCap),
-    marketCapCurrency: k?.marketCap?.fmt?.match(/[A-Z]{3}/)?.[0] ?? null,
+    marketCapCurrency: extractCurrencyCode(k?.marketCap?.fmt),
     employees: a?.fullTimeEmployees ?? null,
     sector: a?.sector ?? null,
     industry: a?.industry ?? null,
@@ -43,7 +53,7 @@ export function extractYahooFacts(result: YahooFinanceResult): ExtractedFinancia
       : null,
     country: a?.country ?? null,
     currency: f?.financialCurrency?.toString() ?? null,
-    exchange: null,
+    exchange: result.exchange,
     ticker: result.symbol,
     profitMargin: parseMargin(f?.profitMargins),
     operatingMargin: parseMargin(f?.operatingMargins),
