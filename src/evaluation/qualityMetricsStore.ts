@@ -118,6 +118,10 @@ export class QualityMetricsStore {
     return filtered.filter((r) => r.passed).length / filtered.length;
   }
 
+  static getAllResults(): StoredResult[] {
+    return [...this.results];
+  }
+
   static clear(): void {
     this.results = [];
   }

@@ -13,6 +13,8 @@ import {
   recordGeneration,
 } from "@/lib/generation-limits";
 import { companyGraph } from "@/src/graph/companyGraph";
+import { EvaluationEngine } from "@/src/evaluation/evaluationEngine";
+import { QualityMetricsStore } from "@/src/evaluation/qualityMetricsStore";
 
 export const maxDuration = 300;
 
@@ -422,7 +424,24 @@ export async function POST(request) {
         .then(async () => {
           const result = await companyGraph.invoke(initialState);
 
-          const sections = result.reviewedSections || {};
+          const sections = { ...(result.reviewedSections || {}), ...(result.generatedSections || {}) };
+          const knowledge = result.knowledge?.knowledgeBase;
+
+          // Evaluate each section for dashboard metrics
+          try {
+            const evalVersion = process.env.PROMPT_VERSION || "4.0";
+            for (const [sectionId, content] of Object.entries(sections)) {
+              if (!content?.trim()) continue;
+              const evalResult = await EvaluationEngine.evaluateSection(
+                sectionId, sectionId, content,
+                knowledge || {},
+                cName, evalVersion,
+              );
+              QualityMetricsStore.store(evalResult, { promptId: sectionId });
+            }
+          } catch (evalErr) {
+            console.error("Evaluation error (non-fatal):", evalErr.message);
+          }
 
           // Order sections consistently
           const SECTION_ORDER = [

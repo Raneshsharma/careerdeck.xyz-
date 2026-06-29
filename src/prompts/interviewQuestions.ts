@@ -88,6 +88,8 @@ STRUCTURE:
 5. [Question] *(References [specific fact/insight])*
 
 QUALITY CHECK: ✓ 5 questions ✓ Each from different domain ✓ Each references specific KB fact ✓ Conversational tone ✓ Would impress a hiring manager ✓ Not generic
+
+IMPORTANT: End with "**Executive Insight:** [one-sentence insight about preparing for this company's interviews]".
 Output only the polished markdown.`;
 
 export function buildWriterPrompt(analysis: Record<string, unknown>, companyName: string, role?: string | undefined): { systemPrompt: string; userPrompt: string } {
@@ -108,6 +110,7 @@ RULES:
 4. Conversational tone: "I noticed X; how is the team thinking about Y?"
 5. Include parenthetical note of what fact each question references.
 6. No generic questions. If it could be asked at any company, rewrite.
+7. End with "**Executive Insight:** [one-sentence insight]".
 
 STRUCTURE:
 ## Bonus: The 5 Highest-Value Questions
@@ -115,6 +118,8 @@ STRUCTURE:
 1. [Question] *(References [specific fact])*
 ...
 5. [Question] *(References [specific fact])*
+
+**Executive Insight:** [...]
 
 Output only the polished markdown.`;
 

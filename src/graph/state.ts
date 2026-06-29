@@ -8,6 +8,8 @@ import type {
   YahooFinanceResult,
   GNewsResult,
   DuckDuckGoResult,
+  GoogleNewsRssResult,
+  SecEdgarResult,
 } from "../research/types";
 import type {
   ExtractedCompany,
@@ -23,6 +25,7 @@ import type { RawResolvedFacts } from "../knowledge/conflictResolver";
 import type { DomainVersions } from "../cache/versioning";
 import type { CacheMetrics } from "../cache/metrics";
 import type { CoreFacts } from "../knowledge/coreFactsExtractor";
+import type { CompetitorIntelligence } from "./nodes/competitorIntelligence";
 
 /**
  * Shared state for the Company Dossier graph.
@@ -44,6 +47,8 @@ export interface AssembledResearch {
   yahooFinance: YahooFinanceResult | null;
   gnews: GNewsResult | null;
   duckduckgo: DuckDuckGoResult | null;
+  googleNewsRss: GoogleNewsRssResult | null;
+  secEdgar: SecEdgarResult | null;
 }
 
 export interface CompanyKnowledge {
@@ -160,10 +165,32 @@ export const CompanyStateAnnotation = Annotation.Root({
     default: () => ({}),
   }),
 
+  // ── Final report quality ─────────────────────────────────────────────────
+  reportQuality: Annotation<number>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => 0,
+  }),
+
+  reportIssues: Annotation<Array<Record<string, unknown>>>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => [],
+  }),
+
   // ── Internal section scores (not exposed to user) ────────────────────────
   sectionScores: Annotation<Record<string, Record<string, number>>>({
     reducer: (previous, next) => ({ ...previous, ...next }),
     default: () => ({}),
+  }),
+
+  // ── Data Enrichment sources ─────────────────────────────────────────────
+  researchGoogleNewsRss: Annotation<ResearchEnvelope<GoogleNewsRssResult> | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  researchSecEdgar: Annotation<ResearchEnvelope<SecEdgarResult> | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
   }),
 
   // ── Domain versioning (per-domain hashes for incremental regeneration) ───
@@ -174,6 +201,12 @@ export const CompanyStateAnnotation = Annotation.Root({
 
   // ── Core Facts Evidence Graph ────────────────────────────────────────────
   coreFacts: Annotation<CoreFacts | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  // ── Competitor Intelligence (researched profiles of named competitors) ───
+  competitorIntelligence: Annotation<CompetitorIntelligence | null>({
     reducer: (_previous, next) => next ?? _previous,
     default: () => null,
   }),

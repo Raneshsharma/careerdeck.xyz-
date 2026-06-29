@@ -134,9 +134,18 @@ export function createSectionEditor(sectionId: string, sectionName: string) {
       : undefined;
 
     const availableNumbers = extractAvailableNumbers(knowledge);
+
+    const sectionNumberMinimums: Record<string, number> = {
+      financials: 4, companyOverview: 3, businessModel: 3,
+      competitors: 4, industry: 2, products: 3,
+      journey: 2, strategy: 2, moat: 2, whyExists: 2,
+      culture: 1, employeeInsights: 1, interviewQuestions: 0,
+    };
+    const minNumbers = sectionNumberMinimums[sectionId] ?? 2;
+
     const numbersStr = availableNumbers.length > 0
-      ? `\nAVAILABLE QUANTITATIVE EVIDENCE (you MUST incorporate as many as relevant into the section — minimum 3 specific numbers/named facts):\n${availableNumbers.join("\n")}`
-      : "\nNO quantitative evidence available in KB — if the section makes numerical claims without KB support, remove them.";
+      ? `\nAVAILABLE QUANTITATIVE EVIDENCE (you MUST incorporate at least ${minNumbers} into this section — minimum ${minNumbers} specific numbers/named facts required for '${sectionName}'):\n${availableNumbers.join("\n")}`
+      : `\nNO quantitative evidence available in KB — if no numbers exist, state that clearly once and move on. Minimum ${minNumbers} named facts required.`;
 
     try {
       const { systemPrompt, userPrompt } = buildEditorPrompt(

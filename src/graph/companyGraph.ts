@@ -7,6 +7,8 @@ import { googleSearchNode } from "./nodes/googleSearch";
 import { yahooFinanceNode } from "./nodes/yahooFinance";
 import { gnewsNode } from "./nodes/gnews";
 import { duckduckgoNode } from "./nodes/duckduckgo";
+import { googleNewsRssNode } from "./nodes/googleNewsRss";
+import { secEdgarNode } from "./nodes/secEdgarResearch";
 import { websiteDiscoveryNode } from "./nodes/websiteDiscovery";
 import { websiteFetchNode } from "./nodes/websiteFetch";
 import { mergeResearchNode } from "./nodes/mergeResearch";
@@ -50,7 +52,9 @@ import { generateSWOT } from "./nodes/genSWOT";
 import { generatePortersFiveForces } from "./nodes/genPortersFiveForces";
 import { generateInterviewPlaybook } from "./nodes/genInterviewPlaybook";
 import { extractCoreFactsNode } from "./nodes/extractCoreFacts";
+import { finalReportValidatorNode } from "./nodes/finalReportValidator";
 import { routeAfterValidation } from "./edges/conditional";
+import { competitorIntelligenceNode } from "./nodes/competitorIntelligence";
 
 /**
  * 6-layer architecture + 4 premium synthesis modules.
@@ -67,13 +71,13 @@ g.addEdge(START, "validateCompany");
 g.addConditionalEdges("validateCompany", routeAfterValidation, { __end__: END, normalizeCompanyName: "normalizeCompanyName" });
 
 // Layer 2: Research
-for (const n of ["wikipedia","google","yahoo","gnews","duckduckgo","websiteDiscovery","websiteFetch","mergeResearch"]) {
-  g.addNode(n, {wikipedia: wikipediaResearchNode, google: googleSearchNode, yahoo: yahooFinanceNode, gnews: gnewsNode, duckduckgo: duckduckgoNode, websiteDiscovery: websiteDiscoveryNode, websiteFetch: websiteFetchNode, mergeResearch: mergeResearchNode}[n]);
+for (const n of ["wikipedia","google","yahoo","gnews","duckduckgo","websiteDiscovery","websiteFetch","mergeResearch","googleNewsRss","secEdgar"]) {
+  g.addNode(n, {wikipedia: wikipediaResearchNode, google: googleSearchNode, yahoo: yahooFinanceNode, gnews: gnewsNode, duckduckgo: duckduckgoNode, websiteDiscovery: websiteDiscoveryNode, websiteFetch: websiteFetchNode, mergeResearch: mergeResearchNode, googleNewsRss: googleNewsRssNode, secEdgar: secEdgarNode}[n]);
 }
-for (const n of ["wikipedia","google","yahoo","gnews","duckduckgo"]) g.addEdge("normalizeCompanyName", n);
+for (const n of ["wikipedia","google","yahoo","gnews","duckduckgo","googleNewsRss","secEdgar"]) g.addEdge("normalizeCompanyName", n);
 g.addEdge("google", "websiteDiscovery");
 g.addEdge("websiteDiscovery", "websiteFetch");
-for (const n of ["wikipedia","websiteFetch","yahoo","gnews","duckduckgo"]) g.addEdge(n, "mergeResearch");
+for (const n of ["wikipedia","websiteFetch","yahoo","gnews","duckduckgo","googleNewsRss","secEdgar"]) g.addEdge(n, "mergeResearch");
 
 // Layer 3: Extraction
 for (const n of ["wikipediaExtraction","googleExtraction","yahooExtraction","gnewsExtraction","duckduckgoExtraction","websiteExtraction","mergeExtractedFacts"]) {
@@ -92,15 +96,25 @@ g.addEdge("mergeExtractedFacts", "resolveConflicts");
 g.addEdge("resolveConflicts", "buildKnowledge");
 g.addEdge("buildKnowledge", "extractCoreFacts");
 
-// Layer 5: 13 Section Generators
+// Layer 5: 13 Section Generators + Competitor Intelligence
 const sections = ["genCompanyOverview","genWhyExists","genBusinessModel","genProducts","genJourney","genIndustry","genCompetitors","genMoat","genFinancials","genStrategy","genCulture","genEmployeeInsights","genInterviewQuestions"];
 const genNodes = [generateCompanyOverview, generateWhyExists, generateBusinessModel, generateProducts, generateJourney, generateIndustry, generateCompetitors, generateMoat, generateFinancials, generateStrategy, generateCulture, generateEmployeeInsights, generateInterviewQuestions];
 sections.forEach((n, i) => { g.addNode(n, genNodes[i]); g.addEdge("extractCoreFacts", n); });
 
+// Competitor Intelligence — researches named competitors via Wikipedia (runs in parallel with generators)
+g.addNode("competitorIntel", competitorIntelligenceNode);
+g.addEdge("extractCoreFacts", "competitorIntel");
+
 // Layer 6: 13 Reviewers
 const reviews = ["reviewCompanyOverview","reviewWhyExists","reviewBusinessModel","reviewProducts","reviewJourney","reviewIndustry","reviewCompetitors","reviewMoat","reviewFinancials","reviewStrategy","reviewCulture","reviewEmployeeInsights","reviewInterviewQuestions"];
 const revNodes = [reviewCompanyOverview, reviewWhyExists, reviewBusinessModel, reviewProducts, reviewJourney, reviewIndustry, reviewCompetitors, reviewMoat, reviewFinancials, reviewStrategy, reviewCulture, reviewEmployeeInsights, reviewInterviewQuestions];
-reviews.forEach((n, i) => { g.addNode(n, revNodes[i]); g.addEdge(sections[i], n); g.addEdge(n, END); });
+reviews.forEach((n, i) => { g.addNode(n, revNodes[i]); g.addEdge(sections[i], n); });
+
+// Final Report Validator — all reviewers + competitorIntel converge here
+g.addNode("finalValidator", finalReportValidatorNode);
+reviews.forEach((n) => g.addEdge(n, "finalValidator"));
+g.addEdge("competitorIntel", "finalValidator");
+g.addEdge("finalValidator", END);
 
 // Premium Synthesis Modules
 const premium = ["genExecutiveSummary","genSWOT","genPortersFiveForces","genInterviewPlaybook"];

@@ -158,6 +158,12 @@ Every factual claim must be directly supported by at least one evidence field fr
 If evidence is absent for a claim, omit the claim entirely.
 Never invent supporting data.
 
+BRAND/REPUTATION CLAIMS (CRITICAL):
+- Do NOT claim "strong brand", "brand leader", "strong recognition", or similar unless the analysis explicitly includes brand evidence.
+- If the analysis has NO brand or moat data, do NOT make any brand-related claims at all.
+- Incorrect: "Zomato has strong brand recognition in India" if no brand data exists.
+- Correct: Omit brand claims entirely when no data exists.
+
 MOAT EXPLANATION RULE:
 When describing a competitive advantage, explain WHY competitors struggle to replicate it.
 Don't just state the moat — explain the mechanism.
@@ -207,6 +213,7 @@ QUALITY CHECKLIST — before returning, verify ALL of these:
 ✓ Every paragraph includes a company-specific fact
 ✓ Sounds like an equity research report, not Wikipedia
 ✓ Concluding sentence provides a fresh strategic insight
+✓ ABSOLUTELY NO brand/reputation claims like "strong brand", "brand recognition", "brand leader" unless the analysis explicitly has brand evidence in its competitive_advantage.evidence field. If the analysis has NO brand evidence in evidence fields, do NOT make any brand claim. Period.
 
 If any check fails, rewrite.
 

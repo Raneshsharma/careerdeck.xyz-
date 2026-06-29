@@ -96,7 +96,10 @@ RULES:
 2. Write objectively. Avoid HR fluff. Avoid promotional language.
 3. Every cultural trait must be connected to business performance — how does it enable or constrain strategy?
 4. No bullet points. No generic values lists.
-5. If no verified culture data exists, state: "Limited cultural data available. Research the company's values page and recent employee reviews on platforms like Glassdoor or Blind."
+5. If no verified culture data exists, output:
+   "Limited cultural data available from verified sources. Research the company's values page and recent employee reviews on platforms like Glassdoor or Blind.
+   
+   **Executive Insight:** Cultural data is unavailable from verified sources. Candidates should research values pages and employee reviews during interview preparation to assess company culture."
 6. If a sentence could describe another company, delete and rewrite.
 
 FORBIDDEN STATEMENTS:
@@ -115,12 +118,16 @@ STRUCTURE:
 
 [Para 4 — Culture & Strategy Link (2-3 sentences)]: HOW does the culture reinforce the business model? Specific connections: innovation culture → R&D leadership, ownership culture → execution speed, customer obsession → retention. This is the strategic value of culture.
 
-[Para 5 — Interview Insight (2 sentences)]: What should a candidate demonstrate to show cultural fit? End with **Executive Insight:** [one-sentence culture takeaway].
+[Para 5 — Interview Insight (2 sentences)]: What should a candidate demonstrate to show cultural fit?
+
+**REQUIRED: End the section EXACTLY with this format:**
+**Executive Insight:** [one-sentence culture takeaway]
+This is REQUIRED even with limited data. Example: "**Executive Insight:** This company's culture emphasizes speed and execution. Candidates should research recent employee reviews for deeper insight."
 
 QUALITY CHECK: ✓ Dominant traits named ✓ Work style specifics ✓ Success profile ✓ Culture-strategy link ✓ Interview advice ✓ No HR fluff ✓ No bullet points
 If limited data: ✓ Disclaimer included ✓ Available data maximized
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.
-Output only the polished markdown.`;
+Output only the polished markdown. The last section must contain **Executive Insight:** [insight].`;
 
 export function buildWriterPrompt(analysis: Record<string, unknown>, companyName: string, _role?: string | undefined): { systemPrompt: string; userPrompt: string } {
   const rc = _role ? `Candidate role: ${_role}. Connect interview insight to this role.` : "";
@@ -137,7 +144,7 @@ RULES:
 1. Use ONLY verified facts from KB.
 2. Write objectively — connect culture to business performance. No HR fluff.
 3. No bullet points. No generic values lists.
-4. If no data, state the disclaimer. Extract whatever IS available.
+4. If no data, state the disclaimer then end with "**Executive Insight:** [insight]". Extract whatever IS available.
 5. No generic statements.
 
 STRUCTURE:

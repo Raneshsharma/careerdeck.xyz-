@@ -5,6 +5,8 @@ import type { ExtractedUrls } from "../../extractors/types";
 export async function googleExtractionNode(
   state: CompanyState,
 ): Promise<Partial<CompanyState>> {
+  if (state.extractedGoogle !== undefined) return {};
+
   const envelope = state.researchGoogle;
   if (!envelope?.data) {
     return {

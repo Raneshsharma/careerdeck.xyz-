@@ -17,22 +17,32 @@ export class DashboardProvider {
     const topPrompts = QualityMetricsStore.getTopPerformingPrompts(5);
     const lowest = QualityMetricsStore.getLowestScoringSections(5);
     const flags = QualityMetricsStore.getMostCommonFlags(5);
+    const allSections = QualityMetricsStore.getAllResults();
+    const avgScore = QualityMetricsStore.getAverageScore();
 
-    const bySection: Record<string, number[]> = {};
-    let allScores: number[] = [];
-    let passCount = 0;
-    let totalCount = 0;
+    const sectionMap = new Map<string, { scores: number[]; pass: number; total: number }>();
+    for (const r of allSections) {
+      if (!sectionMap.has(r.sectionId)) {
+        sectionMap.set(r.sectionId, { scores: [], pass: 0, total: 0 });
+      }
+      const entry = sectionMap.get(r.sectionId)!;
+      entry.scores.push(r.score.overall);
+      entry.total++;
+      if (r.passed) entry.pass++;
+    }
 
     return {
       overview: {
-        totalEvaluations: totalCount,
-        averageScore: QualityMetricsStore.getAverageScore(),
+        totalEvaluations: allSections.length,
+        averageScore: avgScore,
         passRate: QualityMetricsStore.getPassRate(),
       },
-      bySection: Object.entries(bySection).map(([id, scores]) => ({
+      bySection: Array.from(sectionMap.entries()).map(([id, data]) => ({
         sectionId: id,
-        averageScore: scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0,
-        passRate: 0,
+        averageScore: data.scores.length > 0
+          ? data.scores.reduce((a, b) => a + b, 0) / data.scores.length
+          : 0,
+        passRate: data.total > 0 ? data.pass / data.total : 0,
       })),
       topPrompts: topPrompts.map((r) => ({
         sectionId: r.sectionId,

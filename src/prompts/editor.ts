@@ -33,10 +33,16 @@ CONFIDENCE-AWARE LANGUAGE:
 - Claims inferred from company description, news, or Wikipedia: soften with "Evidence suggests..." or "Public data indicates..."
 - Claims with NO KB support: REMOVE entirely. Do not soften — delete.
 
-CONTRADICTION DETECTION:
-- Compare the section against the provided cross-section summary (what other sections say about this company).
-- If the section contradicts another section on a core fact (brand, revenue, moat, competitive position, leadership), mark it as an issue and correct it.
-- Example: if another section says "weak brand recognition" but this section says "strong brand," remove the unsupported claim.
+CONTRADICTION DETECTION (CRITICAL):
+- Compare EVERY claim in this section against the CORE_FACTS provided below. If CORE_FACTS says brand is "unverified", NO section may claim "strong brand". Period.
+- If this section contradicts another section ON ANY IMMUTABLE FACT (brand, revenue, leadership, moat, competitive position, founder, industry), flag and fix the contradiction. Use the core facts as the single source of truth.
+- Example: if CORE_FACTS shows no brand data → remove "strong brand recognition" from this section.
+- Example: if another section says "unverified brand" but this section says "brand leader" → fix this section to match the core facts AUTHORITATIVELY.
+
+EXECUTIVE INSIGHT (MANDATORY):
+- Every section MUST end with a bolded **Executive Insight:** line.
+- Even if data is limited, add a meaningful insight: "**Executive Insight:** [one-sentence strategic takeaway about what the available data suggests]."
+- If the section does not end with **Executive Insight:**, ADD IT. This is a hard requirement.
 
 REVIEW CHECKLIST:
 1. Accuracy: every factual claim matches the KB. Flag unsupported claims.
@@ -139,6 +145,7 @@ STEPS:
 2. Replace vague adjectives with specific numbers from the KB wherever possible.
 3. Soften confidence for inferred claims, delete unsupported claims entirely.
 4. Ensure the section explains WHY, not just WHAT.
+5. BRAND CLAIM CHECK: If CORE_FACTS shows no brand data (brandStrength.score is 0 or assessment says "Unverified"), scan the section for ANY phrase about "strong brand", "brand recognition", "brand loyalty", "brand leader", "brand power", "well-known brand" — REMOVE all of them. No section may claim brand strength without evidence.
 
 Return ONLY the JSON. No other text.`,
   };

@@ -71,3 +71,32 @@ export interface DuckDuckGoResult {
   relatedTopics: string[];
   heading: string;
 }
+
+export interface GoogleNewsRssItem {
+  title: string;
+  link: string;
+  pubDate: string;
+  source: string;
+  snippet: string;
+}
+
+export interface GoogleNewsRssResult {
+  items: GoogleNewsRssItem[];
+}
+
+export interface SecEdgarFiling {
+  formType: string;
+  companyName: string;
+  cik: string;
+  filingDate: string;
+  description: string;
+  url: string;
+}
+
+export interface SecEdgarResult {
+  cik: string;
+  ticker: string;
+  filings: SecEdgarFiling[];
+  latest10K?: { url: string; filingDate: string };
+  latest10Q?: { url: string; filingDate: string };
+}

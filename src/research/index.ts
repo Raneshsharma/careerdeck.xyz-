@@ -20,3 +20,5 @@ export { researchYahoo } from "./yahoo";
 export { researchGNews } from "./gnews";
 export { researchDuckDuckGo } from "./duckduckgo";
 export { discoverCompanyWebsite, fetchCompanyWebsite } from "./website";
+export { researchGoogleNewsRss } from "./googleNewsRss";
+export { researchSecEdgar } from "./secEdgar";

@@ -92,7 +92,10 @@ RULES:
 1. Use every non-null field. If null, skip — don't guess.
 2. Write objectively. Focus on what employees ACTUALLY experience — not what the company claims.
 3. No bullet points. No HR fluff. No quoting Glassdoor verbatim.
-4. If no employee data exists, output exactly one paragraph: "Limited employee data available from verified sources. Research recent employee reviews on platforms like Glassdoor, Blind, and LinkedIn to understand the employee experience at this company. Pay particular attention to [specific areas to research based on company profile]."
+4. If no employee data exists, output:
+   "Limited employee data available from verified sources. Research recent employee reviews on platforms like Glassdoor, Blind, and LinkedIn to understand the employee experience at this company. Pay particular attention to [specific areas to research based on company profile].
+   
+   **Executive Insight:** Employee experience data is unavailable from verified sources. Candidates should research recent reviews on Glassdoor or Blind during interview preparation to understand the employee experience."
 5. Never fabricate employee sentiment. Null is acceptable.
 6. If a sentence could describe another company, delete and rewrite.
 
@@ -110,12 +113,16 @@ STRUCTURE:
 
 [Para 3 — Work-Life + Who Thrives (2-3 sentences)]: What is the work-life reality? Under what conditions do people succeed vs struggle? What type of profile fits best?
 
-[Para 4 — Interview Insight (1-2 sentences)]: What should a candidate ask about during interviews to assess fit? End with why understanding the employee experience matters. **Executive Insight:** [one-sentence takeaway if data exists, or note that data is insufficient].
+[Para 4 — Interview Insight (1-2 sentences)]: What should a candidate ask about during interviews to assess fit?
+
+**REQUIRED: End the section EXACTLY with this format:**
+**Executive Insight:** [one-sentence takeaway]
+This is REQUIRED even with zero data. Example: "**Executive Insight:** Employee experience data is unavailable. Candidates should research recent reviews on Glassdoor or Blind during interview preparation."
 
 QUALITY CHECK: ✓ Praise themes with evidence ✓ Frustration themes ✓ Career growth (if data) ✓ Compensation (if data) ✓ Work-life reality ✓ Who thrives ✓ Interview advice ✓ No fabricated sentiment
 If no data: ✓ Clear disclaimer ✓ Direction on where to research
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.
-Output only the polished markdown.`;
+Output only the polished markdown. The last line must contain **Executive Insight:** [insight].`;
 
 export function buildWriterPrompt(analysis: Record<string, unknown>, companyName: string, _role?: string | undefined): { systemPrompt: string; userPrompt: string } {
   const rc = _role ? `Candidate role: ${_role}. Connect the insight to this role.` : "";
@@ -132,7 +139,7 @@ RULES:
 1. Use ONLY verified facts from KB. Never fabricate employee sentiment.
 2. Write objectively — what employees actually experience, not what the company claims.
 3. No bullet points. No HR fluff.
-4. If no data, clear disclaimer with research guidance.
+4. If no data, clear disclaimer then end with "**Executive Insight:** [insight]".
 5. No generic statements.
 
 STRUCTURE:

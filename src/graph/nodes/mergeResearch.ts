@@ -3,6 +3,11 @@ import type { CompanyState, AssembledResearch, CompanyKnowledge } from "../state
 export async function mergeResearchNode(
   state: CompanyState,
 ): Promise<Partial<CompanyState>> {
+  // Idempotency: skip if already merged
+  if (state.knowledge?.rawResearch) {
+    return {};
+  }
+
   const assembled: AssembledResearch = {
     wikipedia: state.researchWikipedia?.data ?? null,
     google: state.researchGoogle?.data ?? null,
@@ -13,6 +18,8 @@ export async function mergeResearchNode(
     yahooFinance: state.researchYahoo?.data ?? null,
     gnews: state.researchGNews?.data ?? null,
     duckduckgo: state.researchDuckDuckGo?.data ?? null,
+    googleNewsRss: state.researchGoogleNewsRss?.data ?? null,
+    secEdgar: state.researchSecEdgar?.data ?? null,
   };
 
   const knowledge: CompanyKnowledge = {
