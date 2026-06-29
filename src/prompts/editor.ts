@@ -17,11 +17,16 @@ CORE FACTS CROSS-CHECK — before anything else, verify these core claims agains
 
 If you find any statement in the section that contradicts these core facts, REMOVE it immediately.
 
-QUANTITATIVE ENFORCEMENT:
-- Replace vague adjectives ("large", "growing", "strong", "significant", "high") with specific numbers from the KB.
-- Bad: "operates in many cities" → Good: "operates in 800+ cities" (use exact KB number)
-- Bad: "generates significant revenue" → Good: "generated $X in revenue (FY20XX)" (use exact KB number)
-- If the KB has no number for a claim, drop the adjective and state the fact neutrally: "operates across multiple cities" → use exact count, or "operates in India and UAE" if country list exists but count doesn't.
+QUANTITATIVE ENFORCEMENT — this is the SINGLE most important rule:
+- The section MUST contain minimum 3 specific numbers, named products, named segments, or specific dates from the KB.
+- Replace EVERY vague adjective ("large", "growing", "strong", "significant", "high", "rapid", "substantial") with specific numbers from the KB.
+- Bad: "operates in many cities" → MUST become: "operates in 800+ cities" (if KB has country/city count)
+- Bad: "generates significant revenue" → MUST become: "generated $383.3B in revenue (FY2024)" (if KB has revenue)
+- Bad: "has a large workforce" → MUST become: "employs 160,000+ people" (if KB has employee count)
+- Bad: "was founded in the early 2000s" → MUST become: "founded in 2008" (if KB has founded year)
+- Bad: "offers multiple products" → MUST become: "offers iPhone, Mac, iPad, Services, and Wearables" (if KB has named products)
+- If KB has a number for ANY claim in the section, USE IT. Never use an adjective where a number exists.
+- If the section has fewer than 3 specific numbers/named facts after your edit, rewrite it until it does.
 
 CONFIDENCE-AWARE LANGUAGE:
 - Claims directly supported by financial statements, annual reports, or verified Yahoo Finance data: state confidently.

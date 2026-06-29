@@ -1,8 +1,9 @@
 import type { CompanyState } from "../state";
-import type { CoreFacts } from "../../knowledge/coreFactsExtractor";
 import { generateSection } from "../../prompts/llm";
 import { buildEditorPrompt, type EditorResult } from "../../prompts/editor";
 import { validateSection } from "../../prompts/validator";
+import type { CompanyKnowledgeBase } from "../../knowledge/types";
+import type { CoreFacts } from "../../knowledge/coreFactsExtractor";
 
 function buildCrossSectionContext(
   state: CompanyState,
@@ -66,6 +67,42 @@ function extractKeyClaims(text: string): string {
   return claims.join("; ");
 }
 
+function extractAvailableNumbers(knowledge: CompanyKnowledgeBase): string[] {
+  const numbers: string[] = [];
+  const f = knowledge.financials;
+
+  if (f?.revenue?.value != null) numbers.push(`Revenue: ${f.revenue.value} ${f.revenueCurrency?.value ?? ""}`);
+  if (f?.marketCap?.value != null) numbers.push(`Market Cap: ${f.marketCap.value} ${f.marketCapCurrency?.value ?? ""}`);
+  if (f?.employees?.value != null) numbers.push(`Employees: ${f.employees.value}`);
+  if (f?.profitMargin?.value != null) numbers.push(`Profit Margin: ${(f.profitMargin.value * 100).toFixed(1)}%`);
+  if (f?.operatingMargin?.value != null) numbers.push(`Operating Margin: ${(f.operatingMargin.value * 100).toFixed(1)}%`);
+  if (f?.grossMargin?.value != null) numbers.push(`Gross Margin: ${(f.grossMargin.value * 100).toFixed(1)}%`);
+  if (f?.beta?.value != null) numbers.push(`Beta: ${f.beta.value}`);
+  if (f?.trailingPE?.value != null) numbers.push(`P/E Ratio: ${f.trailingPE.value}`);
+  if (f?.currentPrice?.value != null) numbers.push(`Current Price: ${f.currentPrice.value} ${f.currency?.value ?? ""}`);
+  if (f?.fiftyTwoWeekHigh?.value != null && f?.fiftyTwoWeekLow?.value != null) {
+    numbers.push(`52-Week Range: ${f.fiftyTwoWeekLow.value} - ${f.fiftyTwoWeekHigh.value}`);
+  }
+
+  const h = knowledge.history;
+  if (h?.founded?.value != null) numbers.push(`Founded: ${h.founded.value}`);
+  const founders = knowledge.leadership?.founders?.value;
+  if (Array.isArray(founders) && founders.length > 0) numbers.push(`Founders: ${founders.join(", ")}`);
+
+  const p = knowledge.products;
+  if (Array.isArray(p?.items?.value) && p.items.value.length > 0) numbers.push(`Products: ${p.items.value.join(", ")}`);
+  if (Array.isArray(p?.brands?.value) && p.brands.value.length > 0) numbers.push(`Brands: ${p.brands.value.join(", ")}`);
+  const segs = knowledge.business?.businessSegments?.value;
+  if (Array.isArray(segs) && segs.length > 0) numbers.push(`Business Segments: ${segs.join(", ")}`);
+
+  const news = knowledge.news?.slice(0, 5)?.map((n: { title: string; publishedDate?: string | null }) =>
+    `${n.title}${n.publishedDate ? ` (${n.publishedDate})` : ""}`
+  ) ?? [];
+  if (news.length > 0) numbers.push(`Recent News: ${news.join(" | ")}`);
+
+  return numbers;
+}
+
 export function createSectionEditor(sectionId: string, sectionName: string) {
   return async (state: CompanyState): Promise<Partial<CompanyState>> => {
     const knowledge = state.knowledge.knowledgeBase;
@@ -79,43 +116,36 @@ export function createSectionEditor(sectionId: string, sectionName: string) {
     }
 
     if (!original || original.trim().length === 0) {
-      return {
-        reviewedSections: { [sectionId]: "" },
-      };
+      return { reviewedSections: { [sectionId]: "" } };
     }
 
     const companyName = state.normalizedCompanyName || state.companyName;
     const crossContext = buildCrossSectionContext(state, sectionId);
-    const coreFacts: CoreFacts | null = state.coreFacts ?? null;
-    const coreFactsStr = coreFacts
+    const cf: CoreFacts | null = state.coreFacts ?? null;
+    const coreFactsStr = cf
       ? JSON.stringify({
-          companyName: coreFacts.companyName,
-          industry: coreFacts.industry,
-          sector: coreFacts.sector,
-          ceo: coreFacts.ceo,
-          revenue: coreFacts.revenue,
-          marketCap: coreFacts.marketCap,
-          employees: coreFacts.employees,
-          businessModel: coreFacts.businessModel,
-          namedProducts: coreFacts.namedProducts,
-          brandStrength: coreFacts.brandStrength,
-          scaleAdvantage: coreFacts.scaleAdvantage,
-          switchingCosts: coreFacts.switchingCosts,
-          networkEffects: coreFacts.networkEffects,
-          moatSummary: coreFacts.moatSummary,
+          companyName: cf.companyName, industry: cf.industry, sector: cf.sector,
+          ceo: cf.ceo, revenue: cf.revenue, marketCap: cf.marketCap,
+          employees: cf.employees, businessModel: cf.businessModel,
+          namedProducts: cf.namedProducts, brandStrength: cf.brandStrength,
+          scaleAdvantage: cf.scaleAdvantage, switchingCosts: cf.switchingCosts,
+          networkEffects: cf.networkEffects, moatSummary: cf.moatSummary,
         }, null, 2)
       : undefined;
 
+    const availableNumbers = extractAvailableNumbers(knowledge);
+    const numbersStr = availableNumbers.length > 0
+      ? `\nAVAILABLE QUANTITATIVE EVIDENCE (you MUST incorporate as many as relevant into the section — minimum 3 specific numbers/named facts):\n${availableNumbers.join("\n")}`
+      : "\nNO quantitative evidence available in KB — if the section makes numerical claims without KB support, remove them.";
+
     try {
       const { systemPrompt, userPrompt } = buildEditorPrompt(
-        knowledge,
-        sectionName,
-        original,
-        companyName,
-        crossContext,
-        coreFactsStr,
+        knowledge, sectionName, original, companyName,
+        crossContext, coreFactsStr,
       );
-      const rawResponse = await generateSection(systemPrompt, userPrompt);
+
+      const enhancedUserPrompt = userPrompt + numbersStr;
+      const rawResponse = await generateSection(systemPrompt, enhancedUserPrompt);
 
       let editorResult: EditorResult;
 
