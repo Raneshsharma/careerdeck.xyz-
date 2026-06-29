@@ -11,3 +11,7 @@ export { buildPrompt as strategy, SECTION_ID as strategyId } from "./strategy";
 export { buildPrompt as culture, SECTION_ID as cultureId } from "./culture";
 export { buildPrompt as employeeInsights, SECTION_ID as employeeInsightsId } from "./employeeInsights";
 export { buildPrompt as interviewQuestions, SECTION_ID as interviewQuestionsId } from "./interviewQuestions";
+export { buildPrompt as executiveSummary, SECTION_ID as executiveSummaryId } from "./executiveSummary";
+export { buildPrompt as swot, SECTION_ID as swotId } from "./swot";
+export { buildPrompt as portersFiveForces, SECTION_ID as portersFiveForcesId } from "./portersFiveForces";
+export { buildPrompt as interviewPlaybook, SECTION_ID as interviewPlaybookId } from "./interviewPlaybook";

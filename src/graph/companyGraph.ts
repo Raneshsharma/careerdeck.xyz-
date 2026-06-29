@@ -19,7 +19,6 @@ import { websiteExtractionNode } from "./nodes/websiteExtraction";
 import { mergeExtractedFactsNode } from "./nodes/mergeExtractedFacts";
 import { resolveConflictsNode } from "./nodes/resolveConflicts";
 import { buildKnowledgeNode } from "./nodes/buildKnowledge";
-// Section generators
 import { generateCompanyOverview } from "./nodes/genCompanyOverview";
 import { generateWhyExists } from "./nodes/genWhyExists";
 import { generateBusinessModel } from "./nodes/genBusinessModel";
@@ -33,7 +32,6 @@ import { generateStrategy } from "./nodes/genStrategy";
 import { generateCulture } from "./nodes/genCulture";
 import { generateEmployeeInsights } from "./nodes/genEmployeeInsights";
 import { generateInterviewQuestions } from "./nodes/genInterviewQuestions";
-// Section reviewers
 import { reviewCompanyOverview } from "./nodes/reviewCompanyOverview";
 import { reviewWhyExists } from "./nodes/reviewWhyExists";
 import { reviewBusinessModel } from "./nodes/reviewBusinessModel";
@@ -47,138 +45,64 @@ import { reviewStrategy } from "./nodes/reviewStrategy";
 import { reviewCulture } from "./nodes/reviewCulture";
 import { reviewEmployeeInsights } from "./nodes/reviewEmployeeInsights";
 import { reviewInterviewQuestions } from "./nodes/reviewInterviewQuestions";
+import { generateExecutiveSummary } from "./nodes/genExecutiveSummary";
+import { generateSWOT } from "./nodes/genSWOT";
+import { generatePortersFiveForces } from "./nodes/genPortersFiveForces";
+import { generateInterviewPlaybook } from "./nodes/genInterviewPlaybook";
 import { routeAfterValidation } from "./edges/conditional";
 
 /**
- * 6-layer architecture — every section: Write → Edit → Done
+ * 6-layer architecture + 4 premium synthesis modules.
+ * Graph has 50+ nodes — uses mutable builder pattern to avoid
+ * TypeScript type instantiation depth limit from chaining.
  */
-export const companyGraph = new StateGraph(CompanyStateAnnotation)
-  // Layer 1
-  .addNode("validateCompany", validateCompanyNode)
-  .addNode("normalizeCompanyName", normalizeCompanyNameNode)
-  .addEdge(START, "validateCompany")
-  .addConditionalEdges("validateCompany", routeAfterValidation, {
-    __end__: END,
-    normalizeCompanyName: "normalizeCompanyName",
-  })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const g = new StateGraph(CompanyStateAnnotation) as any;
 
-  // Layer 2
-  .addNode("wikipedia", wikipediaResearchNode)
-  .addNode("google", googleSearchNode)
-  .addNode("yahoo", yahooFinanceNode)
-  .addNode("gnews", gnewsNode)
-  .addNode("duckduckgo", duckduckgoNode)
-  .addNode("websiteDiscovery", websiteDiscoveryNode)
-  .addNode("websiteFetch", websiteFetchNode)
-  .addNode("mergeResearch", mergeResearchNode)
-  .addEdge("normalizeCompanyName", "wikipedia")
-  .addEdge("normalizeCompanyName", "google")
-  .addEdge("normalizeCompanyName", "yahoo")
-  .addEdge("normalizeCompanyName", "gnews")
-  .addEdge("normalizeCompanyName", "duckduckgo")
-  .addEdge("google", "websiteDiscovery")
-  .addEdge("websiteDiscovery", "websiteFetch")
-  .addEdge("wikipedia", "mergeResearch")
-  .addEdge("websiteFetch", "mergeResearch")
-  .addEdge("yahoo", "mergeResearch")
-  .addEdge("gnews", "mergeResearch")
-  .addEdge("duckduckgo", "mergeResearch")
+// Layer 1: Validation & Normalization
+g.addNode("validateCompany", validateCompanyNode);
+g.addNode("normalizeCompanyName", normalizeCompanyNameNode);
+g.addEdge(START, "validateCompany");
+g.addConditionalEdges("validateCompany", routeAfterValidation, { __end__: END, normalizeCompanyName: "normalizeCompanyName" });
 
-  // Layer 3
-  .addNode("wikipediaExtraction", wikipediaExtractionNode)
-  .addNode("googleExtraction", googleExtractionNode)
-  .addNode("yahooExtraction", yahooExtractionNode)
-  .addNode("gnewsExtraction", gnewsExtractionNode)
-  .addNode("duckduckgoExtraction", duckduckgoExtractionNode)
-  .addNode("websiteExtraction", websiteExtractionNode)
-  .addNode("mergeExtractedFacts", mergeExtractedFactsNode)
-  .addEdge("mergeResearch", "wikipediaExtraction")
-  .addEdge("mergeResearch", "googleExtraction")
-  .addEdge("mergeResearch", "yahooExtraction")
-  .addEdge("mergeResearch", "gnewsExtraction")
-  .addEdge("mergeResearch", "duckduckgoExtraction")
-  .addEdge("mergeResearch", "websiteExtraction")
-  .addEdge("wikipediaExtraction", "mergeExtractedFacts")
-  .addEdge("googleExtraction", "mergeExtractedFacts")
-  .addEdge("yahooExtraction", "mergeExtractedFacts")
-  .addEdge("gnewsExtraction", "mergeExtractedFacts")
-  .addEdge("duckduckgoExtraction", "mergeExtractedFacts")
-  .addEdge("websiteExtraction", "mergeExtractedFacts")
+// Layer 2: Research
+for (const n of ["wikipedia","google","yahoo","gnews","duckduckgo","websiteDiscovery","websiteFetch","mergeResearch"]) {
+  g.addNode(n, {wikipedia: wikipediaResearchNode, google: googleSearchNode, yahoo: yahooFinanceNode, gnews: gnewsNode, duckduckgo: duckduckgoNode, websiteDiscovery: websiteDiscoveryNode, websiteFetch: websiteFetchNode, mergeResearch: mergeResearchNode}[n]);
+}
+for (const n of ["wikipedia","google","yahoo","gnews","duckduckgo"]) g.addEdge("normalizeCompanyName", n);
+g.addEdge("google", "websiteDiscovery");
+g.addEdge("websiteDiscovery", "websiteFetch");
+for (const n of ["wikipedia","websiteFetch","yahoo","gnews","duckduckgo"]) g.addEdge(n, "mergeResearch");
 
-  // Layer 4
-  .addNode("resolveConflicts", resolveConflictsNode)
-  .addNode("buildKnowledge", buildKnowledgeNode)
-  .addEdge("mergeExtractedFacts", "resolveConflicts")
-  .addEdge("resolveConflicts", "buildKnowledge")
+// Layer 3: Extraction
+for (const n of ["wikipediaExtraction","googleExtraction","yahooExtraction","gnewsExtraction","duckduckgoExtraction","websiteExtraction","mergeExtractedFacts"]) {
+  g.addNode(n, {wikipediaExtraction: wikipediaExtractionNode, googleExtraction: googleExtractionNode, yahooExtraction: yahooExtractionNode, gnewsExtraction: gnewsExtractionNode, duckduckgoExtraction: duckduckgoExtractionNode, websiteExtraction: websiteExtractionNode, mergeExtractedFacts: mergeExtractedFactsNode}[n]);
+}
+for (const n of ["wikipediaExtraction","googleExtraction","yahooExtraction","gnewsExtraction","duckduckgoExtraction","websiteExtraction"]) {
+  g.addEdge("mergeResearch", n);
+  g.addEdge(n, "mergeExtractedFacts");
+}
 
-  // Layer 5: 13 writers
-  .addNode("genCompanyOverview", generateCompanyOverview)
-  .addNode("genWhyExists", generateWhyExists)
-  .addNode("genBusinessModel", generateBusinessModel)
-  .addNode("genProducts", generateProducts)
-  .addNode("genJourney", generateJourney)
-  .addNode("genIndustry", generateIndustry)
-  .addNode("genCompetitors", generateCompetitors)
-  .addNode("genMoat", generateMoat)
-  .addNode("genFinancials", generateFinancials)
-  .addNode("genStrategy", generateStrategy)
-  .addNode("genCulture", generateCulture)
-  .addNode("genEmployeeInsights", generateEmployeeInsights)
-  .addNode("genInterviewQuestions", generateInterviewQuestions)
-  .addEdge("buildKnowledge", "genCompanyOverview")
-  .addEdge("buildKnowledge", "genWhyExists")
-  .addEdge("buildKnowledge", "genBusinessModel")
-  .addEdge("buildKnowledge", "genProducts")
-  .addEdge("buildKnowledge", "genJourney")
-  .addEdge("buildKnowledge", "genIndustry")
-  .addEdge("buildKnowledge", "genCompetitors")
-  .addEdge("buildKnowledge", "genMoat")
-  .addEdge("buildKnowledge", "genFinancials")
-  .addEdge("buildKnowledge", "genStrategy")
-  .addEdge("buildKnowledge", "genCulture")
-  .addEdge("buildKnowledge", "genEmployeeInsights")
-  .addEdge("buildKnowledge", "genInterviewQuestions")
+// Layer 4: Knowledge Resolution
+g.addNode("resolveConflicts", resolveConflictsNode);
+g.addNode("buildKnowledge", buildKnowledgeNode);
+g.addEdge("mergeExtractedFacts", "resolveConflicts");
+g.addEdge("resolveConflicts", "buildKnowledge");
 
-  // Layer 6: 13 editors
-  .addNode("reviewCompanyOverview", reviewCompanyOverview)
-  .addNode("reviewWhyExists", reviewWhyExists)
-  .addNode("reviewBusinessModel", reviewBusinessModel)
-  .addNode("reviewProducts", reviewProducts)
-  .addNode("reviewJourney", reviewJourney)
-  .addNode("reviewIndustry", reviewIndustry)
-  .addNode("reviewCompetitors", reviewCompetitors)
-  .addNode("reviewMoat", reviewMoat)
-  .addNode("reviewFinancials", reviewFinancials)
-  .addNode("reviewStrategy", reviewStrategy)
-  .addNode("reviewCulture", reviewCulture)
-  .addNode("reviewEmployeeInsights", reviewEmployeeInsights)
-  .addNode("reviewInterviewQuestions", reviewInterviewQuestions)
-  .addEdge("genCompanyOverview", "reviewCompanyOverview")
-  .addEdge("genWhyExists", "reviewWhyExists")
-  .addEdge("genBusinessModel", "reviewBusinessModel")
-  .addEdge("genProducts", "reviewProducts")
-  .addEdge("genJourney", "reviewJourney")
-  .addEdge("genIndustry", "reviewIndustry")
-  .addEdge("genCompetitors", "reviewCompetitors")
-  .addEdge("genMoat", "reviewMoat")
-  .addEdge("genFinancials", "reviewFinancials")
-  .addEdge("genStrategy", "reviewStrategy")
-  .addEdge("genCulture", "reviewCulture")
-  .addEdge("genEmployeeInsights", "reviewEmployeeInsights")
-  .addEdge("genInterviewQuestions", "reviewInterviewQuestions")
-  .addEdge("reviewCompanyOverview", END)
-  .addEdge("reviewWhyExists", END)
-  .addEdge("reviewBusinessModel", END)
-  .addEdge("reviewProducts", END)
-  .addEdge("reviewJourney", END)
-  .addEdge("reviewIndustry", END)
-  .addEdge("reviewCompetitors", END)
-  .addEdge("reviewMoat", END)
-  .addEdge("reviewFinancials", END)
-  .addEdge("reviewStrategy", END)
-  .addEdge("reviewCulture", END)
-  .addEdge("reviewEmployeeInsights", END)
-  .addEdge("reviewInterviewQuestions", END)
-  .compile();
+// Layer 5: 13 Section Generators
+const sections = ["genCompanyOverview","genWhyExists","genBusinessModel","genProducts","genJourney","genIndustry","genCompetitors","genMoat","genFinancials","genStrategy","genCulture","genEmployeeInsights","genInterviewQuestions"];
+const genNodes = [generateCompanyOverview, generateWhyExists, generateBusinessModel, generateProducts, generateJourney, generateIndustry, generateCompetitors, generateMoat, generateFinancials, generateStrategy, generateCulture, generateEmployeeInsights, generateInterviewQuestions];
+sections.forEach((n, i) => { g.addNode(n, genNodes[i]); g.addEdge("buildKnowledge", n); });
 
+// Layer 6: 13 Reviewers
+const reviews = ["reviewCompanyOverview","reviewWhyExists","reviewBusinessModel","reviewProducts","reviewJourney","reviewIndustry","reviewCompetitors","reviewMoat","reviewFinancials","reviewStrategy","reviewCulture","reviewEmployeeInsights","reviewInterviewQuestions"];
+const revNodes = [reviewCompanyOverview, reviewWhyExists, reviewBusinessModel, reviewProducts, reviewJourney, reviewIndustry, reviewCompetitors, reviewMoat, reviewFinancials, reviewStrategy, reviewCulture, reviewEmployeeInsights, reviewInterviewQuestions];
+reviews.forEach((n, i) => { g.addNode(n, revNodes[i]); g.addEdge(sections[i], n); g.addEdge(n, END); });
+
+// Premium Synthesis Modules
+const premium = ["genExecutiveSummary","genSWOT","genPortersFiveForces","genInterviewPlaybook"];
+const premNodes = [generateExecutiveSummary, generateSWOT, generatePortersFiveForces, generateInterviewPlaybook];
+premium.forEach((n, i) => { g.addNode(n, premNodes[i]); g.addEdge("buildKnowledge", n); g.addEdge(n, END); });
+
+export const companyGraph = g.compile();
 export type CompanyGraph = typeof companyGraph;
