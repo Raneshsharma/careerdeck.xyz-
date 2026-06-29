@@ -423,17 +423,28 @@ export async function POST(request) {
           const result = await companyGraph.invoke(initialState);
 
           const sections = result.reviewedSections || {};
-          const sectionIds = Object.keys(sections);
+
+          // Order sections consistently
+          const SECTION_ORDER = [
+            "companyOverview", "whyExists", "businessModel", "products",
+            "journey", "industry", "competitors", "moat", "financials",
+            "strategy", "culture", "employeeInsights", "interviewQuestions",
+            "executiveSummary", "swot", "portersFiveForces", "interviewPlaybook",
+          ];
+          const sectionIds = SECTION_ORDER.filter((id) => sections[id]?.trim());
 
           if (sectionIds.length === 0) {
             emitter.emit("chunk", {
               content: "Insufficient company data provided. Try a different company name.",
             });
           } else {
-            for (const id of sectionIds) {
+            const separator = "\n\n---\n\n";
+            for (let i = 0; i < sectionIds.length; i++) {
+              const id = sectionIds[i];
               const content = sections[id];
               if (content?.trim()) {
-                try { emitter.emit("chunk", { content }); } catch {}
+                const chunk = i < sectionIds.length - 1 ? content + separator : content;
+                try { emitter.emit("chunk", { content: chunk }); } catch {}
               }
             }
           }
