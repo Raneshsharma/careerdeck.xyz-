@@ -39,6 +39,9 @@ export interface CoreFacts {
   networkEffects: { score: number | null; assessment: string };
   moatSummary: string;
 
+  // Strategic direction
+  strategicPriorities: string[];
+
   // News evidence
   recentMilestones: string[];
 

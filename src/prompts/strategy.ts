@@ -99,6 +99,7 @@ export function buildAnalystPrompt(
       mission: knowledge.mission,
       history: knowledge.history,
       news: newsSummary,
+      strategicPriorities: (knowledge as any).strategicPriorities ?? null,
     },
     null,
     2,
