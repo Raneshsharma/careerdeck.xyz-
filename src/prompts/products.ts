@@ -102,8 +102,8 @@ You receive a structured analysis (JSON). Write strategic portfolio prose from i
 RULES:
 1. Use every non-null field. If null, skip — don't guess.
 2. If the product list or segmentation is null or empty, explicitly state that detailed product portfolio data is unverified or limited in the available materials. Do NOT assert that the company has an underdeveloped portfolio or lacks products. Never invent weaknesses for unknown categories.
-3. Write analytically. Do not list products — explain their strategic role.
-4. Every paragraph answers: "Why does this product category MATTER to the company?"
+3. Write analytically. Do not list products — explain their strategic role. Evolve the product description into a strategic analysis of its growth, margins, competitive positioning, and specific business role (Core revenue engine, User acquisition, Engagement, Retention, Merchant monetization, B2B Expansion).
+4. Every paragraph answers: "Why does this product category MATTER to the company?" Connect its strategic position (e.g. high margin vs loss-leader customer acquisition) to the overall corporate health.
 5. No marketing language. No feature descriptions. No bullet points.
 6. If a sentence could describe another company, delete and rewrite.
 
@@ -121,15 +121,11 @@ STRUCTURE:
 | --- | --- | --- |
 | [Product name] | [Business Role, must be one of: Core revenue engine, User acquisition, Engagement, Retention, Merchant monetization, B2B Expansion] | [1-sentence strategic description of its function] |
 
-[Para 1 — Portfolio Overview (3-4 sentences)]: Major product/service categories — grouped strategically as an ECOSYSTEM, not a list. How they support each other. Which categories define the company's identity. Show how products interlock: Core product → Customer acquisition, Secondary product → Higher frequency, Subscription/ecosystem → Retention, Enterprise services → Revenue diversification.
-
-[Para 2 — Revenue-Driving Products (3-4 sentences)]: Which products/services contribute most to the business. Primary and secondary revenue drivers. Which have highest margins. Explain WHY, not just what.
-
-[Para 3 — Customer Segments + Strategic Role (3-4 sentences)]: Who buys which products. How the portfolio enables retention, cross-sell, ecosystem lock-in. Which products build the brand vs drive growth vs enable the ecosystem.
-
-[Para 4 — Innovation + Evolution (3-4 sentences)]: Recent developments and their business significance — not a list, but why they matter. How the portfolio has evolved over time. What the evolution signals about strategic direction.
-
-[Para 5 — Future Opportunities + Role Connection (2-3 sentences)]: Where the portfolio is likely headed based on evidence. End with why understanding this portfolio matters for someone interviewing. **Executive Insight:** [one-sentence strategic takeaway about the product portfolio].
+[Para 1 — Portfolio Overview (3-4 sentences)]: Major product/service categories — grouped strategically as an ECOSYSTEM, not a list. Analyze how products interlock (e.g. Core product → Customer acquisition, Secondary product → Higher frequency, Subscription/ecosystem → Retention, Enterprise services → Revenue diversification).
+[Para 2 — Profitability & Growth Drivers (3-4 sentences)]: Growth rates and margin dynamics of key products/services. Explain which products generate the highest margins or act as strategic loss-leaders.
+[Para 3 — Customer Segments & Ecosystem Lock-in (3-4 sentences)]: Who buys which products. How the portfolio enables retention, cross-sell, ecosystem lock-in, and barriers to entry.
+[Para 4 — Portfolio Evolution & Pivots (3-4 sentences)]: How the portfolio has evolved over time (e.g. hardware to services, offline to digital, domestic to global). What this evolution signals about strategic direction and upcoming pivots.
+[Para 5 — Future Gaps & Role Connection (2-3 sentences)]: Strategic gaps in the current portfolio and future opportunities. End with why understanding this portfolio matters for someone interviewing. **Executive Insight:** [one-sentence strategic takeaway about the product portfolio].
 
 QUALITY CHECK: ✓ Categories named strategically ✓ Revenue drivers identified ✓ Customer segments connected ✓ Innovation explained ✓ Evolution discussed ✓ Role Connection included ✓ No bullet points ✓ No generic statements
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.

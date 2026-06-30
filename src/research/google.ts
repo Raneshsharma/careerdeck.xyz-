@@ -29,6 +29,8 @@ async function fetchGoogleResults(companyName: string, queryOverride?: string[])
     `${companyName} official website`,
     `${companyName} investor relations`,
     `${companyName} annual report`,
+    `${companyName} CEO letter strategic priorities goals`,
+    `${companyName} investor presentation priorities strategy`,
     `${companyName} leadership team`,
     `${companyName} mission about us`,
   ];

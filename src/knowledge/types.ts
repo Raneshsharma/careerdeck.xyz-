@@ -58,6 +58,20 @@ export interface CompanyKnowledgeBase {
     currentPrice: ProvenancedValue<number | null>;
     fiftyTwoWeekHigh: ProvenancedValue<number | null>;
     fiftyTwoWeekLow: ProvenancedValue<number | null>;
+    totalEquity?: ProvenancedValue<number | null>;
+    investedCapital?: ProvenancedValue<number | null>;
+    ebitda?: ProvenancedValue<number | null>;
+    freeCashFlow?: ProvenancedValue<number | null>;
+    revenueGrowth?: ProvenancedValue<string | null>;
+    computedMetrics?: {
+      ebitdaMargin?: string | null;
+      netMargin?: string | null;
+      fcfMargin?: string | null;
+      fcfConversion?: string | null;
+      fcfYield?: string | null;
+      roe?: string | null;
+      roic?: string | null;
+    };
   };
   mission: {
     mission: ProvenancedValue;
@@ -81,10 +95,16 @@ export interface CompanyKnowledgeBase {
   };
   news: ExtractedNewsArticle[];
   competitive_advantage: {
-    brand: { confidence: number; assessment: string };
-    scale: { confidence: number; assessment: string };
-    switching_costs: { confidence: number; assessment: string };
-    network_effects: { confidence: number; assessment: string };
+    brand: { confidence: number; assessment: string; rationale?: string[] };
+    scale: { confidence: number; assessment: string; rationale?: string[] };
+    switching_costs: { confidence: number; assessment: string; rationale?: string[] };
+    network_effects: { confidence: number; assessment: string; rationale?: string[] };
+    cost_advantage?: { confidence: number; assessment: string; rationale?: string[] };
+    technology?: { confidence: number; assessment: string; rationale?: string[] };
+    intellectual_property?: { confidence: number; assessment: string; rationale?: string[] };
+    distribution?: { confidence: number; assessment: string; rationale?: string[] };
+    data?: { confidence: number; assessment: string; rationale?: string[] };
+    regulatory?: { confidence: number; assessment: string; rationale?: string[] };
   };
   metadata: {
     resolved_at: string;

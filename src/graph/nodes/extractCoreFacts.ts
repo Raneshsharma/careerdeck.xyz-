@@ -7,22 +7,23 @@ import { researchGoogleCSE } from "../../research/google";
 const EXTRACTION_SYSTEM_PROMPT = `You are a McKinsey Strategy Analyst. Your task is to compile a Canonical Knowledge Graph of Core Facts for a company from the provided raw multi-source research text.
 
 CRITICAL INSTRUCTIONS:
-1. Extract ALL concrete metrics (Revenue, Revenue Growth, EBITDA, Free Cash Flow, Market Cap, Employees, Founded Year, CEO name, founders, headquarters description). If they are in the text, extract them. Never invent them. If they are absent or unavailable, return null. If the company is private/unlisted (e.g., Robert Bosch GmbH, Amul, or private startups), set "marketCap" explicitly to null.
-2. For Revenue, EBITDA, Free Cash Flow, and Market Cap, return the raw numeric value (e.g. 150000000 for $150M), the currency code (e.g. "USD", "INR"), and the year if mentioned.
+1. Extract ALL concrete metrics (Revenue, Revenue Growth, EBITDA, Net Income, Free Cash Flow, Market Cap, Total Equity, Invested Capital, Employees, Founded Year, CEO name, founders, headquarters description). If they are in the text, extract them. Never invent them. If they are absent or unavailable, return null. If the company is private/unlisted, set "marketCap" explicitly to null.
+2. For Revenue, Net Income, EBITDA, Free Cash Flow, Market Cap, Total Equity, and Invested Capital, return the raw numeric value (e.g. 150000000 for $150M), the currency code (e.g. "USD", "INR"), and the year if mentioned.
 3. Extract all named products, brands, and business segments.
-4. Assess the competitive advantages (Moat) using this scale:
+4. Assess the competitive advantages (Moat) across 10 standard categories using this scale:
    - Strong (score 7-10): Consistently verified across high-quality sources, clear structural barrier.
    - Moderate (score 4-6): Supported by some evidence, but replicable or limited.
    - Weak (score 1-3): Clear evidence of structural weakness or commodity status.
    - Unknown (score null): NO evidence exists in the text. Return null for the score. Do NOT return 0.
    - For each moat score, provide a "rationale" list of 3-5 specific facts or evidence bullets that justify the score (e.g. "Supercharger network with 50k+ stalls").
+   - Categorize these moats for all 10 dimensions: Brand, Network Effects, Switching Costs, Cost Advantage, Scale Advantage, Technology, Intellectual Property, Distribution, Data, Regulatory.
 5. Distinguish between 'Weak' (evidence shows high churn, low pricing power, high competition) and 'Unknown' (absence of evidence in the text).
     - If a dimension is Unknown, the assessment MUST state 'Unknown - insufficient evidence in the source material.'
-6. Extract the top 3-5 strategic priorities of the company.
+6. Extract the top 3-5 strategic priorities of the company. These MUST be grounded directly in annual reports, CEO letters, or investor presentations. Each priority in the "strategicPriorities" list MUST be formatted as: "[Priority Description] (Source: [CEO Letter | Annual Report | Investor Day] [Year])".
 7. Extract 3-5 verified strategic/operational weaknesses of the company (e.g. procurement dependence, low margin commodities, regulatory risk) for the "strategicWeaknesses" list. Do NOT include unknown placeholders.
-8. Extract employee review intelligence (Glassdoor, AmbitionBox, or news trends found in Google snippets) and populate the "employeeInsights" object with rating (e.g. "4.1"), pros, cons, and a short culture summary.
+8. Extract employee review intelligence (Glassdoor, AmbitionBox, or news trends found in Google snippets) and populate the "employeeInsights" object with rating (e.g. "4.1"), ratingConfidence (float 0.0-1.0 based on review count/credibility), sourceCounts (approx number of reviews e.g. 15000), pros, cons, and a short culture summary.
 9. Extract Careers page values, Leadership principles, common Interview experiences, and Work style trends from the source materials.
-10. Extract 5-10 company-specific or domain-specific key terms (e.g. "GCMMF", "cooperative", "milk union" for Amul; "Gigafactory", "FSD", "Autopilot" for Tesla) in the "domainTerminology" list.
+10. Extract 5-10 company-specific or domain-specific key terms in the "domainTerminology" list.
 11. Identify the "asOfTimestamp" (e.g., "FY2024", "Q3 2025") representing when the most recent financial and scale metrics are current.
 
 Output ONLY valid JSON matching this exact structure:
@@ -36,9 +37,12 @@ Output ONLY valid JSON matching this exact structure:
   "ceo": "CEO Name or null",
   "revenue": { "value": 123450000, "currency": "USD", "year": "2024" },
   "revenueGrowth": "+15% or null",
+  "netIncome": { "value": 15000000, "currency": "USD" },
   "ebitda": { "value": 25000000, "currency": "USD" },
   "freeCashFlow": { "value": 15000000, "currency": "USD" },
   "marketCap": { "value": 5432100000, "currency": "USD" },
+  "totalEquity": { "value": 100000000, "currency": "USD" },
+  "investedCapital": { "value": 150000000, "currency": "USD" },
   "employees": 12000,
   "operatingCountries": 5,
   "asOfTimestamp": "FY2024 or null",
@@ -51,10 +55,16 @@ Output ONLY valid JSON matching this exact structure:
   "scaleAdvantage": { "score": 6, "assessment": "...", "rationale": [] },
   "switchingCosts": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
   "networkEffects": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
+  "costAdvantage": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
+  "technology": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
+  "intellectualProperty": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
+  "distribution": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
+  "data": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
+  "regulatory": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
   "moatSummary": "One-sentence competitive strategy summary",
   "strategicPriorities": ["priority1", "priority2", ...],
   "strategicWeaknesses": ["weakness1", "weakness2", ...],
-  "employeeInsights": { "rating": "4.2", "pros": ["Pro 1", ...], "cons": ["Con 1", ...], "cultureSummary": "Culture details..." },
+  "employeeInsights": { "rating": "4.2", "ratingConfidence": 0.85, "sourceCounts": 12000, "pros": ["Pro 1", ...], "cons": ["Con 1", ...], "cultureSummary": "Culture details..." },
   "careersValues": ["value1", "value2", ...],
   "leadershipPrinciples": ["principle1", "principle2", ...],
   "interviewExperiences": ["experience1", "experience2", ...],
@@ -179,44 +189,60 @@ function applyHardcodedFallbacks(companyName: string, coreFacts: CoreFacts): Cor
     coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Obsession with product perfection", "Deep collaboration and cross-functional teams", "Discretion and secrecy", "Simplicity as the ultimate sophistication"];
     coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["Deep domain-specific technical grilling", "Collaborative case studies and design challenges", "Intense cultural fit and attention to detail review"];
     coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["High confidentiality and product isolation", "Attention to tiny details", "Cross-functional collaborative sprints"];
-  } else if (norm.includes("amd") || norm.includes("advanced micro devices")) {
-    coreFacts.companyName = coreFacts.companyName || "AMD";
-    coreFacts.industry = coreFacts.industry || "Semiconductors";
-    coreFacts.sector = coreFacts.sector || "Information Technology";
-    coreFacts.description = coreFacts.description || "Advanced Micro Devices (AMD) designs high-performance processors and graphics cards.";
-    coreFacts.ceo = coreFacts.ceo || "Lisa Su";
-    coreFacts.revenue = coreFacts.revenue?.value ? coreFacts.revenue : { value: 22680000000, currency: "USD", year: "2023" };
-    coreFacts.revenueGrowth = coreFacts.revenueGrowth || "-4%";
-    coreFacts.netIncome = coreFacts.netIncome?.value ? coreFacts.netIncome : { value: 854000000, currency: "USD" };
-    coreFacts.ebitda = coreFacts.ebitda?.value ? coreFacts.ebitda : { value: 3780000000, currency: "USD" };
-    coreFacts.freeCashFlow = coreFacts.freeCashFlow?.value ? coreFacts.freeCashFlow : { value: 1250000000, currency: "USD" };
-    coreFacts.marketCap = coreFacts.marketCap?.value ? coreFacts.marketCap : { value: 220000000000, currency: "USD" };
-    coreFacts.employees = coreFacts.employees || 26000;
-    coreFacts.asOfTimestamp = coreFacts.asOfTimestamp || "FY2023";
-    coreFacts.careersValues = coreFacts.careersValues?.length ? coreFacts.careersValues : ["Innovation", "Collaboration", "Integrity & high quality", "Customer success"];
-    coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Lisa Su's execution focus", "First-principles chip engineering", "Agile competitor response", "Strategic market expansion"];
-    coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["In-depth silicon design questions", "Coding challenges in C/C++ and Verilog", "Architecture discussion with senior tech leaders"];
-    coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["Silicon engineering intensity", "Cross-continental team sprints", "Performance-oriented development focus"];
-  } else if (norm.includes("bosch") || norm.includes("robert bosch")) {
-    coreFacts.companyName = coreFacts.companyName || "Bosch";
-    coreFacts.industry = coreFacts.industry || "Industrial Technology and Consumer Goods";
-    coreFacts.sector = coreFacts.sector || "Industrials";
-    coreFacts.description = coreFacts.description || "Robert Bosch GmbH is a global supplier of technology and services in mobility, industrial tech, consumer goods, and energy.";
-    coreFacts.ceo = coreFacts.ceo || "Stefan Hartung";
-    coreFacts.revenue = coreFacts.revenue?.value ? coreFacts.revenue : { value: 91600000000, currency: "EUR", year: "2023" };
-    coreFacts.revenueGrowth = coreFacts.revenueGrowth || "+3.8%";
-    coreFacts.netIncome = coreFacts.netIncome?.value ? coreFacts.netIncome : { value: 2500000000, currency: "EUR" };
-    coreFacts.ebitda = coreFacts.ebitda?.value ? coreFacts.ebitda : { value: 8500000000, currency: "EUR" };
-    coreFacts.freeCashFlow = coreFacts.freeCashFlow?.value ? coreFacts.freeCashFlow : { value: 2200000000, currency: "EUR" };
-    coreFacts.marketCap = null; // Private GmbH
-    coreFacts.employees = coreFacts.employees || 429000;
-    coreFacts.asOfTimestamp = coreFacts.asOfTimestamp || "FY2023";
-    coreFacts.careersValues = coreFacts.careersValues?.length ? coreFacts.careersValues : ["Future focus", "Responsibility and sustainability", "Openness and trust", "Reliability and legality"];
-    coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Result focus and responsibility", "Openness and mutual trust", "Fairness and legality in operations"];
-    coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["In-depth system engineering and design case studies", "Grilling on automotive controller technologies", "Situational behavioral questions on teamwork"];
-    coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["High engineering rigor and process quality", "Long-term sustainability focus", "Interdisciplinary collaborative projects"];
   }
   return coreFacts;
+}
+
+function validateAndComputeFinancials(cf: CoreFacts): CoreFacts {
+  cf.computedMetrics = {
+    ebitdaMargin: null,
+    netMargin: null,
+    fcfMargin: null,
+    fcfConversion: null,
+    fcfYield: null,
+    roe: null,
+    roic: null,
+  };
+
+  const rev = Number(cf.revenue?.value ?? 0);
+  const ebitdaVal = Number(cf.ebitda?.value ?? 0);
+  const netInc = Number(cf.netIncome?.value ?? 0);
+  const fcf = Number(cf.freeCashFlow?.value ?? 0);
+  const mcap = Number(cf.marketCap?.value ?? 0);
+  const equity = Number(cf.totalEquity?.value ?? 0);
+  const capital = Number(cf.investedCapital?.value ?? 0);
+
+  if (rev > 0) {
+    if (ebitdaVal > 0) {
+      cf.computedMetrics.ebitdaMargin = ((ebitdaVal / rev) * 100).toFixed(1) + "%";
+    }
+    if (netInc !== 0) {
+      cf.computedMetrics.netMargin = ((netInc / rev) * 100).toFixed(1) + "%";
+    }
+    if (fcf !== 0) {
+      cf.computedMetrics.fcfMargin = ((fcf / rev) * 100).toFixed(1) + "%";
+    }
+  }
+
+  if (netInc > 0 && fcf > 0) {
+    cf.computedMetrics.fcfConversion = ((fcf / netInc) * 100).toFixed(1) + "%";
+  }
+
+  if (mcap > 0 && fcf !== 0) {
+    cf.computedMetrics.fcfYield = ((fcf / mcap) * 100).toFixed(1) + "%";
+  }
+
+  if (equity > 0 && netInc !== 0) {
+    cf.computedMetrics.roe = ((netInc / equity) * 100).toFixed(1) + "%";
+  }
+
+  if (capital > 0 && ebitdaVal > 0) {
+    // Invested Capital return using EBITDA as proxy for EBIT (less D&A, approximate as EBIT = EBITDA * 0.75)
+    const estimatedEbit = ebitdaVal * 0.75;
+    cf.computedMetrics.roic = ((estimatedEbit / capital) * 100).toFixed(1) + "%";
+  }
+
+  return cf;
 }
 
 function enrichKnowledgeBase(kb: CompanyKnowledgeBase, cf: CoreFacts): CompanyKnowledgeBase {
@@ -306,7 +332,6 @@ function enrichKnowledgeBase(kb: CompanyKnowledgeBase, cf: CoreFacts): CompanyKn
     };
   }
 
-  // Inject ebitda, fcf, growth, and asOfTimestamp
   if (cf.revenueGrowth) {
     (enriched.financials as any).revenueGrowth = { value: cf.revenueGrowth, sources: ["llm-extraction"], confidence: 1, last_verified: new Date().toISOString() };
   }
@@ -319,8 +344,19 @@ function enrichKnowledgeBase(kb: CompanyKnowledgeBase, cf: CoreFacts): CompanyKn
   if (cf.freeCashFlow) {
     (enriched.financials as any).freeCashFlow = { value: cf.freeCashFlow.value, currency: cf.freeCashFlow.currency, sources: ["llm-extraction"], confidence: 1, last_verified: new Date().toISOString() };
   }
+  if (cf.totalEquity) {
+    (enriched.financials as any).totalEquity = { value: cf.totalEquity.value, currency: cf.totalEquity.currency, sources: ["llm-extraction"], confidence: 1, last_verified: new Date().toISOString() };
+  }
+  if (cf.investedCapital) {
+    (enriched.financials as any).investedCapital = { value: cf.investedCapital.value, currency: cf.investedCapital.currency, sources: ["llm-extraction"], confidence: 1, last_verified: new Date().toISOString() };
+  }
   if (cf.asOfTimestamp) {
     (enriched as any).asOfTimestamp = cf.asOfTimestamp;
+  }
+
+  // Inject analytical computed metrics
+  if (cf.computedMetrics) {
+    (enriched.financials as any).computedMetrics = cf.computedMetrics;
   }
 
   // Inject strategic priorities, weaknesses, reviews, and domain terms
@@ -350,7 +386,7 @@ function enrichKnowledgeBase(kb: CompanyKnowledgeBase, cf: CoreFacts): CompanyKn
     (enriched as any).workStyleTrends = cf.workStyleTrends;
   }
 
-  // Map competitive advantage (Moat) scores
+  // Map competitive advantage (Moat) scores for all 10 categories
   enriched.competitive_advantage = {
     brand: {
       confidence: cf.brandStrength.score !== null ? cf.brandStrength.score / 10 : 0,
@@ -371,6 +407,36 @@ function enrichKnowledgeBase(kb: CompanyKnowledgeBase, cf: CoreFacts): CompanyKn
       confidence: cf.networkEffects.score !== null ? cf.networkEffects.score / 10 : 0,
       assessment: cf.networkEffects.assessment,
       rationale: cf.networkEffects.rationale
+    } as any,
+    cost_advantage: {
+      confidence: cf.costAdvantage?.score !== null ? (cf.costAdvantage?.score ?? 0) / 10 : 0,
+      assessment: cf.costAdvantage?.assessment ?? "",
+      rationale: cf.costAdvantage?.rationale ?? []
+    } as any,
+    technology: {
+      confidence: cf.technology?.score !== null ? (cf.technology?.score ?? 0) / 10 : 0,
+      assessment: cf.technology?.assessment ?? "",
+      rationale: cf.technology?.rationale ?? []
+    } as any,
+    intellectual_property: {
+      confidence: cf.intellectualProperty?.score !== null ? (cf.intellectualProperty?.score ?? 0) / 10 : 0,
+      assessment: cf.intellectualProperty?.assessment ?? "",
+      rationale: cf.intellectualProperty?.rationale ?? []
+    } as any,
+    distribution: {
+      confidence: cf.distribution?.score !== null ? (cf.distribution?.score ?? 0) / 10 : 0,
+      assessment: cf.distribution?.assessment ?? "",
+      rationale: cf.distribution?.rationale ?? []
+    } as any,
+    data: {
+      confidence: cf.data?.score !== null ? (cf.data?.score ?? 0) / 10 : 0,
+      assessment: cf.data?.assessment ?? "",
+      rationale: cf.data?.rationale ?? []
+    } as any,
+    regulatory: {
+      confidence: cf.regulatory?.score !== null ? (cf.regulatory?.score ?? 0) / 10 : 0,
+      assessment: cf.regulatory?.assessment ?? "",
+      rationale: cf.regulatory?.rationale ?? []
     } as any
   };
 
@@ -413,8 +479,11 @@ export async function extractCoreFactsNode(
         revenue: null,
         revenueGrowth: null,
         ebitda: null,
+        netIncome: null,
         freeCashFlow: null,
         marketCap: null,
+        totalEquity: null,
+        investedCapital: null,
         employees: null,
         operatingCountries: 1,
         asOfTimestamp: null,
@@ -427,13 +496,24 @@ export async function extractCoreFactsNode(
         scaleAdvantage: { score: null, assessment: "Unknown", rationale: [] },
         switchingCosts: { score: null, assessment: "Unknown", rationale: [] },
         networkEffects: { score: null, assessment: "Unknown", rationale: [] },
+        costAdvantage: { score: null, assessment: "Unknown", rationale: [] },
+        technology: { score: null, assessment: "Unknown", rationale: [] },
+        intellectualProperty: { score: null, assessment: "Unknown", rationale: [] },
+        distribution: { score: null, assessment: "Unknown", rationale: [] },
+        data: { score: null, assessment: "Unknown", rationale: [] },
+        regulatory: { score: null, assessment: "Unknown", rationale: [] },
         moatSummary: "",
         strategicPriorities: [],
         strategicWeaknesses: [],
-        employeeInsights: { rating: null, pros: [], cons: [], cultureSummary: null },
+        employeeInsights: { rating: null, ratingConfidence: null, sourceCounts: null, pros: [], cons: [], cultureSummary: null },
+        careersValues: [],
+        leadershipPrinciples: [],
+        interviewExperiences: [],
+        workStyleTrends: [],
         domainTerminology: [],
         recentMilestones: [],
         evidenceSources: [],
+        computedMetrics: null,
         extractedAt: new Date().toISOString()
       };
     }
@@ -479,6 +559,8 @@ export async function extractCoreFactsNode(
       }
     }
 
+    // Run computed metrics validation layer
+    coreFacts = validateAndComputeFinancials(coreFacts);
     coreFacts.extractedAt = new Date().toISOString();
 
     const currentKb = state.knowledge?.knowledgeBase;
@@ -497,10 +579,11 @@ export async function extractCoreFactsNode(
   } catch (e) {
     // If everything completely crashed, try to return at least the fallback coreFacts
     console.error("[extractCoreFactsNode] Fatal crash, returning fallback coreFacts:", e);
-    const cf = applyHardcodedFallbacks(companyName, {
+    let cf = applyHardcodedFallbacks(companyName, {
       companyName,
       extractedAt: new Date().toISOString()
     } as any);
+    cf = validateAndComputeFinancials(cf);
     const currentKb = state.knowledge?.knowledgeBase;
     if (currentKb) {
       const enrichedKb = enrichKnowledgeBase(currentKb, cf);

@@ -45,7 +45,13 @@ OUTPUT ONLY valid JSON:
   "profitability": {
     "gross_margin": "Formatted or null",
     "operating_margin": "Formatted or null",
-    "net_margin": "Formatted or null",
+    "net_margin": "Computed net margin from computedMetrics in KB (e.g. 12.1%) or null",
+    "ebitda_margin": "Computed EBITDA margin from computedMetrics in KB (e.g. 23.4%) or null",
+    "fcf_margin": "Computed FCF margin from computedMetrics in KB (e.g. 15.0%) or null",
+    "fcf_conversion": "Computed FCF conversion from computedMetrics in KB (e.g. 110%) or null",
+    "fcf_yield": "Computed FCF yield from computedMetrics in KB (e.g. 4.5%) or null",
+    "roe": "Computed ROE from computedMetrics in KB (e.g. 18.2%) or null",
+    "roic": "Computed ROIC from computedMetrics in KB (e.g. 14.5%) or null",
     "profit_drivers": ["Premium pricing | Scale | Recurring revenue | Platform economics | Cost leadership | Business mix"],
     "strongest_profit_lever": "Single strongest profitability driver",
     "evidence": ["kb field paths"]
@@ -120,7 +126,8 @@ RULES:
    d) If the company IS private: explain that private financials are inherently unavailable and what proxy metrics could indicate performance.
 7. NEVER write multiple paragraphs saying "could not be verified" for each field — consolidate unavailable data into one paragraph, then move on. Spend more words on what IS known.
 8. If NO financial data exists at all, end with: "**Executive Insight:** Financial data is unavailable from verified sources. Candidates should research the company's latest annual report or investor presentation for financial details."
-9. If a sentence could describe another company, delete and rewrite.
+9. ANALYZE COMPUTED METRICS: When discussing growth, profitability, and capital allocation, explicitly reference computed metrics (EBITDA margin, net margin, FCF conversion, ROE, ROIC, FCF yield) present in the JSON. Discuss their strategic implications (e.g. high ROE/ROIC indicates high capital efficiency, high FCF conversion reflects cash conversion strength).
+10. If a sentence could describe another company, delete and rewrite.
 
 FORBIDDEN STATEMENTS:
 - "has strong financial performance" (explain why or delete)

@@ -107,7 +107,7 @@ You receive a structured competitor matrix (JSON). Write a strategic competitive
 
 RULES:
 1. Use every non-null field. If null, skip — don't guess.
-2. Write analytically. Every paragraph explains WHY a competitor matters, what advantage each side has, and the business implication.
+2. Write analytically. Every paragraph explains WHY a competitor matters, what advantage each side has, and the business implication. Evolve descriptions from descriptive lists into strategic analyses (growth, margins, competitive positioning, and business role).
 3. No product feature-by-feature comparisons. No bullet points. No generic lists of rival companies.
 4. Be objective. Acknowledge where competitors are stronger — don't just praise the target company.
 5. If a sentence could describe another company, delete and rewrite.
@@ -128,14 +128,10 @@ STRUCTURE:
 | [Segment name or Core Business] | [Name] | [e.g. Market Leader / Challenger] | [e.g. Premium / Value / Dynamic] | [e.g. Super-app / Standalone] | High/Med/Low |
 Map the competitor matrix from the analysis data. Ensure the matrix uses this exact set of columns.
 
-[Para 2 — Direct Competitors (3-4 sentences)]: Name the top direct competitors. For each, describe what they compete on, where they are stronger, where the target company is stronger. Refer to the competitor matrix table above. Don't just list — explain strategic implications.
-
-[Para 3 — Indirect + Emerging Threats (3-4 sentences)]: Indirect competitors, substitutes, or emerging entrants. Where are they gaining ground? What strategic threat level do they represent? How might they change the competitive dynamic?
-
-[Para 4 — Differentiation (3-4 sentences)]: What makes the target company stand out? Sustainable advantages vs vulnerable positions. Explain WHY certain advantages are durable and which competitive gaps are closing.
-
-[Para 5 — Threats + Strategic Response (3-4 sentences)]: Biggest competitive threats over 3-5 years. How should management respond based on available evidence? What specific actions would strengthen the competitive position?
-
+[Para 2 — Direct Competitors & Margin Pressure (3-4 sentences)]: Name the top direct competitors. Compare their relative growth, profit margins, and cost structures to the target company's performance. Strategic implications for pricing power.
+[Para 3 — Strategic Positioning & Battlegrounds (3-4 sentences)]: Direct competitor battlegrounds. Where is the target company stronger (technology, scale, switching costs)? Where do competitors hold the advantage (geographic reach, product breadth)?
+[Para 4 — Indirect & Disruptive Entrants (3-4 sentences)]: Indirect competitors, substitutes, or emerging entrants. Analyze technology shifts, AI disruption, and platform entrants that threaten to rewrite market dynamics.
+[Para 5 — Competitive Threats & Recommended Actions (3-4 sentences)]: Biggest competitive threats over 3-5 years. What strategic responses should management prioritize (e.g. defensive ecosystem locks, acquisitions, product pivots) based on evidence?
 [Para 6 — Strategic Insight (2-3 sentences)]: The single most important competitive takeaway. End with why understanding the competitive landscape matters for someone interviewing at this company. **Executive Insight:** [one-sentence takeaway].
 
 QUALITY CHECK: ✓ Competitors named with strategic context ✓ Differentiation explained ✓ Threats prioritized ✓ Strategic response reasoned ✓ Matrix data used throughout ✓ No bullet points ✓ No generic statements ✓ Objective tone

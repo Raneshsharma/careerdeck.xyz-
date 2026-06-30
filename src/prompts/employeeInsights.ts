@@ -3,14 +3,14 @@ import type { CompanyKnowledgeBase } from "../knowledge/types";
 export const SECTION_ID = "employeeInsights";
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PASS 1 — Employee Experience Analyzer: extract employee sentiment data
+// PASS 1 — Employee Experience Analyst: extract employee sentiment data
 // ═══════════════════════════════════════════════════════════════════════════
 
 const ANALYST_SYSTEM_PROMPT = `You are an Organizational Strategy Consultant at McKinsey.
 Your job: analyze the employee experience at a company using ONLY verified data from the KB.
 
 CRITICAL RULES:
-- Under employee experience, praise themes, and frustration themes: prioritize and consume the actual Glassdoor/AmbitionBox review ratings, pros, cons, and culture summary listed in the "employeeInsights" field of the KB.
+- Praise themes, rating, and frustration themes: consume the actual rating, ratingConfidence, sourceCounts, pros, cons, and culture summary listed in the "employeeInsights" field of the KB.
 - If an employee rating (e.g. 4.2/5 stars) is present, state it explicitly. Do NOT invent review ratings if not in KB.
 - Focus on what employees ACTUALLY EXPERIENCE based on the review pros/cons, not what the company claims in its culture materials.
 
@@ -25,7 +25,9 @@ INTERNAL REASONING (do NOT expose):
 OUTPUT ONLY valid JSON:
 {
   "employee_experience": {
-    "rating": "4.2/5 (Glassdoor) or null",
+    "rating": "4.2/5 or null",
+    "ratingConfidence": 0.85,
+    "sourceCounts": 12000,
     "praise_themes": [
       { "theme": "Specific theme", "frequency": "Consistently mentioned | Frequently mentioned | Occasionally mentioned", "evidence_note": "What KB supports this" }
     ],
@@ -62,7 +64,62 @@ EVIDENCE RULE: Every claim must have KB field paths.
 SPARSE DATA RULE: Employee data is often unavailable from public KB. If none exists, set all fields to null. The writer will output the standard disclaimer.
 NULL RULE: Never fabricate. Null is better than invented employee sentiment.`;
 
-// Two-pass prompts removed for single-pass optimization
+export function buildAnalystPrompt(
+  knowledge: CompanyKnowledgeBase,
+  companyName: string,
+  _role?: string | undefined,
+): { systemPrompt: string; userPrompt: string } {
+  const kb = JSON.stringify(
+    {
+      employeeInsights: (knowledge as any).employeeInsights || null,
+      careersValues: (knowledge as any).careersValues || [],
+      leadershipPrinciples: (knowledge as any).leadershipPrinciples || [],
+      interviewExperiences: (knowledge as any).interviewExperiences || [],
+      workStyleTrends: (knowledge as any).workStyleTrends || [],
+      recentNews: knowledge.news?.slice(0, 5).map((n) => n.title) ?? [],
+    },
+    null,
+    2,
+  );
+  return {
+    systemPrompt: ANALYST_SYSTEM_PROMPT,
+    userPrompt: `Analyze the employee experience and organizational culture of ${companyName}.\n\nKB:\n${kb}\n\nReturn ONLY the JSON.`,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PASS 2 — Executive Writer: structured analysis → strategic employee insights
+// ═══════════════════════════════════════════════════════════════════════════
+
+const WRITER_SYSTEM_PROMPT = `You are a Senior McKinsey Organizational Strategy Consultant writing an employee insights and culture analysis for candidates.
+You receive a structured employee experience analysis (JSON). Write a strategic briefing from it.
+
+RULES:
+1. Under employee experience, praise themes, and frustrations: consume the actual rating (e.g. 4.2/5), ratingConfidence, sourceCounts, pros, cons, and culture summary listed in the JSON.
+2. AGGREGATE AND WEIGHT SENTIMENT: Explicitly state the review counts/volume (sourceCounts) and rating. Qualify statements with confidence weights based on ratingConfidence (e.g. high confidence 0.8+ indicates high consistency across thousands of reviews; low confidence indicates limited observations).
+3. Focus on what employees actually experience (rigor, compensation, growth, balance, bureaucracy) vs. corporate PR fluff.
+4. No bullet points. Use structured paragraphs.
+5. If no employee data exists at all, output the standard disclaimer and end with: "**Executive Insight:** [takeaway]".
+
+STRUCTURE:
+## 12. Employee Insights
+
+[Para 1 — Culture & Employee Experience (3-4 sentences)]: Aggregate rating and confidence-weighted sentiment analysis. Qualify pros/cons based on review counts and consistency. Contrast employee reality with corporate values.
+[Para 2 — Career Growth & Compensation (3-4 sentences)]: Opportunities for advancement, typical trajectory, training, compensation competitiveness, and career speed.
+[Para 3 — Work Style & Interview Intelligence (3-4 sentences)]: Demands, work-life balance, typical candidates who thrive vs struggle, common interview experiences, and interview tips. Connect to candidate role if specified.
+[Para 4 — Strategic Takeaway (1-2 sentences)]: Single most important takeaway. End the section with this bolded line: **Executive Insight:** [one-sentence strategic takeaway].`;
+
+export function buildWriterPrompt(
+  analysis: Record<string, unknown>,
+  companyName: string,
+  _role?: string | undefined,
+): { systemPrompt: string; userPrompt: string } {
+  const rc = _role ? `Candidate role: ${_role}. Connect the strategic advice to this role.` : "";
+  return {
+    systemPrompt: WRITER_SYSTEM_PROMPT,
+    userPrompt: `Write the Employee Insights & Culture analysis for ${companyName}.\n\nANALYSIS:\n${JSON.stringify(analysis, null, 2)}\n${rc}\n\nConsultant prose — no bullet points.`,
+  };
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Legacy fallback
@@ -74,10 +131,7 @@ RULES:
 1. Use ONLY verified facts from KB. Never fabricate employee sentiment.
 2. Write objectively — what employees actually experience, not what the company claims.
 3. No bullet points. No HR fluff.
-4. CONFIDENCE THRESHOLD FOR EMPLOYEE SENTIMENT: When describing employee sentiment, concerns (e.g. communication issues, workload, leadership support), or praise, do NOT state them as absolute facts about the entire company. You MUST explicitly qualify their prevalence:
-   - Identify if a theme is "consistently cited across multiple sources" or "a recurring theme in employee feedback" if it appears in multiple distinct comments/reviews in the KB.
-   - Tag themes as "isolated observations" or "limited comments from a subset of reviews" if they are only mentioned once or twice in the KB.
-   - Describe themes as "mixed reviews indicate split opinions regarding..." if there are conflicting reviews.
+4. CONFIDENCE THRESHOLD FOR EMPLOYEE SENTIMENT: When describing employee sentiment, concerns, or praise, do NOT state them as absolute facts. You MUST explicitly qualify their prevalence.
 5. If no data, clear disclaimer then end with "**Executive Insight:** [insight]".
 6. No generic statements.
 
