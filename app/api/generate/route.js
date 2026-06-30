@@ -15,6 +15,7 @@ import {
 import { companyGraph } from "@/src/graph/companyGraph";
 import { EvaluationEngine } from "@/src/evaluation/evaluationEngine";
 import { QualityMetricsStore } from "@/src/evaluation/qualityMetricsStore";
+import { UNIVERSAL_MASTER_PROMPT, DOMAIN_MASTER_PROMPTS } from "@/src/prompts/masterPrompt";
 
 export const maxDuration = 300;
 
@@ -541,8 +542,11 @@ export async function POST(request) {
         throw new Error(`Unsupported legacy dossier type: ${dosType}`);
     }
 
+    const domainPrompt = DOMAIN_MASTER_PROMPTS[dosType] || DOMAIN_MASTER_PROMPTS["company"];
+    const dynamicSystemPrompt = `${UNIVERSAL_MASTER_PROMPT}\n\n${domainPrompt}`;
+
     const messages = [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: dynamicSystemPrompt },
       { role: "user", content: userPrompt },
     ];
 

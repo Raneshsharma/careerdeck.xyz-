@@ -4,6 +4,7 @@ import { generateSection } from "../../prompts/llm";
 import { CacheManager } from "../../cache/cacheManager";
 import { CacheLevel } from "../../cache/types";
 import { getSectionDependency } from "../../cache/dependencyMap";
+import { UNIVERSAL_MASTER_PROMPT, DOMAIN_MASTER_PROMPTS } from "../../prompts/masterPrompt";
 
 function getScopedCoreFacts(sectionId: string, cf: any): Record<string, any> {
   if (!cf) return {};
@@ -141,6 +142,10 @@ export function createSectionGenerator(prompt: SectionPrompt) {
 2. HISTORICAL VS CURRENT FOOTPRINT: For any international operations or scale descriptors, distinguish between past peaks (historical expansion) and current operational reality. Use terms like "historically operated in..." vs "currently operates in..." and ground with the asOfTimestamp if available.
 3. Keep the report trustworthy by never stating a hypothesis or inference as a verified fact.`;
 
+    const domainType = state.dossierType || "company";
+    const domainMasterPrompt = DOMAIN_MASTER_PROMPTS[domainType] || DOMAIN_MASTER_PROMPTS["company"];
+    const fullMasterSystemPrompt = `${UNIVERSAL_MASTER_PROMPT}\n\n${domainMasterPrompt}`;
+
     try {
       let content: string;
 
@@ -149,22 +154,26 @@ export function createSectionGenerator(prompt: SectionPrompt) {
           // ── Two-pass: Business Analyst → Executive Writer ──
           const { systemPrompt: analystSys, userPrompt: analystUser } =
             prompt.buildAnalystPrompt(knowledge, companyName, role);
-          const analystRaw = await generateSection(analystSys, analystUser + coreFactsSuffix + confidenceSuffix);
+          const fullAnalystSystemPrompt = `${fullMasterSystemPrompt}\n\n${analystSys}`;
+          const analystRaw = await generateSection(fullAnalystSystemPrompt, analystUser + coreFactsSuffix + confidenceSuffix);
           const analysis = parseStructuredAnalysis(analystRaw);
 
           const { systemPrompt: writerSys, userPrompt: writerUser } =
             prompt.buildWriterPrompt(analysis, companyName, role);
-          content = await generateSection(writerSys, writerUser + coreFactsSuffix + confidenceSuffix);
+          const fullWriterSystemPrompt = `${fullMasterSystemPrompt}\n\n${writerSys}`;
+          content = await generateSection(fullWriterSystemPrompt, writerUser + coreFactsSuffix + confidenceSuffix);
         } catch (twoPassError) {
           console.error(`${prompt.SECTION_ID}: two-pass failed, falling back to single-pass:`, twoPassError);
           // Fallback to legacy single-pass
           const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
-          content = await generateSection(systemPrompt, userPrompt + coreFactsSuffix + confidenceSuffix);
+          const fullSystemPrompt = `${fullMasterSystemPrompt}\n\n${systemPrompt}`;
+          content = await generateSection(fullSystemPrompt, userPrompt + coreFactsSuffix + confidenceSuffix);
         }
       } else {
         // ── Legacy single-pass ──
         const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
-        content = await generateSection(systemPrompt, userPrompt + coreFactsSuffix + confidenceSuffix);
+        const fullSystemPrompt = `${fullMasterSystemPrompt}\n\n${systemPrompt}`;
+        content = await generateSection(fullSystemPrompt, userPrompt + coreFactsSuffix + confidenceSuffix);
       }
 
       if (versionTag && content) {
