@@ -252,6 +252,94 @@ export interface JDFacts {
   confidence: Record<string, string>;
 }
 
+export interface NewsFacts {
+  // ── Core facts (Fact Layer) ───────────────────────────────────────────
+  headline: string;
+  company: string;
+  industry: string;
+  category: string;  // e.g. "Acquisition", "Earnings", "Layoffs", "Product Launch", "Leadership Change"
+  date: string;
+  summary: string;
+  sources: string[];
+
+  // ── Business Reasoning (Business Layer) ──────────────────────────────
+  business_problem: string;
+  business_opportunity: string;
+  root_cause: string;
+  strategic_priority: string;
+  business_impact: {
+    winners: string[];
+    losers: string[];
+    revenue_effect: string;
+    margin_effect: string;
+    operational_effect: string;
+    customer_effect: string;
+  };
+  financial_effect: {
+    revenue_impact: string;
+    margin_impact: string;
+    stock_signal: string;
+    cash_position: string;
+    investment_risk: string;
+  };
+  industry_impact: {
+    competitor_reactions: string[];
+    industry_trend: string;
+    ripple_effects: string[];
+  };
+  customer_impact: string[];
+  employee_impact: {
+    hiring_signal: string;
+    layoff_risk: string;
+    skills_in_demand: string[];
+    culture_change: string;
+  };
+  role_impact: Array<{
+    role_family: string;
+    impact: string;
+    opportunity: string;
+  }>;
+
+  // ── Intelligence Scores ───────────────────────────────────────────────
+  importance_score: number;  // 1-10
+  freshness: string;         // "Breaking" | "24 Hours" | "This Week" | "This Month" | "Historical"
+  interview_relevance: string; // "Highly Likely" | "Likely" | "Low"
+  career_relevance: Array<{
+    role_family: string;
+    relevance: string;
+    reason: string;
+  }>;
+
+  // ── Career Layer ─────────────────────────────────────────────────────
+  interview_talking_points: Array<{
+    opinion: string;
+    reasoning: string;
+    confidence: string;
+  }>;
+  risks: Array<{
+    risk: string;
+    likelihood: string;
+    mitigation: string;
+  }>;
+  opportunities: Array<{
+    opportunity: string;
+    timeframe: string;
+    who_benefits: string;
+  }>;
+  predictions: Array<{
+    prediction: string;
+    timeframe: string;
+    confidence: string;  // "High" | "Medium" | "Low"
+    rationale: string;
+  }>;
+  candidate_action_plan: Array<{
+    action: string;
+    why: string;
+    priority: string;
+  }>;
+  confidence: Record<string, string>;
+}
+
 export const CompanyStateAnnotation = Annotation.Root({
   // ── Raw inputs ──────────────────────────────────────────────────────────
   companyName: Annotation<string>(),
@@ -433,6 +521,12 @@ export const CompanyStateAnnotation = Annotation.Root({
 
   // ── JD Intelligence facts graph ─────────────────────────────────────────
   jdFacts: Annotation<JDFacts | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  // ── News Intelligence facts graph ──────────────────────────────────────
+  newsFacts: Annotation<NewsFacts | null>({
     reducer: (_previous, next) => next ?? _previous,
     default: () => null,
   }),

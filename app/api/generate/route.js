@@ -15,6 +15,7 @@ import {
 import { companyGraph } from "@/src/graph/companyGraph";
 import { roleGraph } from "@/src/graph/roleGraph";
 import { jdGraph } from "@/src/graph/jdGraph";
+import { newsGraph } from "@/src/graph/newsGraph";
 import { EvaluationEngine } from "@/src/evaluation/evaluationEngine";
 import { QualityMetricsStore } from "@/src/evaluation/qualityMetricsStore";
 import { UNIVERSAL_MASTER_PROMPT, DOMAIN_MASTER_PROMPTS } from "@/src/prompts/masterPrompt";
@@ -404,8 +405,8 @@ export async function POST(request) {
         return Response.json({ error: `Unknown dossier type: ${dosType}` }, { status: 400 });
     }
 
-    // ── LANGGRAPH PIPELINE: company, role, and jd dossier types use parallel graphs ──
-    if (dosType === "company" || dosType === "role" || dosType === "jd") {
+    // ── LANGGRAPH PIPELINE: company, role, jd, and news dossier types use parallel graphs ──
+    if (dosType === "company" || dosType === "role" || dosType === "jd" || dosType === "news") {
       const emitter = createSSEEmitter();
       const { stream } = emitter;
       const stopHeartbeat = startHeartbeat(emitter);
@@ -424,7 +425,8 @@ export async function POST(request) {
 
       const graphToUse = dosType === "company" ? companyGraph
         : dosType === "role" ? roleGraph
-        : jdGraph;
+        : dosType === "jd" ? jdGraph
+        : newsGraph;
 
       // Run graph asynchronously — emit sections as they complete
       Promise.resolve()
@@ -469,12 +471,19 @@ export async function POST(request) {
                 "maturityModel", "careerPath", "compensation", "interviewPrep",
                 "first90Days", "scenarios", "businessVocabulary", "functionalPriorities"
               ]
-            : [
+            : dosType === "jd"
+            ? [
                 "jdOverview", "hiringIntent", "hiddenExpectations", "responsibilityIntelligence",
                 "skillsIntelligence", "atsIntelligence", "hiringSignals", "businessProblems",
                 "stakeholderMap", "kpiIntelligence", "interviewPrediction", "starBlueprint",
                 "resumeMatch", "expectations3060", "redFlags", "companyAlignment",
                 "fitScore", "interviewCheatSheet"
+              ]
+            : [
+                "newsOverview", "executiveSummary", "whatHappened", "whyItHappened",
+                "businessImpact", "strategicImportance", "industryImpact", "financialImpact",
+                "customerImpact", "employeeImpact", "roleImpact", "interviewTalkingPoints",
+                "risksAndOpportunities", "whatHappensNext", "candidateActionPlan"
               ];
           const sectionIds = SECTION_ORDER.filter((id) => sections[id]?.trim());
 
@@ -531,16 +540,6 @@ export async function POST(request) {
     // Build prompt
     let userPrompt;
     switch (dosType) {
-      case "news":
-        const newsText = buildNewsText(null, companyResearch);
-        let newsFacts = await extractNewsFacts(newsText);
-        if (!newsFacts || newsFacts.length === 0) {
-          const nsFallback = newsText.split("\n").filter(Boolean);
-          newsFacts = nsFallback.length > 0 ? nsFallback : [];
-        }
-        const nsFactStr = newsFacts.length > 0 ? newsFacts.map((f) => `- ${f}`).join("\n") : "";
-        userPrompt = buildNewsPrompt(cName, rName || "", null, nsFactStr);
-        break;
       default:
         throw new Error(`Unsupported legacy dossier type: ${dosType}`);
     }
