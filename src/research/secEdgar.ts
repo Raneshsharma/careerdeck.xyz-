@@ -88,7 +88,18 @@ export async function researchSecEdgar(
   try {
     const searchKey = ticker || companyName;
     const cik = await withRetry(() => findCik(searchKey), { maxAttempts: 2, baseDelayMs: 1000 });
-    if (!cik) throw new Error("CIK not found");
+    if (!cik) {
+      const durationMs = Date.now() - startTime;
+      return {
+        source: SOURCE,
+        success: false,
+        fetchedAt: new Date().toISOString(),
+        cached: false,
+        durationMs,
+        data: null,
+        error: "CIK not found",
+      };
+    }
 
     const filings = await fetchFilings(cik);
 

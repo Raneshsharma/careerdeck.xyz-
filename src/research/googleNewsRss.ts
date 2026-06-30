@@ -17,43 +17,69 @@ export interface GoogleNewsRssResult {
   items: GoogleNewsRssItem[];
 }
 
+function cleanRssSearchQuery(name: string): string {
+  return name
+    .replace(/\b(gmbh|limited|ltd|inc|co|corp|corporation|private|pvt|plc|sa|ag)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function fetchRssData(companyName: string): Promise<GoogleNewsRssResult | null> {
-  const q = encodeURIComponent(companyName.trim());
-  const url = `https://news.google.com/rss/search?q=${q}+when:1m&hl=en-US&gl=US&ceid=US:en`;
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    if (!res.ok) return null;
-    const xml = await res.text();
-
-    const items: GoogleNewsRssItem[] = [];
-    const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
-    let match;
-
-    while ((match = itemRegex.exec(xml)) !== null) {
-      const itemXml = match[1];
-      const title = extractTag(itemXml, "title");
-      const link = extractTag(itemXml, "link");
-      const pubDate = extractTag(itemXml, "pubDate");
-      const sourceMatch = /<source[^>]*>([^<]*)<\/source>/i.exec(itemXml);
-      const source = sourceMatch ? sourceMatch[1] : "";
-
-      const snippetMatch = /<description[^>]*>([^<]*)<\/description>/i.exec(itemXml);
-      let snippet = snippetMatch ? decodeHtml(snippetMatch[1]) : "";
-      snippet = snippet.replace(/<[^>]*>/g, "").trim();
-
-      if (title && title !== companyName) {
-        items.push({ title, link, pubDate, source, snippet: snippet.slice(0, 500) });
-      }
-      if (items.length >= 15) break;
-    }
-
-    return items.length > 0 ? { items } : null;
-  } finally {
-    clearTimeout(timer);
+  const cleanName = cleanRssSearchQuery(companyName);
+  const queries = [companyName.trim()];
+  if (cleanName && cleanName.toLowerCase() !== companyName.toLowerCase()) {
+    queries.push(cleanName);
   }
+  const firstWord = cleanName.split(" ")[0];
+  if (firstWord && firstWord.toLowerCase() !== cleanName.toLowerCase() && firstWord.length > 2) {
+    queries.push(firstWord);
+  }
+
+  const uniqueQueries = Array.from(new Set(queries.filter(Boolean)));
+
+  for (const q of uniqueQueries) {
+    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}+when:1m&hl=en-US&gl=US&ceid=US:en`;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      if (!res.ok) continue;
+      const xml = await res.text();
+
+      const items: GoogleNewsRssItem[] = [];
+      const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+      let match;
+
+      while ((match = itemRegex.exec(xml)) !== null) {
+        const itemXml = match[1];
+        const title = extractTag(itemXml, "title");
+        const link = extractTag(itemXml, "link");
+        const pubDate = extractTag(itemXml, "pubDate");
+        const sourceMatch = /<source[^>]*>([^<]*)<\/source>/i.exec(itemXml);
+        const source = sourceMatch ? sourceMatch[1] : "";
+
+        const snippetMatch = /<description[^>]*>([^<]*)<\/description>/i.exec(itemXml);
+        let snippet = snippetMatch ? decodeHtml(snippetMatch[1]) : "";
+        snippet = snippet.replace(/<[^>]*>/g, "").trim();
+
+        if (title && title !== companyName) {
+          items.push({ title, link, pubDate, source, snippet: snippet.slice(0, 500) });
+        }
+        if (items.length >= 15) break;
+      }
+
+      if (items.length > 0) {
+        return { items };
+      }
+    } catch (err) {
+      console.warn(`[googleNewsRss] Query "${q}" failed:`, err.message);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  return null;
 }
 
 function extractTag(xml: string, tag: string): string {

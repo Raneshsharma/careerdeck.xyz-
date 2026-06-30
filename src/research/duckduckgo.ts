@@ -23,30 +23,51 @@ interface DDApiResponse {
   RelatedTopics?: Array<{ Text?: string; FirstURL?: string }>;
 }
 
-async function fetchDuckDuckGoData(companyName: string): Promise<DuckDuckGoResult | null> {
-  const q = encodeURIComponent(companyName.trim());
-  const url = `https://api.duckduckgo.com/?q=${q}&format=json&no_html=1&skip_disambig=1`;
-  const res = await fetchWithTimeout(url);
-  const data: DDApiResponse = await res.json();
+function cleanDuckSearchQuery(name: string): string {
+  return name
+    .replace(/\b(gmbh|limited|ltd|inc|co|corp|corporation|private|pvt|plc|sa|ag)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-  const relatedTopics: string[] = [];
-  if (Array.isArray(data.RelatedTopics)) {
-    for (const topic of data.RelatedTopics) {
-      if (topic.Text && !topic.Text.startsWith("Official site")) {
-        relatedTopics.push(topic.Text);
+async function fetchDuckDuckGoData(companyName: string): Promise<DuckDuckGoResult | null> {
+  const cleanName = cleanDuckSearchQuery(companyName);
+  const queries = [companyName.trim()];
+  if (cleanName && cleanName.toLowerCase() !== companyName.toLowerCase()) {
+    queries.push(cleanName);
+  }
+
+  for (const q of queries) {
+    try {
+      const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1`;
+      const res = await fetchWithTimeout(url);
+      if (!res.ok) continue;
+      const data: DDApiResponse = await res.json();
+
+      const relatedTopics: string[] = [];
+      if (Array.isArray(data.RelatedTopics)) {
+        for (const topic of data.RelatedTopics) {
+          if (topic.Text && !topic.Text.startsWith("Official site")) {
+            relatedTopics.push(topic.Text);
+          }
+          if (relatedTopics.length >= 5) break;
+        }
       }
-      if (relatedTopics.length >= 5) break;
+
+      if (!data.AbstractText?.trim() && relatedTopics.length === 0) continue;
+
+      return {
+        abstractText: data.AbstractText ?? "",
+        abstractUrl: data.AbstractURL ?? null,
+        heading: data.Heading ?? companyName,
+        relatedTopics,
+      };
+    } catch (err) {
+      console.warn(`[duckduckgo] Query "${q}" failed:`, err.message);
     }
   }
 
-  if (!data.AbstractText?.trim() && relatedTopics.length === 0) return null;
-
-  return {
-    abstractText: data.AbstractText ?? "",
-    abstractUrl: data.AbstractURL ?? null,
-    heading: data.Heading ?? companyName,
-    relatedTopics,
-  };
+  return null;
 }
 
 export async function researchDuckDuckGo(

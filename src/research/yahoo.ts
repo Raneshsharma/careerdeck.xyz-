@@ -24,45 +24,71 @@ async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response
   }
 }
 
+function cleanYahooSearchQuery(name: string): string {
+  return name
+    .replace(/\b(gmbh|limited|ltd|inc|co|corp|corporation|private|pvt|plc|sa|ag)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function fetchYahooData(companyName: string): Promise<YahooFinanceResult | null> {
-  const q = encodeURIComponent(companyName.trim());
-  const searchRes = await fetchWithTimeout(
-    `https://query1.finance.yahoo.com/v1/finance/search?q=${q}&quotesCount=1&newsCount=0`,
-    8000,
-  );
-  if (!searchRes.ok) throw new Error(`Yahoo Search returned ${searchRes.status}`);
-  const searchData = await searchRes.json();
-  const quote = searchData.quotes?.[0];
-  const symbol = quote?.symbol;
-  if (!symbol) return null;
+  const cleanName = cleanYahooSearchQuery(companyName);
+  const queries = [companyName.trim()];
+  if (cleanName && cleanName.toLowerCase() !== companyName.toLowerCase()) {
+    queries.push(cleanName);
+  }
+  const firstWord = cleanName.split(" ")[0];
+  if (firstWord && firstWord.toLowerCase() !== cleanName.toLowerCase() && firstWord.length > 2) {
+    queries.push(firstWord);
+  }
 
-  const modules = ["assetProfile", "summaryDetail", "defaultKeyStatistics", "financialData"].join(",");
-  const summaryRes = await fetchWithTimeout(
-    `https://query1.finance.yahoo.com/v11/finance/quoteSummary/${symbol}?modules=${modules}`,
-    8000,
-  );
-  if (!summaryRes.ok) throw new Error(`Yahoo Summary returned ${summaryRes.status}`);
-  const summaryData = await summaryRes.json();
-  const result = summaryData.quoteSummary?.result?.[0];
-  if (!result) return null;
+  const uniqueQueries = Array.from(new Set(queries.filter(Boolean)));
 
-  const profile = result.assetProfile || {};
-  return {
-    symbol,
-    exchange: quote?.exchange ?? null,
-    assetProfile: {
-      longBusinessSummary: profile.longBusinessSummary,
-      sector: profile.sector,
-      industry: profile.industry,
-      website: profile.website,
-      fullTimeEmployees: profile.fullTimeEmployees,
-      country: profile.country,
-      city: profile.city,
-    },
-    summaryDetail: buildFmt(raw(result.summaryDetail)),
-    keyStatistics: buildFmt(raw(result.defaultKeyStatistics)),
-    financialData: buildFmt(raw(result.financialData)),
-  };
+  for (const q of uniqueQueries) {
+    try {
+      const searchRes = await fetchWithTimeout(
+        `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=1&newsCount=0`,
+        8000,
+      );
+      if (!searchRes.ok) continue;
+      const searchData = await searchRes.json();
+      const quote = searchData.quotes?.[0];
+      const symbol = quote?.symbol;
+      if (!symbol) continue;
+
+      const modules = ["assetProfile", "summaryDetail", "defaultKeyStatistics", "financialData"].join(",");
+      const summaryRes = await fetchWithTimeout(
+        `https://query1.finance.yahoo.com/v11/finance/quoteSummary/${symbol}?modules=${modules}`,
+        8000,
+      );
+      if (!summaryRes.ok) continue;
+      const summaryData = await summaryRes.json();
+      const result = summaryData.quoteSummary?.result?.[0];
+      if (!result) continue;
+
+      const profile = result.assetProfile || {};
+      return {
+        symbol,
+        exchange: quote?.exchange ?? null,
+        assetProfile: {
+          longBusinessSummary: profile.longBusinessSummary,
+          sector: profile.sector,
+          industry: profile.industry,
+          website: profile.website,
+          fullTimeEmployees: profile.fullTimeEmployees,
+          country: profile.country,
+          city: profile.city,
+        },
+        summaryDetail: buildFmt(raw(result.summaryDetail)),
+        keyStatistics: buildFmt(raw(result.defaultKeyStatistics)),
+        financialData: buildFmt(raw(result.financialData)),
+      };
+    } catch (err) {
+      console.warn(`[yahoo] Query "${q}" failed:`, err.message);
+    }
+  }
+
+  return null;
 }
 
 function raw(obj: unknown): Record<string, { fmt?: string; raw?: number }> {

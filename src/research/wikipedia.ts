@@ -16,42 +16,69 @@ async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response
   }
 }
 
+function cleanWikipediaSearchQuery(name: string): string {
+  return name
+    .replace(/\b(gmbh|limited|ltd|inc|co|corp|corporation|private|pvt|plc|sa|ag)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function fetchWikipediaData(companyName: string): Promise<WikipediaResult | null> {
-  const q = encodeURIComponent(companyName.trim());
+  const cleanName = cleanWikipediaSearchQuery(companyName);
+  const queries = [companyName.trim()];
+  if (cleanName && cleanName.toLowerCase() !== companyName.toLowerCase()) {
+    queries.push(cleanName);
+  }
+  const firstWord = cleanName.split(" ")[0];
+  if (firstWord && firstWord.toLowerCase() !== cleanName.toLowerCase() && firstWord.length > 2) {
+    queries.push(firstWord);
+  }
 
-  const searchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${q}&limit=3&format=json&origin=*`;
-  const searchRes = await fetchWithTimeout(searchUrl);
-  const searchData = await searchRes.json();
-  const titles: string[] = searchData[1];
-  if (!titles || titles.length === 0) return null;
+  const uniqueQueries = Array.from(new Set(queries.filter(Boolean)));
 
-  const bestTitle =
-    titles.find((t) => t.toLowerCase().includes(companyName.toLowerCase())) || titles[0];
+  for (const q of uniqueQueries) {
+    try {
+      const searchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(q)}&limit=3&format=json&origin=*`;
+      const searchRes = await fetchWithTimeout(searchUrl);
+      if (!searchRes.ok) continue;
+      const searchData = await searchRes.json();
+      const titles: string[] = searchData[1];
+      if (!titles || titles.length === 0) continue;
 
-  const params = new URLSearchParams({
-    action: "query",
-    prop: "extracts",
-    exintro: "1",
-    explaintext: "1",
-    titles: bestTitle,
-    format: "json",
-    origin: "*",
-  });
-  const extractRes = await fetchWithTimeout(
-    `https://en.wikipedia.org/w/api.php?${params.toString()}`,
-  );
-  const extractData = await extractRes.json();
-  const pages = extractData.query?.pages;
-  if (!pages) return null;
-  const pageEntry = Object.values(pages)[0] as { extract?: string; title?: string; pageid?: number };
-  if (!pageEntry?.extract) return null;
+      const bestTitle =
+        titles.find((t) => t.toLowerCase().includes(q.toLowerCase())) || titles[0];
 
-  return {
-    title: pageEntry.title || bestTitle,
-    extract: pageEntry.extract,
-    url: `https://en.wikipedia.org/wiki/${encodeURIComponent(String(pageEntry.title || bestTitle))}`,
-    pageId: pageEntry.pageid ?? 0,
-  };
+      const params = new URLSearchParams({
+        action: "query",
+        prop: "extracts",
+        exintro: "1",
+        explaintext: "1",
+        titles: bestTitle,
+        format: "json",
+        origin: "*",
+      });
+      const extractRes = await fetchWithTimeout(
+        `https://en.wikipedia.org/w/api.php?${params.toString()}`,
+      );
+      if (!extractRes.ok) continue;
+      const extractData = await extractRes.json();
+      const pages = extractData.query?.pages;
+      if (!pages) continue;
+      const pageEntry = Object.values(pages)[0] as { extract?: string; title?: string; pageid?: number };
+      if (!pageEntry?.extract) continue;
+
+      return {
+        title: pageEntry.title || bestTitle,
+        extract: pageEntry.extract,
+        url: `https://en.wikipedia.org/wiki/${encodeURIComponent(String(pageEntry.title || bestTitle))}`,
+        pageId: pageEntry.pageid ?? 0,
+      };
+    } catch (err) {
+      console.warn(`[wikipedia] Query "${q}" failed:`, err.message);
+    }
+  }
+
+  return null;
 }
 
 export async function researchWikipedia(companyName: string): Promise<ResearchEnvelope<WikipediaResult>> {
