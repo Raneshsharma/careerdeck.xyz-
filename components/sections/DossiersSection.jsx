@@ -4,10 +4,10 @@ import NonReversingReveal from "@/components/NonReversingReveal";
 import Link from "next/link";
 
 const gridCards = [
-  { title: "Company Dossier", desc: "Research the company inside out", bg: "#FFF7ED", color: "#F97316", icon: "briefcase" },
-  { title: "Role Dossier", desc: "Understand the role and expectations", bg: "#ECFDF5", color: "#10B981", icon: "user" },
-  { title: "JD Dossier", desc: "Decode the job description like a pro", bg: "#F5F3FF", color: "#8B5CF6", icon: "document" },
-  { title: "News Dossier", desc: "Stay updated with the latest developments", bg: "#EFF6FF", color: "#2563EB", icon: "news" },
+  { title: "Company Dossier", desc: "Research the company inside out", bg: "rgba(249,115,22,0.1)", border: "rgba(249,115,22,0.2)", color: "#F97316", icon: "briefcase" },
+  { title: "Role Dossier", desc: "Understand the role and expectations", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.2)", color: "#10B981", icon: "user" },
+  { title: "JD Dossier", desc: "Decode the job description like a pro", bg: "rgba(139,92,246,0.1)", border: "rgba(139,92,246,0.2)", color: "#8B5CF6", icon: "document" },
+  { title: "News Dossier", desc: "Stay updated with recent developments", bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.2)", color: "#3B82F6", icon: "news" },
 ];
 
 const dossiers = [
@@ -19,7 +19,7 @@ const dossiers = [
       "Competitor landscape & market position",
       "Cultural signals & recent strategic moves",
     ],
-    bg: "#FFF7ED", color: "#F97316",
+    bg: "rgba(249,115,22,0.1)", border: "rgba(249,115,22,0.2)", color: "#F97316",
     icon: "briefcase",
   },
   {
@@ -30,7 +30,7 @@ const dossiers = [
       "Required vs nice-to-have skills",
       "Career trajectory & interview expectations",
     ],
-    bg: "#ECFDF5", color: "#10B981",
+    bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.2)", color: "#10B981",
     icon: "user",
   },
   {
@@ -41,7 +41,7 @@ const dossiers = [
       "STAR blueprints for likely questions",
       "Red flags to address before they ask",
     ],
-    bg: "#F5F3FF", color: "#8B5CF6",
+    bg: "rgba(139,92,246,0.1)", border: "rgba(139,92,246,0.2)", color: "#8B5CF6",
     icon: "document",
   },
   {
@@ -52,7 +52,7 @@ const dossiers = [
       "Regulatory moves & industry shifts",
       "Interview relevance for each story",
     ],
-    bg: "#EFF6FF", color: "#2563EB",
+    bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.2)", color: "#3B82F6",
     icon: "news",
   },
 ];
@@ -90,8 +90,8 @@ function DossierIcon({ type, color, bg }) {
 
   return (
     <div
-      className="w-20 h-20 rounded-[24px] flex items-center justify-center shrink-0"
-      style={{ backgroundColor: bg, color: color }}
+      className="w-16 h-16 rounded-[20px] flex items-center justify-center shrink-0 border"
+      style={{ backgroundColor: bg, borderColor: color, color: color }}
     >
       {icons[type]}
     </div>
@@ -100,38 +100,40 @@ function DossierIcon({ type, color, bg }) {
 
 export default function DossiersSection() {
   return (
-    <section id="section-dossiers" className="relative bg-[#FAFAFA] py-16 overflow-hidden border-t border-gray-100/60">
-      <div className="max-w-7xl mx-auto px-8">
-        <div className="grid lg:grid-cols-[40%_60%] gap-20 items-center">
+    <section id="section-dossiers" className="relative bg-transparent py-24 overflow-hidden border-t border-white/[0.05]">
+      {/* Background glow */}
+      <div className="absolute right-0 top-1/3 w-96 h-96 rounded-full bg-violet-500/[0.02] blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-8 relative z-10">
+        <div className="grid lg:grid-cols-[40%_60%] gap-12 lg:gap-20 items-center">
           {/* ===== LEFT COLUMN ===== */}
           <div>
             <NonReversingReveal id="dos-headline">
-              <div className="w-12 h-[5px] bg-[#F28C28] rounded-full mb-8" />
-              <h2 className="text-5xl sm:text-6xl font-extrabold text-[#0F172A] leading-[1.05] tracking-tight">
+              <div className="w-12 h-1 bg-[#F28C28] rounded-full mb-8" />
+              <h2 className="text-4xl sm:text-5xl font-extrabold text-white leading-[1.08] tracking-tight">
                 Four ways to prepare
               </h2>
-              <p className="mt-6 text-xl sm:text-2xl text-[#64748B] max-w-[520px] leading-relaxed">
+              <p className="mt-6 text-lg text-slate-400 max-w-[520px] leading-relaxed">
                 Each dossier type is a complete research and prep package — tailored to the format you need.
               </p>
             </NonReversingReveal>
 
             {/* 2x2 Grid */}
             <NonReversingReveal id="dos-grid" className="mt-10">
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4">
                 {gridCards.map((card) => (
                   <div
                     key={card.title}
-                    className="rounded-[28px] border border-[rgba(15,23,42,0.08)] bg-white/80 shadow-[0_20px_60px_rgba(0,0,0,0.04)] p-6 hover:-translate-y-2 transition-all duration-300"
-                    style={{ minHeight: 250 }}
+                    className="rounded-[28px] border border-white/[0.08] bg-[#0B0F19]/40 hover:bg-[#0B0F19]/70 shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-5 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
+                    style={{ minHeight: 240 }}
                   >
-                    <div
-                      className="w-20 h-20 rounded-[24px] flex items-center justify-center mb-4"
-                      style={{ backgroundColor: card.bg, color: card.color }}
-                    >
-                      <DossierIcon type={card.icon} color={card.color} bg={card.bg} />
+                    <div>
+                      <div className="mb-4">
+                        <DossierIcon type={card.icon} color={card.color} bg={card.bg} />
+                      </div>
+                      <h3 className="text-sm font-bold text-white">{card.title}</h3>
+                      <p className="text-xs text-slate-400 mt-1 leading-snug">{card.desc}</p>
                     </div>
-                    <h3 className="text-base font-bold text-[#0F172A]">{card.title}</h3>
-                    <p className="text-sm text-[#64748B] mt-1 leading-snug">{card.desc}</p>
                     <Link
                       href="/auth"
                       className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#F28C28] hover:text-[#E07E1F] transition-colors"
@@ -145,24 +147,24 @@ export default function DossiersSection() {
           </div>
 
           {/* ===== RIGHT COLUMN ===== */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {dossiers.map((d, i) => (
               <NonReversingReveal key={d.title} id={`dos-card-${i}`}>
                 <div
-                  className="rounded-[28px] border border-[rgba(15,23,42,0.06)] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-8 flex items-center gap-6 hover:-translate-y-1 transition-all duration-300"
-                  style={{ minHeight: 190 }}
+                  className="rounded-[28px] border border-white/[0.08] bg-[#0B0F19]/40 hover:bg-[#0B0F19]/70 shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:-translate-y-0.5 transition-all duration-300"
+                  style={{ minHeight: 180 }}
                 >
                   {/* Icon block */}
                   <DossierIcon type={d.icon} color={d.color} bg={d.bg} />
 
                   {/* Center content */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-bold text-[#0F172A]">{d.title}</h3>
-                    <p className="text-sm text-[#64748B] mt-1">{d.desc}</p>
+                    <h3 className="text-lg font-bold text-white">{d.title}</h3>
+                    <p className="text-sm text-slate-400 mt-1">{d.desc}</p>
                     <ul className="mt-3 space-y-1">
                       {d.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2 text-sm text-[#475569]">
-                          <svg className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                        <li key={f} className="flex items-start gap-2 text-xs text-slate-300">
+                          <svg className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                           </svg>
                           {f}
@@ -174,10 +176,10 @@ export default function DossiersSection() {
                   {/* Generate button */}
                   <Link
                     href="/auth"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F28C28]/10 hover:bg-[#F28C28]/20 text-[#F28C28] font-bold text-sm transition-all duration-200 shrink-0 whitespace-nowrap"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-slate-200 text-[#030712] font-bold text-xs transition-all duration-200 shrink-0 w-full sm:w-auto justify-center"
                   >
                     Generate
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
@@ -191,11 +193,11 @@ export default function DossiersSection() {
         <NonReversingReveal id="dos-cta" className="text-center mt-16">
           <Link
             href="/auth"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#F28C28] hover:bg-[#E07E1F] text-[#0F172A] font-bold rounded-2xl transition-all duration-200 text-sm shadow-[0_4px_14px_rgba(242,140,40,0.3)] hover:shadow-[0_8px_25px_rgba(242,140,40,0.4)] hover:-translate-y-0.5"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-slate-200 text-[#030712] font-bold rounded-2xl transition-all duration-200 text-sm shadow-[0_4px_14px_rgba(255,255,255,0.08)] hover:-translate-y-0.5"
           >
             Generate Your First Dossier &rarr;
           </Link>
-          <p className="mt-3 text-sm text-[#94A3B8]">No account needed. Takes 90 seconds.</p>
+          <p className="mt-3 text-sm text-slate-500">Takes 90 seconds. No signup required.</p>
         </NonReversingReveal>
       </div>
     </section>
