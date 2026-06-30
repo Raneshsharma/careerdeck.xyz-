@@ -315,8 +315,12 @@ function DashboardContent() {
                       <span className="text-red-400 shrink-0 mt-0.5">&#x26A0;&#xFE0F;</span>
                       <div className="flex-1"><p className="text-sm text-red-400">{errorMessage}</p><button onClick={() => setErrorMessage(null)} className="text-xs text-red-400 underline mt-1 hover:text-red-300">Dismiss</button></div>
                     </div>
-                    {(errorMessage.includes("used all generations") || errorMessage.includes("Upgrade") || errorMessage.includes("upgrade")) && (
+                    {(errorMessage.includes("used all generations") || errorMessage.includes("Upgrade") || errorMessage.includes("upgrade")) ? (
                       <div className="mt-3 pt-3 border-t border-white/[0.08]"><button onClick={() => setShowUpgradeModal(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] text-xs font-bold rounded-lg shadow-md">Upgrade to Pro</button></div>
+                    ) : (
+                      <div className="mt-3 pt-3 border-t border-white/[0.08] text-xs text-slate-400">
+                        Need help? <a href="https://mail.google.com/mail/?view=cm&fs=1&to=arcstudiooos@gmail.com&su=CareerDeck%20Error%20Report" target="_blank" rel="noopener noreferrer" className="underline text-slate-300 hover:text-white font-medium">Contact support at arcstudiooos@gmail.com</a>
+                      </div>
                     )}
                   </div>
                 )}
@@ -354,9 +358,20 @@ function DashboardContent() {
         </div>
       </main>
 
-      <footer className="bg-transparent border-t border-white/[0.05] mt-16 no-print hidden lg:block">
-        <div className="max-w-7xl mx-auto px-8 py-6 text-center text-xs text-slate-500">
+      <footer className="bg-transparent border-t border-white/[0.05] mt-16 no-print hidden lg:block relative z-10">
+        <div className="max-w-7xl mx-auto px-8 py-6 flex items-center justify-between text-xs text-slate-500">
           <p><strong className="text-slate-400">CareerDeck</strong> — Verify critical facts before your interview. Good luck!</p>
+          <p className="flex items-center gap-1.5">
+            Questions or issues?
+            <a
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=arcstudiooos@gmail.com&su=CareerDeck%20Inquiry"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-slate-400 hover:text-white transition-colors duration-200"
+            >
+              Contact Support
+            </a>
+          </p>
         </div>
       </footer>
       <BottomNav />

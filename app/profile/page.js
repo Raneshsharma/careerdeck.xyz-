@@ -124,6 +124,22 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* Help & Support Card */}
+            <div className="bg-[#0B0F19]/60 border border-white/[0.08] backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+              <h2 className="text-lg font-bold text-white mb-2">Help & Support</h2>
+              <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+                Experiencing issues, found a bug, or have questions about your subscription? Reach out directly and we will get back to you as soon as possible.
+              </p>
+              <a
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=arcstudiooos@gmail.com&su=CareerDeck%20Support%20Request"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] text-slate-300 hover:text-white text-sm font-bold transition-all duration-200"
+              >
+                ✉️ Contact Support
+              </a>
+            </div>
+
             {/* Recent Generations Card */}
             {usage?.recent?.length > 0 && (
               <div className="bg-[#0B0F19]/60 border border-white/[0.08] backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
