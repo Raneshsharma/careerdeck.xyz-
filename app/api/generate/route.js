@@ -7,10 +7,10 @@ import { extractCompanyFacts, extractRoleFacts, extractJDFacts, extractNewsFacts
 import { researchCompany } from "@/lib/research";
 import { tryAcquire, release, cancel } from "@/lib/rate-limiter";
 import {
-  FREE_MONTHLY_LIMIT,
   getGenerationsThisMonth,
   getProfile,
   recordGeneration,
+  getLimitForTier,
 } from "@/lib/generation-limits";
 import { companyGraph } from "@/src/graph/companyGraph";
 import { EvaluationEngine } from "@/src/evaluation/evaluationEngine";
@@ -351,7 +351,7 @@ export async function POST(request) {
     const isAdmin = user.email === (process.env.ADMIN_EMAIL || "raneshsharma33@gmail.com");
     if (!isAdmin) {
       const profile = await getProfile(user.id).catch(() => null);
-      const planLimit = profile?.plan_tier === "free" ? FREE_MONTHLY_LIMIT : Infinity;
+      const planLimit = getLimitForTier(profile?.plan_tier);
       const usedThisMonth = await getGenerationsThisMonth(user.id).catch(() => 0);
       if (usedThisMonth >= planLimit) {
         return Response.json(

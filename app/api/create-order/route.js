@@ -2,8 +2,10 @@ import { createClient } from "@/lib/supabase-server";
 import Razorpay from "razorpay";
 
 const PLANS = {
-  pro: { amount: 14900, name: "Pro – ₹149/mo" },
-  "pro-annual": { amount: 119900, name: "Pro Annual – ₹1,199/yr" },
+  medium: { amount: 9900, name: "Medium – ₹99/mo" },
+  "medium-annual": { amount: 79900, name: "Medium Annual – ₹799/yr" },
+  pro: { amount: 19900, name: "Pro – ₹199/mo" },
+  "pro-annual": { amount: 149900, name: "Pro Annual – ₹1,499/yr" },
 };
 
 export async function POST(request) {
@@ -19,7 +21,7 @@ export async function POST(request) {
     const selectedPlan = PLANS[plan];
 
     if (!selectedPlan) {
-      return Response.json({ error: "Invalid plan. Use 'pro' or 'pro-annual'." }, { status: 400 });
+      return Response.json({ error: "Invalid plan. Use 'medium', 'medium-annual', 'pro' or 'pro-annual'." }, { status: 400 });
     }
 
     const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;

@@ -38,7 +38,7 @@ export async function POST(request) {
     const order = await rzp.orders.fetch(razorpay_order_id);
     const plan = order.notes?.plan;
 
-    if (plan && ["pro", "pro-annual"].includes(plan)) {
+    if (plan && ["medium", "medium-annual", "pro", "pro-annual"].includes(plan)) {
       const { error: dbErr } = await supabase
         .from("profiles")
         .upsert({ id: user.id, plan_tier: plan })

@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import { supabase } from "@/lib/supabase";
-import { FREE_MONTHLY_LIMIT } from "@/lib/generation-limits"
+import { getLimitForTier } from "@/lib/generation-limits"
 
 export async function GET() {
   const supabaseAuth = await createClient();
@@ -38,7 +38,7 @@ export async function GET() {
     console.error("Generations fetch error:", err)
   }
 
-  const planLimit = (profile?.plan_tier === "free" || !profile?.plan_tier) ? FREE_MONTHLY_LIMIT : 9999
+  const planLimit = getLimitForTier(profile?.plan_tier)
 
   return Response.json({
     profile,

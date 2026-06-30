@@ -4,17 +4,16 @@ import { useState } from "react";
 import NonReversingReveal from "@/components/NonReversingReveal";
 import Link from "next/link";
 
-const TIERS = [
+const TIERS_MONTHLY = [
   {
     name: "Free",
     price: "₹0",
     period: "forever",
-    desc: "Get started with 3 free dossiers every month. No credit card, no catch.",
+    desc: "Test the waters. Ideal for preparing for a single interview.",
     features: [
       "3 dossiers per month",
       "All 4 dossier types",
-      "Wikipedia + DuckDuckGo research",
-      "Section source citations",
+      "Wikipedia & DuckDuckGo lookup",
       "Standard generation speed",
     ],
     cta: "Get started free",
@@ -23,18 +22,34 @@ const TIERS = [
     highlight: false,
   },
   {
-    name: "Pro Monthly",
-    price: "₹149",
+    name: "Medium",
+    price: "₹99",
     period: "per month",
-    subtext: "₹7.45/dossier — less than a chai",
-    desc: "Everything you need to crush every interview. Cancel anytime.",
+    subtext: "₹9.90/dossier — less than a cup of coffee",
+    desc: "Perfect for active job seekers applying to multiple roles.",
     features: [
-      "20 dossiers per month",
+      "10 dossiers per month",
       "All 4 dossier types",
-      "6 research sources",
-      "PDF export",
-      "Priority generation speed",
-      "Email support",
+      "Google & Yahoo Finance research",
+      "PDF export enabled",
+      "Priority queue speed",
+    ],
+    cta: "Get Medium",
+    href: "/checkout?plan=medium",
+    badge: null,
+    highlight: false,
+  },
+  {
+    name: "Pro",
+    price: "₹199",
+    period: "per month",
+    subtext: "₹6.60/dossier — best for placement prep",
+    desc: "For candidates applying widely to maximize placement chances.",
+    features: [
+      "30 dossiers per month",
+      "Everything in Medium",
+      "Domain competitor segmentation",
+      "Priority email & chat support",
     ],
     cta: "Get Pro Monthly",
     href: "/checkout?plan=pro",
@@ -42,39 +57,100 @@ const TIERS = [
     highlight: true,
   },
   {
-    name: "Pro Annual",
-    price: "₹1,199",
-    period: "per year",
-    subtext: "₹99/mo — save ₹600/year",
-    desc: "Best value. Lock in your price for a full year of unlimited preparation.",
+    name: "Business",
+    price: "Custom",
+    period: "cohort",
+    subtext: "For universities & teams",
+    desc: "Provide placement prep dossiers for your entire cohort or cell.",
     features: [
-      "Everything in Pro Monthly",
-      "20 dossiers per month",
-      "Save ₹600 vs monthly",
-      "One payment, full year access",
-      "Price lock guarantee",
+      "Unlimited dossiers / student",
+      "Custom university PDF branding",
+      "Bulk generation portal",
+      "Placement officer dashboard",
+      "Dedicated support SLA",
+    ],
+    cta: "Contact Sales",
+    href: "mailto:sales@careerdeck.xyz?subject=Business%20Tier%20Inquiry",
+    badge: null,
+    highlight: false,
+  },
+];
+
+const TIERS_ANNUAL = [
+  {
+    name: "Free",
+    price: "₹0",
+    period: "forever",
+    desc: "Test the waters. Ideal for preparing for a single interview.",
+    features: [
+      "3 dossiers per month",
+      "All 4 dossier types",
+      "Wikipedia & DuckDuckGo lookup",
+      "Standard generation speed",
+    ],
+    cta: "Get started free",
+    href: "/auth",
+    badge: null,
+    highlight: false,
+  },
+  {
+    name: "Medium Annual",
+    price: "₹79",
+    period: "per month",
+    subtext: "Billed annually (₹799/yr) — save 33%",
+    desc: "Perfect for active job seekers applying to multiple roles.",
+    features: [
+      "10 dossiers per month",
+      "All 4 dossier types",
+      "Google & Yahoo Finance research",
+      "PDF export enabled",
+      "Priority queue speed",
+    ],
+    cta: "Get Medium Annual",
+    href: "/checkout?plan=medium-annual",
+    badge: null,
+    highlight: false,
+  },
+  {
+    name: "Pro Annual",
+    price: "₹125",
+    period: "per month",
+    subtext: "Billed annually (₹1,499/yr) — save 37%",
+    desc: "For candidates applying widely to maximize placement chances.",
+    features: [
+      "30 dossiers per month",
+      "Everything in Medium",
+      "Domain competitor segmentation",
+      "Priority email & chat support",
     ],
     cta: "Get Pro Annual",
     href: "/checkout?plan=pro-annual",
     badge: "Best Value",
+    highlight: true,
+  },
+  {
+    name: "Business",
+    price: "Custom",
+    period: "cohort",
+    subtext: "For universities & teams",
+    desc: "Provide placement prep dossiers for your entire cohort or cell.",
+    features: [
+      "Unlimited dossiers / student",
+      "Custom university PDF branding",
+      "Bulk generation portal",
+      "Placement officer dashboard",
+      "Dedicated support SLA",
+    ],
+    cta: "Contact Sales",
+    href: "mailto:sales@careerdeck.xyz?subject=Business%20Tier%20Inquiry",
+    badge: null,
     highlight: false,
   },
 ];
 
 export default function PricingSection() {
   const [annual, setAnnual] = useState(false);
-
-  const tiers = annual
-    ? TIERS.map((t) => {
-        if (t.name === "Pro Monthly") return { ...t, highlight: false, badge: null };
-        if (t.name === "Pro Annual") return { ...t, highlight: true, badge: "Best Value" };
-        return t;
-      })
-    : TIERS.map((t) => {
-        if (t.name === "Pro Monthly") return { ...t, highlight: true, badge: "Most Popular" };
-        if (t.name === "Pro Annual") return { ...t, highlight: false };
-        return t;
-      });
+  const tiers = annual ? TIERS_ANNUAL : TIERS_MONTHLY;
 
   return (
     <section id="section-pricing" className="relative bg-[#FAFAFA] py-16 border-t border-gray-100/60">
@@ -99,12 +175,12 @@ export default function PricingSection() {
             <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ${annual ? "translate-x-5" : "translate-x-0"}`} />
           </button>
           <span className={`text-sm font-medium transition-colors ${annual ? "text-[#0F172A]" : "text-[#94A3B8]"}`}>
-            Annual <span className="text-xs text-emerald-600 font-semibold ml-1">Save ₹600</span>
+            Annual <span className="text-xs text-emerald-600 font-semibold ml-1">Save up to 37%</span>
           </span>
         </NonReversingReveal>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mt-10 max-w-sm md:max-w-none mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10 max-w-sm sm:max-w-none mx-auto">
           {tiers.map((tier) => (
             <NonReversingReveal key={tier.name} id={`pricing-${tier.name}`}>
               <div
