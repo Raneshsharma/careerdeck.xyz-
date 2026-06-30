@@ -2,93 +2,109 @@
 
 const tabs = [
   {
-    title: "Crunchbase · Apple Inc.",
-    lines: [70, 90, 55],
-    x: 0, y: 0, rotate: -4,
-    color: "border-red-200/40",
+    title: "10-K Report - FY23_Apple.pdf (345 pages)",
+    lines: [85, 95, 75, 45],
+    status: "🚨 Too long to read",
+    rotate: -4,
+    x: 10,
+    y: 15,
+    glow: "shadow-[0_0_15px_rgba(239,68,68,0.07)]",
+    borderColor: "border-red-500/30",
+    accentBg: "bg-red-500/10",
+    accentText: "text-red-400",
   },
   {
-    title: "SEC Filing · 10-K",
-    lines: [85, 60, 75, 50],
-    x: 50, y: 40, rotate: 9,
-    color: "border-red-300/30",
+    title: "Google Search: 'Apple margin growth drivers'",
+    lines: [70, 80, 50],
+    status: "🌐 15 tabs open",
+    rotate: 5,
+    x: 45,
+    y: 95,
+    glow: "shadow-[0_0_15px_rgba(239,68,68,0.05)]",
+    borderColor: "border-white/[0.08]",
+    accentBg: "bg-white/[0.04]",
+    accentText: "text-slate-400",
   },
   {
-    title: "LinkedIn · Company",
-    lines: [65, 80],
-    x: 100, y: 20, rotate: -7,
-    color: "border-orange-200/30",
+    title: "MessyNotes_draft_final_v2.txt",
+    lines: [90, 60, 45],
+    status: "📝 Disorganized",
+    rotate: -6,
+    x: 95,
+    y: 40,
+    glow: "shadow-[0_0_15px_rgba(239,68,68,0.06)]",
+    borderColor: "border-red-500/20",
+    accentBg: "bg-red-500/5",
+    accentText: "text-red-400/80",
   },
   {
-    title: "News · 15 tabs open",
-    lines: [50, 70, 60],
-    x: 25, y: 80, rotate: 5,
-    color: "border-red-200/25",
-  },
-  {
-    title: "Blind · Employee reviews",
-    lines: [75, 55],
-    x: 130, y: 75, rotate: -10,
-    color: "border-orange-300/25",
+    title: "Blind Forum: 'Is Apple culture toxic?'",
+    lines: [80, 70],
+    status: "💬 Unverified reviews",
+    rotate: 8,
+    x: 135,
+    y: 120,
+    glow: "shadow-[0_0_15px_rgba(239,68,68,0.05)]",
+    borderColor: "border-white/[0.08]",
+    accentBg: "bg-white/[0.04]",
+    accentText: "text-slate-400",
   },
 ];
 
 export default function ProblemVisualMockup() {
   return (
-    <div className="relative w-full max-w-[380px] h-[340px] mx-auto">
-      {/* red glow behind */}
-      <div className="absolute -top-6 -right-6 w-48 h-48 rounded-full bg-red-400/10 blur-3xl pointer-events-none" />
+    <div className="relative w-full max-w-[380px] h-[340px] mx-auto select-none">
+      {/* Red ambient glow behind the stack */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-red-500/5 blur-3xl pointer-events-none" />
 
-      {/* floating tab cards */}
+      {/* Floating browser tabs stack */}
       {tabs.map((tab, i) => (
         <div
           key={i}
-          className={`absolute rounded-xl border bg-white/90 backdrop-blur-sm shadow-[0_8px_30px_-6px_rgba(0,0,0,0.08)] ${tab.color} p-3`}
+          className={`absolute rounded-xl border bg-[#0B0F19]/80 backdrop-blur-md p-4 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 ${tab.borderColor} ${tab.glow}`}
           style={{
-            width: 200 - i * 8,
+            width: 240,
             left: tab.x,
             top: tab.y,
             transform: `rotate(${tab.rotate}deg)`,
             zIndex: tabs.length - i,
           }}
         >
-          {/* tab header */}
-          <div className="flex items-center gap-1.5 mb-2.5">
-            <div className="flex gap-1">
-              <div className="w-2 h-2 rounded-full bg-red-400/40" />
-              <div className="w-2 h-2 rounded-full bg-amber-400/40" />
-              <div className="w-2 h-2 rounded-full bg-emerald-400/40" />
+          {/* Tab header */}
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <div className="flex gap-1 shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500/40" />
+                <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+                <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+              </div>
+              <span className="text-[10px] text-slate-400 truncate font-mono">{tab.title}</span>
             </div>
-            <span className="text-[8px] text-gray-400 truncate flex-1">{tab.title}</span>
+            <span className="text-[8px] text-red-400 shrink-0 font-bold">✕</span>
           </div>
 
-          {/* content lines */}
-          <div className="space-y-1.5">
+          {/* Lines representing unstructured content */}
+          <div className="space-y-2">
             {tab.lines.map((w, li) => (
-              <div key={li} className="flex gap-2 items-center">
-                <div
-                  className="h-2 rounded-sm bg-gray-200/60"
-                  style={{ width: `${w}%` }}
-                />
-                {li === 0 && i < 2 && (
-                  <svg className="w-3 h-3 text-red-400/50 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                )}
-              </div>
+              <div key={li} className="h-1.5 rounded bg-white/[0.04]" style={{ width: `${w}%` }} />
             ))}
+          </div>
+
+          {/* Status Badge */}
+          <div className="mt-3 pt-2.5 border-t border-white/[0.05] flex items-center justify-between">
+            <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${tab.accentBg} ${tab.accentText}`}>
+              {tab.status}
+            </span>
+            <span className="text-[8px] text-slate-600">Modified 1h ago</span>
           </div>
         </div>
       ))}
 
-      {/* scattered dots */}
-      <div className="absolute bottom-6 right-8 flex gap-1">
-        <div className="w-1.5 h-1.5 rounded-full bg-red-400/30" />
-        <div className="w-2 h-2 rounded-full bg-red-400/20" />
-        <div className="w-1 h-1 rounded-full bg-red-400/25" />
+      {/* Warning icon overlay */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 bg-red-950/80 border border-red-500/40 rounded-2xl p-3 shadow-lg shadow-black/40 flex items-center gap-2 backdrop-blur-md animate-bounce">
+        <span className="text-lg">⚠️</span>
+        <span className="text-xs font-bold text-red-400 tracking-tight">Information Overload</span>
       </div>
-      <div className="absolute top-8 right-4 w-2 h-2 rounded-full bg-red-400/15" />
-      <div className="absolute bottom-16 left-4 w-1.5 h-1.5 rounded-full bg-red-400/20" />
     </div>
   );
 }
