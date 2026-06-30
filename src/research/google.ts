@@ -39,17 +39,41 @@ async function fetchGoogleResults(companyName: string, queryOverride?: string[])
   for (const q of queries) {
     let url: string;
     let isSerp = false;
+    let data = null;
+    let success = false;
 
     if (serpApiKey) {
-      url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(q)}&api_key=${serpApiKey}&num=3`;
-      isSerp = true;
-    } else {
-      url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(q)}&num=3`;
+      try {
+        url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(q)}&api_key=${serpApiKey}&num=3`;
+        const res = await fetchWithTimeout(url);
+        if (res.ok) {
+          const json = await res.json();
+          if (!json.error) {
+            data = json;
+            isSerp = true;
+            success = true;
+          }
+        }
+      } catch (err) {
+        console.warn("[google] SerpAPI query failed, trying Google CSE fallback:", err.message);
+      }
     }
 
-    const res = await fetchWithTimeout(url);
-    if (!res.ok) continue;
-    const data = await res.json();
+    if (!success && apiKey && cx) {
+      try {
+        url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(q)}&num=3`;
+        const res = await fetchWithTimeout(url);
+        if (res.ok) {
+          data = await res.json();
+          isSerp = false;
+          success = true;
+        }
+      } catch (err) {
+        console.warn("[google] Google CSE fallback failed:", err.message);
+      }
+    }
+
+    if (!success || !data) continue;
 
     if (isSerp) {
       const results = data.organic_results ?? [];

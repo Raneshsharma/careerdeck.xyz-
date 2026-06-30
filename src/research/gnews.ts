@@ -27,17 +27,43 @@ async function fetchGNewsData(companyName: string): Promise<GNewsResult | null> 
   const q = encodeURIComponent(companyName.trim());
   let url: string;
   let isSerp = false;
+  let data = null;
+  let success = false;
 
   if (serpApiKey) {
-    url = `https://serpapi.com/search.json?engine=google_news&q=${q}&api_key=${serpApiKey}`;
-    isSerp = true;
-  } else {
-    url = `https://gnews.io/api/v4/search?q=${q}&lang=en&max=10&token=${apiKey}`;
+    try {
+      url = `https://serpapi.com/search.json?engine=google_news&q=${q}&api_key=${serpApiKey}`;
+      const res = await fetchWithTimeout(url);
+      if (res.ok) {
+        const json = await res.json();
+        if (!json.error) {
+          data = json;
+          isSerp = true;
+          success = true;
+        }
+      }
+    } catch (err) {
+      console.warn("[gnews] SerpAPI Google News query failed, trying GNews fallback:", err.message);
+    }
   }
 
-  const res = await fetchWithTimeout(url);
-  if (!res.ok) throw new Error(`News search returned ${res.status}`);
-  const data = await res.json();
+  if (!success && apiKey) {
+    try {
+      url = `https://gnews.io/api/v4/search?q=${q}&lang=en&max=10&token=${apiKey}`;
+      const res = await fetchWithTimeout(url);
+      if (res.ok) {
+        data = await res.json();
+        isSerp = false;
+        success = true;
+      }
+    } catch (err) {
+      console.warn("[gnews] GNews fallback query failed:", err.message);
+    }
+  }
+
+  if (!success || !data) {
+    throw new Error("News search failed: neither SerpAPI nor GNews queries succeeded");
+  }
 
   if (isSerp) {
     const results = data.news_results ?? [];
