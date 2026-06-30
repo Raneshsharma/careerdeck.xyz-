@@ -10,6 +10,7 @@ import type {
   DuckDuckGoResult,
   GoogleNewsRssResult,
   SecEdgarResult,
+  GoogleFinanceResult,
 } from "../research/types";
 import type {
   ExtractedCompany,
@@ -45,6 +46,7 @@ export interface AssembledResearch {
     pages: WebsitePagesResult | null;
   };
   yahooFinance: YahooFinanceResult | null;
+  googleFinance: GoogleFinanceResult | null;
   gnews: GNewsResult | null;
   duckduckgo: DuckDuckGoResult | null;
   googleNewsRss: GoogleNewsRssResult | null;
@@ -97,6 +99,11 @@ export const CompanyStateAnnotation = Annotation.Root({
   }),
 
   researchYahoo: Annotation<ResearchEnvelope<YahooFinanceResult> | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  researchGoogleFinance: Annotation<ResearchEnvelope<GoogleFinanceResult> | null>({
     reducer: (_previous, next) => next ?? _previous,
     default: () => null,
   }),

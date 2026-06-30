@@ -69,6 +69,9 @@ function compileRawResearchText(research: AssembledResearch | undefined): string
   if (research.yahooFinance) {
     parts.push(`--- Yahoo Finance ---\n${JSON.stringify(research.yahooFinance, null, 2)}`);
   }
+  if (research.googleFinance) {
+    parts.push(`--- Google Finance ---\n${JSON.stringify(research.googleFinance, null, 2)}`);
+  }
   if (research.google?.items) {
     parts.push(`--- Google Search Snippets ---\n${research.google.items.map(i => `${i.title}: ${i.snippet}`).join("\n")}`);
   }

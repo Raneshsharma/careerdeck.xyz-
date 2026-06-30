@@ -101,3 +101,24 @@ export interface SecEdgarResult {
   latest10K?: { url: string; filingDate: string };
   latest10Q?: { url: string; filingDate: string };
 }
+
+export interface GoogleFinanceResult {
+  summary?: {
+    title?: string;
+    exchange?: string;
+    price?: string;
+    currency?: string;
+    description?: string;
+  };
+  financials?: Array<{
+    title: string;
+    results: Array<{
+      date: string;
+      period_type: string;
+      table: Array<{
+        title: string;
+        values: string[];
+      }>;
+    }>;
+  }>;
+}

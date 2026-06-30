@@ -5,6 +5,7 @@ import { normalizeCompanyNameNode } from "./nodes/normalizeCompanyName";
 import { wikipediaResearchNode } from "./nodes/wikipediaResearch";
 import { googleSearchNode } from "./nodes/googleSearch";
 import { yahooFinanceNode } from "./nodes/yahooFinance";
+import { googleFinanceNode } from "./nodes/googleFinance";
 import { gnewsNode } from "./nodes/gnews";
 import { duckduckgoNode } from "./nodes/duckduckgo";
 import { googleNewsRssNode } from "./nodes/googleNewsRss";
@@ -72,13 +73,13 @@ g.addEdge(START, "validateCompany");
 g.addConditionalEdges("validateCompany", routeAfterValidation, { __end__: END, normalizeCompanyName: "normalizeCompanyName" });
 
 // Layer 2: Research
-for (const n of ["wikipedia","google","yahoo","gnews","duckduckgo","websiteDiscovery","websiteFetch","mergeResearch","googleNewsRss","secEdgar"]) {
-  g.addNode(n, {wikipedia: wikipediaResearchNode, google: googleSearchNode, yahoo: yahooFinanceNode, gnews: gnewsNode, duckduckgo: duckduckgoNode, websiteDiscovery: websiteDiscoveryNode, websiteFetch: websiteFetchNode, mergeResearch: mergeResearchNode, googleNewsRss: googleNewsRssNode, secEdgar: secEdgarNode}[n]);
+for (const n of ["wikipedia","google","yahoo","googleFinance","gnews","duckduckgo","websiteDiscovery","websiteFetch","mergeResearch","googleNewsRss","secEdgar"]) {
+  g.addNode(n, {wikipedia: wikipediaResearchNode, google: googleSearchNode, yahoo: yahooFinanceNode, googleFinance: googleFinanceNode, gnews: gnewsNode, duckduckgo: duckduckgoNode, websiteDiscovery: websiteDiscoveryNode, websiteFetch: websiteFetchNode, mergeResearch: mergeResearchNode, googleNewsRss: googleNewsRssNode, secEdgar: secEdgarNode}[n]);
 }
-for (const n of ["wikipedia","google","yahoo","gnews","duckduckgo","googleNewsRss","secEdgar"]) g.addEdge("normalizeCompanyName", n);
+for (const n of ["wikipedia","google","yahoo","googleFinance","gnews","duckduckgo","googleNewsRss","secEdgar"]) g.addEdge("normalizeCompanyName", n);
 g.addEdge("google", "websiteDiscovery");
 g.addEdge("websiteDiscovery", "websiteFetch");
-for (const n of ["wikipedia","websiteFetch","yahoo","gnews","duckduckgo","googleNewsRss","secEdgar"]) g.addEdge(n, "mergeResearch");
+for (const n of ["wikipedia","websiteFetch","yahoo","googleFinance","gnews","duckduckgo","googleNewsRss","secEdgar"]) g.addEdge(n, "mergeResearch");
 
 // Layer 3: Extraction
 for (const n of ["wikipediaExtraction","googleExtraction","yahooExtraction","gnewsExtraction","duckduckgoExtraction","websiteExtraction","mergeExtractedFacts"]) {
