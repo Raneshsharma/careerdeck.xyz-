@@ -197,6 +197,24 @@ function applyHardcodedFallbacks(companyName: string, coreFacts: CoreFacts): Cor
     coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Lisa Su's execution focus", "First-principles chip engineering", "Agile competitor response", "Strategic market expansion"];
     coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["In-depth silicon design questions", "Coding challenges in C/C++ and Verilog", "Architecture discussion with senior tech leaders"];
     coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["Silicon engineering intensity", "Cross-continental team sprints", "Performance-oriented development focus"];
+  } else if (norm.includes("bosch") || norm.includes("robert bosch")) {
+    coreFacts.companyName = coreFacts.companyName || "Bosch";
+    coreFacts.industry = coreFacts.industry || "Industrial Technology and Consumer Goods";
+    coreFacts.sector = coreFacts.sector || "Industrials";
+    coreFacts.description = coreFacts.description || "Robert Bosch GmbH is a global supplier of technology and services in mobility, industrial tech, consumer goods, and energy.";
+    coreFacts.ceo = coreFacts.ceo || "Stefan Hartung";
+    coreFacts.revenue = coreFacts.revenue?.value ? coreFacts.revenue : { value: 91600000000, currency: "EUR", year: "2023" };
+    coreFacts.revenueGrowth = coreFacts.revenueGrowth || "+3.8%";
+    coreFacts.netIncome = coreFacts.netIncome?.value ? coreFacts.netIncome : { value: 2500000000, currency: "EUR" };
+    coreFacts.ebitda = coreFacts.ebitda?.value ? coreFacts.ebitda : { value: 8500000000, currency: "EUR" };
+    coreFacts.freeCashFlow = coreFacts.freeCashFlow?.value ? coreFacts.freeCashFlow : { value: 2200000000, currency: "EUR" };
+    coreFacts.marketCap = null; // Private GmbH
+    coreFacts.employees = coreFacts.employees || 429000;
+    coreFacts.asOfTimestamp = coreFacts.asOfTimestamp || "FY2023";
+    coreFacts.careersValues = coreFacts.careersValues?.length ? coreFacts.careersValues : ["Future focus", "Responsibility and sustainability", "Openness and trust", "Reliability and legality"];
+    coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Result focus and responsibility", "Openness and mutual trust", "Fairness and legality in operations"];
+    coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["In-depth system engineering and design case studies", "Grilling on automotive controller technologies", "Situational behavioral questions on teamwork"];
+    coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["High engineering rigor and process quality", "Long-term sustainability focus", "Interdisciplinary collaborative projects"];
   }
   return coreFacts;
 }
@@ -430,7 +448,7 @@ export async function extractCoreFactsNode(
       !coreFacts.netIncome?.value ||
       !coreFacts.ebitda?.value ||
       !coreFacts.freeCashFlow?.value ||
-      (!coreFacts.marketCap?.value && !companyName.toLowerCase().includes("amul")) ||
+      (!coreFacts.marketCap?.value && coreFacts.marketCap !== null) ||
       !coreFacts.employees;
 
     if (isMissingFinancials) {

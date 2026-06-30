@@ -17,6 +17,7 @@ CRITICAL RULES:
 - Be objective. Acknowledge where competitors are stronger — don't just praise the target company.
 
 COMPETITOR MATRIX — for each competitor, fill in:
+- Segment / Business Area: For diversified conglomerates (e.g. Bosch, Siemens, GE, Samsung), specify the distinct business segment (e.g., Mobility, Industrial Automation, Power Tools, Home Appliances, Cloud, Devices). For single-business companies, use "Core Business".
 - Market Position: e.g. Market Leader | Challenger | Niche Player
 - Pricing: e.g. Premium | Value | Dynamic | Low-cost
 - Delivery Speed or Quality: e.g. Ultra-fast | Standard | Premium Service
@@ -35,10 +36,11 @@ INTERNAL REASONING (do NOT expose):
 
 OUTPUT ONLY valid JSON:
 {
-  "competitive_landscape": "One-sentence summary of market structure",
+  "landscape_structure": "One-sentence summary of market structure",
   "competitor_matrix": [
     {
       "name": "Competitor name",
+      "segment": "Mobility | Industrial Technology | Consumer Goods | Cloud | Devices | Core Business",
       "type": "direct | indirect | emerging | substitute",
       "market_position": "Market Leader | Challenger | Niche Player",
       "pricing": "Premium | Value | Dynamic | Low-cost",
@@ -121,9 +123,9 @@ STRUCTURE:
 [Para 1 — Competitive Landscape (2-3 sentences)]: Summarize the market structure. How concentrated or fragmented? What type of competition defines this market? Set the context for the competitors that follow.
 
 [COMPETITOR MATRIX TABLE — Insert this markdown table between Paras 1 and 2]:
-| Competitor | Market Position | Pricing | Delivery Speed | Ecosystem | Threat |
+| Segment / Business Area | Competitor | Market Position | Pricing | Ecosystem | Threat |
 |---|---|---|---|---|---|
-| [Name] | [e.g. Market Leader / Challenger] | [e.g. Premium / Value / Dynamic] | [e.g. Ultra-fast / Standard] | [e.g. Super-app / Standalone] | High/Med/Low |
+| [Segment name or Core Business] | [Name] | [e.g. Market Leader / Challenger] | [e.g. Premium / Value / Dynamic] | [e.g. Super-app / Standalone] | High/Med/Low |
 Map the competitor matrix from the analysis data. Ensure the matrix uses this exact set of columns.
 
 [Para 2 — Direct Competitors (3-4 sentences)]: Name the top direct competitors. For each, describe what they compete on, where they are stronger, where the target company is stronger. Refer to the competitor matrix table above. Don't just list — explain strategic implications.
@@ -162,9 +164,9 @@ STRUCTURE:
 ## 7. Competitor Analysis
 
 [COMPETITOR MATRIX TABLE — Insert this markdown table after Para 1]:
-| Competitor | Market Position | Pricing | Delivery Speed | Ecosystem | Threat |
+| Segment / Business Area | Competitor | Market Position | Pricing | Ecosystem | Threat |
 |---|---|---|---|---|---|
-| [Name] | [e.g. Market Leader / Challenger] | [e.g. Premium / Value / Dynamic] | [e.g. Ultra-fast / Standard] | [e.g. Super-app / Standalone] | High/Med/Low |
+| [Segment name or Core Business] | [Name] | [e.g. Market Leader / Challenger] | [e.g. Premium / Value / Dynamic] | [e.g. Super-app / Standalone] | High/Med/Low |
 
 [Para 1: Landscape — market structure, competition type]
 [Para 2: Direct competitors — who, what they compete on, where each is stronger]

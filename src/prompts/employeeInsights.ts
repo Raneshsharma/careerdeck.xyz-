@@ -74,14 +74,18 @@ RULES:
 1. Use ONLY verified facts from KB. Never fabricate employee sentiment.
 2. Write objectively — what employees actually experience, not what the company claims.
 3. No bullet points. No HR fluff.
-4. If no data, clear disclaimer then end with "**Executive Insight:** [insight]".
-5. No generic statements.
+4. CONFIDENCE THRESHOLD FOR EMPLOYEE SENTIMENT: When describing employee sentiment, concerns (e.g. communication issues, workload, leadership support), or praise, do NOT state them as absolute facts about the entire company. You MUST explicitly qualify their prevalence:
+   - Identify if a theme is "consistently cited across multiple sources" or "a recurring theme in employee feedback" if it appears in multiple distinct comments/reviews in the KB.
+   - Tag themes as "isolated observations" or "limited comments from a subset of reviews" if they are only mentioned once or twice in the KB.
+   - Describe themes as "mixed reviews indicate split opinions regarding..." if there are conflicting reviews.
+5. If no data, clear disclaimer then end with "**Executive Insight:** [insight]".
+6. No generic statements.
 
 STRUCTURE:
 ## 12. Employee Insights
-[Para 1: Employee experience — praise + frustration themes]
-[Para 2: Career growth + compensation — if data exists]
-[Para 3: Work-life + who thrives + interview insight + Role Connection]
+[Para 1: Employee experience — praise + frustration themes, qualified by source frequency and confidence]
+[Para 2: Career growth + compensation — if data exists, qualified by source frequency]
+[Para 3: Work-life + who thrives + interview insight + Role Connection, qualified by source frequency]
 
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.
 Output only the polished markdown.`;
