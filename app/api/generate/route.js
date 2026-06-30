@@ -14,6 +14,7 @@ import {
 } from "@/lib/generation-limits";
 import { companyGraph } from "@/src/graph/companyGraph";
 import { roleGraph } from "@/src/graph/roleGraph";
+import { jdGraph } from "@/src/graph/jdGraph";
 import { EvaluationEngine } from "@/src/evaluation/evaluationEngine";
 import { QualityMetricsStore } from "@/src/evaluation/qualityMetricsStore";
 import { UNIVERSAL_MASTER_PROMPT, DOMAIN_MASTER_PROMPTS } from "@/src/prompts/masterPrompt";
@@ -403,8 +404,8 @@ export async function POST(request) {
         return Response.json({ error: `Unknown dossier type: ${dosType}` }, { status: 400 });
     }
 
-    // ── LANGGRAPH PIPELINE: company and role dossier types use parallel graphs ──
-    if (dosType === "company" || dosType === "role") {
+    // ── LANGGRAPH PIPELINE: company, role, and jd dossier types use parallel graphs ──
+    if (dosType === "company" || dosType === "role" || dosType === "jd") {
       const emitter = createSSEEmitter();
       const { stream } = emitter;
       const stopHeartbeat = startHeartbeat(emitter);
@@ -421,7 +422,9 @@ export async function POST(request) {
         dossierType: dosType,
       };
 
-      const graphToUse = dosType === "company" ? companyGraph : roleGraph;
+      const graphToUse = dosType === "company" ? companyGraph
+        : dosType === "role" ? roleGraph
+        : jdGraph;
 
       // Run graph asynchronously — emit sections as they complete
       Promise.resolve()
@@ -457,13 +460,21 @@ export async function POST(request) {
                 "strategy", "culture", "employeeInsights", "interviewQuestions",
                 "executiveSummary", "swot", "portersFiveForces", "interviewPlaybook",
               ]
-            : [
+            : dosType === "role"
+            ? [
                 "roleOverview", "businessContext", "roleMission", "roleOperatingSystem",
                 "businessImpact", "decisionIntelligence", "responsibilities", "stakeholders",
                 "crossFunctionalCollaboration", "kpis", "skills", "tools",
                 "knowledgeAreas", "productivityIntelligence", "typicalProblems", "blueprint",
                 "maturityModel", "careerPath", "compensation", "interviewPrep",
                 "first90Days", "scenarios", "businessVocabulary", "functionalPriorities"
+              ]
+            : [
+                "jdOverview", "hiringIntent", "hiddenExpectations", "responsibilityIntelligence",
+                "skillsIntelligence", "atsIntelligence", "hiringSignals", "businessProblems",
+                "stakeholderMap", "kpiIntelligence", "interviewPrediction", "starBlueprint",
+                "resumeMatch", "expectations3060", "redFlags", "companyAlignment",
+                "fitScore", "interviewCheatSheet"
               ];
           const sectionIds = SECTION_ORDER.filter((id) => sections[id]?.trim());
 
@@ -520,16 +531,6 @@ export async function POST(request) {
     // Build prompt
     let userPrompt;
     switch (dosType) {
-      case "jd":
-        const jdText = buildJDText(jd, companyResearch, null);
-        let jdFacts = await extractJDFacts(jdText);
-        if (!jdFacts || jdFacts.length === 0) {
-          const jdFallback = jdText.split("\n\n").filter(Boolean);
-          jdFacts = jdFallback.length > 0 ? jdFallback : [];
-        }
-        const jdFactStr = jdFacts.length > 0 ? jdFacts.map((f) => `- ${f}`).join("\n") : "";
-        userPrompt = buildJDPrompt(cName, rName, jd, null, jdFactStr);
-        break;
       case "news":
         const newsText = buildNewsText(null, companyResearch);
         let newsFacts = await extractNewsFacts(newsText);

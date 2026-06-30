@@ -175,6 +175,83 @@ export interface RoleFacts {
   company_specific: Record<string, any>;
 }
 
+export interface JDFacts {
+  role: string;
+  company: string;
+  department: string | null;
+  seniority: string;
+  location: string;
+  employment_type: string;
+  must_have_skills: string[];
+  good_to_have_skills: string[];
+  responsibilities: Array<{
+    responsibility: string;
+    why_it_exists: string;
+    business_kpi: string;
+    failure_mode: string;
+    stakeholders: string[];
+  }>;
+  tools: string[];
+  business_problems: Array<{
+    problem: string;
+    inferred_cause: string;
+    impacted_metric: string;
+  }>;
+  stakeholders: Array<{
+    stakeholder: string;
+    influence: string;
+    frequency: string;
+    goal: string;
+  }>;
+  success_metrics: string[];
+  hidden_expectations: Array<{
+    phrase: string;
+    true_meaning: string;
+    implication: string;
+  }>;
+  keywords: string[];
+  ats_keywords: Array<{
+    keyword: string;
+    frequency: number;
+    importance: string;
+  }>;
+  resume_keywords: string[];
+  hiring_signals: Array<{
+    signal_type: string;
+    evidence: string;
+    implication: string;
+  }>;
+  culture_signals: string[];
+  interview_signals: Array<{
+    question_type: string;
+    predicted_question: string;
+    why_likely: string;
+  }>;
+  star_blueprints: Array<{
+    responsibility: string;
+    situation: string;
+    task: string;
+    action: string;
+    result: string;
+  }>;
+  red_flags: Array<{
+    phrase: string;
+    interpretation: string;
+    risk_level: string;
+  }>;
+  fit_dimensions: Array<{
+    dimension: string;
+    importance: string;
+    signals_from_jd: string;
+  }>;
+  expectations_30_60_90: {
+    day_30: string[];
+    day_60: string[];
+    day_90: string[];
+  };
+  confidence: Record<string, string>;
+}
+
 export const CompanyStateAnnotation = Annotation.Root({
   // ── Raw inputs ──────────────────────────────────────────────────────────
   companyName: Annotation<string>(),
@@ -350,6 +427,12 @@ export const CompanyStateAnnotation = Annotation.Root({
 
   // ── Role Intelligence facts graph ────────────────────────────────────────
   roleFacts: Annotation<RoleFacts | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  // ── JD Intelligence facts graph ─────────────────────────────────────────
+  jdFacts: Annotation<JDFacts | null>({
     reducer: (_previous, next) => next ?? _previous,
     default: () => null,
   }),
