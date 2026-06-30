@@ -1,11 +1,12 @@
 import type { RoleFacts } from "../graph/state";
 
 export const ROLE_SECTION_IDS = [
-  "roleOverview", "businessContext", "roleMission", "roleEvolution",
-  "dayInLife", "responsibilities", "stakeholders", "kpis",
-  "decisionAuthority", "businessImpact", "skills", "tools",
-  "knowledgeAreas", "blueprint", "aiInRole", "careerPath",
-  "compensation", "interviewPrep", "first90Days", "scenarios"
+  "roleOverview", "businessContext", "roleMission", "roleOperatingSystem",
+  "businessImpact", "decisionIntelligence", "responsibilities", "stakeholders",
+  "crossFunctionalCollaboration", "kpis", "skills", "tools",
+  "knowledgeAreas", "productivityIntelligence", "typicalProblems", "blueprint",
+  "maturityModel", "careerPath", "compensation", "interviewPrep",
+  "first90Days", "scenarios", "businessVocabulary", "functionalPriorities"
 ];
 
 // Analyst System Prompt Builder
@@ -18,26 +19,30 @@ export function buildRoleAnalystPrompt(
   const dataStr = roleFacts ? JSON.stringify(roleFacts, null, 2) : "No role facts available";
 
   const objectives: Record<string, string> = {
-    roleOverview: "Decompose the primary objective of the role, why companies hire for it, and what core business problem it solves.",
-    businessContext: "Decompose where the role fits organizationally, what departmental goals it supports, and what happens if the role performs poorly.",
-    roleMission: "Decompose the core mission of this role. Why does it exist? What business problem disappears if the role performs well?",
-    roleEvolution: "Decompose the historical trajectory of the role (past 5-10 years) and future trends (automation, shifts) over the next decade.",
-    dayInLife: "Decompose a typical weekly time allocation, recurring meetings, and typical day-to-day decisions and operational bottlenecks.",
-    responsibilities: "Decompose the core responsibilities and structure typical projects (project, objective, stakeholders, deliverables, success metrics).",
-    stakeholders: "Build a structured Stakeholder Influence Map listing stakeholders, influence level, frequency, goals, and conflicts.",
-    kpis: "Build a KPI Tree mapping the North Star metric down to activation, retention, revenue, and operational metrics.",
-    decisionAuthority: "Decompose decision authority: what the role owns, influences, approves, and escalates.",
-    businessImpact: "Trace activities to business metrics, customers, revenue, and profitability (Role -> Activities -> Metrics -> Revenue -> Customer -> Profit).",
-    skills: "Decompose required technical, business, and communication skills. Build a Role Scorecard scoring skills from 1-10.",
-    tools: "Decompose daily-use software, analytics tools, reporting dashboards, and what tools to learn beforehand.",
-    knowledgeAreas: "Decompose essential business knowledge, industry frameworks, decision-making methodologies (e.g. RICE, MoSCoW, Opportunity Solution Tree) and when/not to use them.",
-    blueprint: "Decompose top performer habits, winning mindset, and common failure modes that average performers make.",
-    aiInRole: "Decompose practical AI use cases, time savings, prompt templates, automation workflows, and risks.",
-    careerPath: "Build a multi-stage Career Roadmap (e.g. Year 0 -> Year 2 -> Year 5) mapping stages, timeframe, required skills, expected projects, promotion signals, and salary growth.",
-    compensation: "Decompose compensation ranges, bonus structures, adjacent comparisons, and drivers of faster progression.",
-    interviewPrep: "Decompose common question types, what interviewers are testing, common pitfalls, and a structured STAR worked framework example.",
-    first90Days: "Decompose a structured onboarding plan: what to learn, relationships to build, quick wins (30/60/90 days), and pitfalls.",
-    scenarios: "Build a realistic operational scenario involving ambiguous data and conflicting stakeholder priorities, asking 'What would you do?' and outlining a strong solution framework."
+    roleOverview: "Analyze the role's core purpose in one minute. Establish why companies hire for it and the main business issue it resolves.",
+    businessContext: "Decompose where the role sits in the organizational structure and P&L hierarchy.",
+    roleMission: "Decompose the Role Mission: why does this role exist, and what business problem disappears if it performs perfectly?",
+    roleOperatingSystem: "Decompose the Role Operating System: Inputs -> Decisions -> Execution -> Metrics -> Feedback -> Iteration.",
+    businessImpact: "Build a structured Business Impact Graph tracing Activities -> Output -> Department KPI -> Business KPI -> Financial Impact.",
+    decisionIntelligence: "Decompose the Decision Intelligence: Decisions owned, decisions influenced, approvals, escalations, and typical trade-offs.",
+    responsibilities: "Deconstruct the day-to-day responsibilities into strategic business metrics, and map key projects (objective, deliverables, success metrics).",
+    stakeholders: "Build a Stakeholder Influence Map analyzing key stakeholders, their goals, and potential friction points.",
+    crossFunctionalCollaboration: "Decompose cross-functional needs: what departments want (e.g. Engineering stability vs Sales features) and friction points.",
+    kpis: "Decompose the KPI Tree: North Star -> Activation -> Retention -> Revenue -> Operational metrics.",
+    skills: "Build a Competency Framework (Beginner vs Intermediate vs Advanced) and a 1-10 Role Scorecard.",
+    tools: "Build Tool Intelligence: analyze Daily tools, why used, frequency, and AI alternatives.",
+    knowledgeAreas: "Analyze Mental Models and industry frameworks (e.g., JTBD, DuPont, AARRR) applied in this role.",
+    productivityIntelligence: "Decompose Productivity Intelligence: AI assistance, automation opportunities, and human-only strengths.",
+    typicalProblems: "Decompose Typical Business Problems this role regularly tackles and the KPIs they impact.",
+    blueprint: "Decompose Top Performer Habits (the top 1% behaviors) and Failure Intelligence (why people fail).",
+    maturityModel: "Build a Maturity Model: junior vs mid vs senior expectations, and What Great Looks Like.",
+    careerPath: "Decompose the Capability Roadmap: Year 1 (Execution) -> Year 3 (Ownership) -> Year 5 (Strategy) -> Year 8 (Leadership), promotion signals, and salary growth.",
+    compensation: "Decompose salary ranges, variables, performance incentives, and adjacent salary options.",
+    interviewPrep: "Decompose common questions, pitfalls leading to rejection, and a worked STAR framework blueprint.",
+    first90Days: "Decompose the 30/60/90 days plan: learn, integrate, optimize, and quick wins.",
+    scenarios: "Decompose a complex, ambiguous real-world interview case study with conflicting stakeholder priorities, asking 'What would you do?' and outlining a strong solution framework.",
+    businessVocabulary: "Decompose 5-10 role-specific business terminology terms and typical usages.",
+    functionalPriorities: "Decompose job-family specific priorities based on the role's job_family (e.g., Product Discovery & Prioritization for Product PM)."
   };
 
   const objective = objectives[sectionId] || "Analyze this role section.";
@@ -76,23 +81,27 @@ export function buildRoleWriterPrompt(
     roleOverview: "Write a high-fidelity McKinsey-style prose paragraph outlining the role's primary objective and why it is a critical organizational pillar.",
     businessContext: "Write a strategic paragraph explaining the role's departmental placement, financial relevance, and the downstream impact of poor execution.",
     roleMission: "Write a strategic summary of the Role Mission. Highlight what core value would disappear from the organization if this role was eliminated. End with a bolded Executive Insight.",
-    roleEvolution: "Write a paragraph tracing the role's evolution over the last 10 years and projecting how AI, automation, and organizational design will shape it in the next decade.",
-    dayInLife: "Write a descriptive paragraph detailing the weekly time allocation (e.g., meetings vs. focus work) and operational workflow. Use bolding for key activities.",
+    roleOperatingSystem: "Build the visual **Role Operating System** using Markdown blocks or lists:\n- **Inputs (What triggers work)**: [list]\n- **Decisions (What you weigh)**: [list]\n- **Execution (What you produce)**: [list]\n- **Metrics (How you are measured)**: [list]\n- **Feedback & Iteration (How you improve)**: [list]\nFollow this with a brief strategic explanation of the loop.",
+    businessImpact: "Build the visual **Business Impact Graph** flow:\n**Activity** -> **Output** -> **Department KPI** -> **Business KPI** -> **Financial Impact**\nFollow with an explanation of how daily tasks directly move the company's financial needle (revenue, cost, customer, risk).",
+    decisionIntelligence: "Build a structured Decision rights block:\n- **Decisions Owned (Independent Decisions)**: [list]\n- **Decisions Influenced**: [list]\n- **Approvals Required**: [list]\n- **Escalation Triggers (Requires Approval)**: [list]\nFollow this with a Markdown table mapping **Typical Trade-offs**:\n| Scenario | Trade-off Option A | Trade-off Option B | Deciding Factor |",
     responsibilities: "Write a structured paragraph on core responsibilities. Follow this with a Markdown table mapping 'Typical Projects':\n| Project | Objective | Stakeholders | Deliverables | Success Metrics |\nUse only projects from the analysis.",
     stakeholders: "Generate a markdown table mapping the Stakeholder Influence Map:\n| Stakeholder | Influence Level | Frequency | Key Goal | Common Conflict |\nFollow this with a short paragraph detailing trust-building strategies.",
+    crossFunctionalCollaboration: "Write a paragraph detailing cross-functional dynamics. Follow this with a Markdown table:\n| Department | Needs & Incentives | Common Friction Point | How to Resolve |\nMap department requirements (e.g. Engineering stability vs Sales features).",
     kpis: "Build a visual Markdown KPI Tree:\n- **North Star Metric**: [Metric]\n  - **Activation Metric**: [Metric]\n  - **Retention Metric**: [Metric]\n  - **Operational Metrics**: [Metric]\nWrite 2-3 sentences explaining the linkage between these levels.",
-    decisionAuthority: "Format a structured Decision Rights block:\n- **Owns (Independent Decisions)**: [list]\n- **Influences**: [list]\n- **Approves**: [list]\n- **Escalates (Requires Approval)**: [list]\nFollow with a brief explanation of how authority changes during scaling.",
-    businessImpact: "Trace the business impact using this visual chain:\n**Role** -> **Activities** -> **Metrics** -> **Revenue** -> **Customer** -> **Profit**\nFollow with an explanation of how daily tasks directly move the company's financial needle.",
-    skills: "Generate a markdown table representing the **Role Scorecard**:\n| Skill / Competency | Required Level (1-10) | Description / Core Focus |\nInclude technical, business, and communication dimensions. Follow with a short paragraph explaining the distinguishing traits.",
-    tools: "Write a paragraph describing daily-use tools and technologies, reporting dashboards, and what software a candidate should master before Day 1.",
-    knowledgeAreas: "Write a paragraph explaining critical business concepts. Follow this with a Markdown table of **Decision Frameworks**:\n| Framework | Best Applied When | Avoid Using When | Core Logic |\nInclude frameworks like RICE, MoSCoW, opportunity trees, or JTBD.",
-    blueprint: "Write a strategic paragraph on top performer habits. Create a sub-section on **Common Failure Modes** (e.g., tactical tunnel vision, stakeholder isolation) and how to avoid them.",
-    aiInRole: "Write a strategic paragraph on AI in the role. Provide 2-3 specific time-saving AI use cases, prompt examples, automation opportunities, and risk mitigations.",
-    careerPath: "Build a multi-stage **Career Roadmap** table:\n| Stage / Title | Timeframe | Core Skills | Target Projects | Promotion Signals | Salary Growth |\nFollow with a short paragraph explaining exit opportunities.",
+    skills: "Generate a markdown table representing the **Competency Framework**:\n| Competency | Beginner Level | Intermediate Level | Advanced Level |\nFollow this with a markdown table representing the **Role Scorecard**:\n| Dimension | Score Needed (1-10) | Core Focus |",
+    tools: "Generate a markdown table mapping **Tool Intelligence**:\n| Tool | Why Used | Frequency | Learning Priority | AI Alternative |",
+    knowledgeAreas: "Write a paragraph explaining critical business concepts. Follow this with a Markdown table of **Mental Models & Frameworks**:\n| Model / Framework | Best Applied When | Avoid Using When | Core Logic |",
+    productivityIntelligence: "Build the **Productivity Intelligence** stack:\n- **AI Assistance (Immediate Time Savings)**: [list]\n- **Automation Opportunities**: [list]\n- **Human-only Strengths (Your Moat)**: [list]\nWrite 2-3 sentences explaining how to leverage AI to scale your capacity.",
+    typicalProblems: "Write a paragraph explaining typical business problems. Follow this with a Markdown table:\n| Business Problem | Why It Matters | Impacted KPI | Strategic Workaround |",
+    blueprint: "Write a strategic paragraph on top performer habits. Create a sub-section on **Failure Intelligence** detailing why people fail (Skill gaps, behavioral mistakes, prioritization issues).",
+    maturityModel: "Build the **Role Maturity Model**:\n- **Junior / Execution Level**: [capabilities]\n- **Mid / Ownership Level**: [capabilities]\n- **Senior / Strategy Level**: [capabilities]\nFollow this with a section on **What Great Looks Like** (how leadership knows someone is exceptional).",
+    careerPath: "Build a multi-stage **Capability Roadmap** table:\n| Stage / Title | Timeframe | Core Skills | Target Projects | Promotion Signals | Salary Growth |\nFollow with a short paragraph explaining exit opportunities.",
     compensation: "Write a detailed paragraph on compensation ranges, variable pay drivers, performance incentives, and adjacent salary comparisons.",
     interviewPrep: "Write a tactical paragraph on what interviewers test. Provide a **STAR Framework Worked Example** mapping a common question, Situation, Task, Action, and Result.",
     first90Days: "Create a structured 30/60/90 days plan:\n- **Days 1-30 (Learn & Align)**: [bullet list]\n- **Days 31-60 (Execute & Integrate)**: [bullet list]\n- **Days 61-90 (Optimize & Scale)**: [bullet list]\nFollow with a short paragraph on early relationship building.",
-    scenarios: "Present the complex scenario from the analysis under the header '### Real-World Interview Case Scenario'. Ask the question 'What would you do?' and outline the structural factors a strong candidate must address in their solution."
+    scenarios: "Present the complex scenario from the analysis under the header '### Real-World Interview Case Scenario'. Ask the question 'What would you do?' and outline the structural factors a strong candidate must address in their solution.",
+    businessVocabulary: "Generate a markdown table of **Business Vocabulary**:\n| Term | Definition | Example Usage |",
+    functionalPriorities: "Write a strategic briefing on the job family's functional pillars (e.g. Discovery & Prioritization for Product). Follow this with a Markdown table of key priorities."
   };
 
   const structure = structures[sectionId] || "Write the section in McKinsey consulting prose.";

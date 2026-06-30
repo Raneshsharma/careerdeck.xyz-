@@ -59,11 +59,12 @@ g.addNode("extractRoleFacts", extractRoleFactsNode);
 g.addEdge(START, "extractRoleFacts");
 
 const sections = [
-  "roleOverview", "businessContext", "roleMission", "roleEvolution",
-  "dayInLife", "responsibilities", "stakeholders", "kpis",
-  "decisionAuthority", "businessImpact", "skills", "tools",
-  "knowledgeAreas", "blueprint", "aiInRole", "careerPath",
-  "compensation", "interviewPrep", "first90Days", "scenarios"
+  "roleOverview", "businessContext", "roleMission", "roleOperatingSystem",
+  "businessImpact", "decisionIntelligence", "responsibilities", "stakeholders",
+  "crossFunctionalCollaboration", "kpis", "skills", "tools",
+  "knowledgeAreas", "productivityIntelligence", "typicalProblems", "blueprint",
+  "maturityModel", "careerPath", "compensation", "interviewPrep",
+  "first90Days", "scenarios", "businessVocabulary", "functionalPriorities"
 ];
 
 sections.forEach((s) => {

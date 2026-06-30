@@ -458,11 +458,12 @@ export async function POST(request) {
                 "executiveSummary", "swot", "portersFiveForces", "interviewPlaybook",
               ]
             : [
-                "roleOverview", "businessContext", "roleMission", "roleEvolution",
-                "dayInLife", "responsibilities", "stakeholders", "kpis",
-                "decisionAuthority", "businessImpact", "skills", "tools",
-                "knowledgeAreas", "blueprint", "aiInRole", "careerPath",
-                "compensation", "interviewPrep", "first90Days", "scenarios"
+                "roleOverview", "businessContext", "roleMission", "roleOperatingSystem",
+                "businessImpact", "decisionIntelligence", "responsibilities", "stakeholders",
+                "crossFunctionalCollaboration", "kpis", "skills", "tools",
+                "knowledgeAreas", "productivityIntelligence", "typicalProblems", "blueprint",
+                "maturityModel", "careerPath", "compensation", "interviewPrep",
+                "first90Days", "scenarios", "businessVocabulary", "functionalPriorities"
               ];
           const sectionIds = SECTION_ORDER.filter((id) => sections[id]?.trim());
 

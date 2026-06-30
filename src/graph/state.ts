@@ -65,6 +65,7 @@ export interface CompanyKnowledge {
 
 export interface RoleFacts {
   role_name: string;
+  job_family: string;
   department: string | null;
   reports_to: string | null;
   team_size: string | null;
@@ -72,6 +73,33 @@ export interface RoleFacts {
   daily_work: string[];
   weekly_work: string[];
   monthly_work: string[];
+  role_operating_system: {
+    inputs: string[];
+    decisions: string[];
+    execution: string[];
+    metrics: string[];
+    feedback: string[];
+    iteration: string[];
+  };
+  business_impact_graph: {
+    activity: string;
+    output: string;
+    department_kpi: string;
+    business_kpi: string;
+    financial_impact: string;
+  };
+  decision_intelligence: {
+    owns: string[];
+    influences: string[];
+    approves: string[];
+    escalates: string[];
+    typical_tradeoffs: string[];
+  };
+  typical_business_problems: Array<{
+    problem: string;
+    why_it_matters: string;
+    impacted_kpi: string;
+  }>;
   stakeholders: Array<{
     stakeholder: string;
     influence: string;
@@ -79,9 +107,25 @@ export interface RoleFacts {
     goal: string;
     conflict: string;
   }>;
+  cross_functional_collaboration: Array<{
+    department: string;
+    needs_and_incentives: string;
+    common_friction_point: string;
+  }>;
   north_star_metrics: string[];
   kpis: string[];
-  tools: string[];
+  competency_framework: Array<{
+    competency: string;
+    beginner: string;
+    intermediate: string;
+    advanced: string;
+  }>;
+  tools: Array<{
+    tool: string;
+    why_used: string;
+    frequency: string;
+    ai_alternative: string;
+  }>;
   skills: string[];
   projects: Array<{
     project: string;
@@ -90,13 +134,17 @@ export interface RoleFacts {
     deliverables: string[];
     success_metrics: string[];
   }>;
-  decision_authority: {
-    owns: string[];
-    influences: string[];
-    approves: string[];
-    escalates: string[];
-  };
   success_profile: string[];
+  maturity_model: Array<{
+    level: string;
+    focus: string;
+    capabilities: string[];
+  }>;
+  productivity_intelligence: {
+    ai_assistance: string[];
+    automation_opportunities: string[];
+    human_only_strengths: string[];
+  };
   career_path: Array<{
     stage: string;
     timeframe: string;
@@ -114,6 +162,16 @@ export interface RoleFacts {
     questions: Array<{ question: string; type: string; framework: string }>;
     pitfalls: string[];
   };
+  business_vocabulary: Array<{
+    term: string;
+    definition: string;
+    example_usage: string;
+  }>;
+  functional_priorities: Array<{
+    pillar: string;
+    description: string;
+    framework_used: string;
+  }>;
   company_specific: Record<string, any>;
 }
 
