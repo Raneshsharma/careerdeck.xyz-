@@ -11,22 +11,18 @@ export async function DELETE(request, { params }) {
   const { id } = params
 
   try {
-    const { data: existing } = await supabase
-      .from("generations")
-      .select("user_id")
-      .eq("id", id)
-      .single()
-
-    if (!existing || existing.user_id !== user.id) {
-      return Response.json({ error: "Not found" }, { status: 404 })
-    }
-
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("generations")
       .delete()
       .eq("id", id)
+      .eq("user_id", user.id)
+      .select("id")
+      .single()
 
-    if (error) throw error
+    if (error || !data) {
+      return Response.json({ error: "Not found" }, { status: 404 })
+    }
+
     return Response.json({ ok: true })
   } catch (err) {
     console.error("Generation delete error:", err)
@@ -46,7 +42,7 @@ export async function GET(request, { params }) {
 
     const { data, error } = await supabase
       .from("generations")
-      .select("id, user_id, dossier_type, company_name, role, created_at")
+      .select("id, user_id, dossier_type, company_name, role, content, created_at")
       .eq("id", id)
       .single()
 
@@ -59,15 +55,7 @@ export async function GET(request, { params }) {
       return Response.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    let content = null
-    const { data: contentData } = await supabase
-      .from("generations")
-      .select("content")
-      .eq("id", id)
-      .single()
-    if (contentData) content = contentData.content
-
-    return Response.json({ generation: { ...data, content } })
+    return Response.json({ generation: data })
   } catch (err) {
     console.error("Generation fetch error:", err?.message || err, "stack:", err?.stack)
     return Response.json({ error: "Failed to fetch generation" }, { status: 500 })
@@ -89,22 +77,18 @@ export async function PATCH(request, { params }) {
   }
 
   try {
-    const { data: existing } = await supabase
-      .from("generations")
-      .select("user_id")
-      .eq("id", id)
-      .single()
-
-    if (!existing || existing.user_id !== user3.id) {
-      return Response.json({ error: "Not found" }, { status: 404 })
-    }
-
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("generations")
       .update({ content })
       .eq("id", id)
+      .eq("user_id", user3.id)
+      .select("id")
+      .single()
 
     if (error) {
+      if (error.code === "PGRST116" || error.message?.includes("no rows")) {
+        return Response.json({ error: "Not found" }, { status: 404 })
+      }
       // If column doesn't exist, ignore silently
       if (error.message?.includes("column") || error.code === "PGRST204") {
         return Response.json({ ok: true, note: "content column not available" })

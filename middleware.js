@@ -36,9 +36,19 @@ export async function middleware(request) {
     return NextResponse.redirect(url);
   }
 
+  const { pathname } = request.nextUrl;
+  if (pathname.startsWith("/eval-dashboard")) {
+    const adminEmail = process.env.ADMIN_EMAIL || "raneshsharma33@gmail.com";
+    if (user.email !== adminEmail) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+  }
+
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/onboarding/:path*", "/checkout/:path*"],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/onboarding/:path*", "/checkout/:path*", "/eval-dashboard/:path*", "/eval-dashboard"],
 };

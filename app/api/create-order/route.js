@@ -1,3 +1,4 @@
+import { createClient } from "@/lib/supabase-server";
 import Razorpay from "razorpay";
 
 const PLANS = {
@@ -7,6 +8,12 @@ const PLANS = {
 
 export async function POST(request) {
   try {
+    const supabaseAuth = await createClient();
+    const { data: { user } } = await supabaseAuth.auth.getUser();
+    if (!user) {
+      return Response.json({ error: "Sign in required" }, { status: 401 });
+    }
+
     const body = await request.json().catch(() => ({}));
     const { plan } = body;
     const selectedPlan = PLANS[plan];

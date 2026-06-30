@@ -427,20 +427,22 @@ export async function POST(request) {
           const sections = { ...(result.reviewedSections || {}), ...(result.generatedSections || {}) };
           const knowledge = result.knowledge?.knowledgeBase;
 
-          // Evaluate each section for dashboard metrics
-          try {
-            const evalVersion = process.env.PROMPT_VERSION || "4.0";
-            for (const [sectionId, content] of Object.entries(sections)) {
-              if (!content?.trim()) continue;
-              const evalResult = await EvaluationEngine.evaluateSection(
-                sectionId, sectionId, content,
-                knowledge || {},
-                cName, evalVersion,
-              );
-              QualityMetricsStore.store(evalResult, { promptId: sectionId });
+          // Evaluate each section for dashboard metrics (only in development or if explicitly enabled)
+          if (process.env.ENABLE_EVALUATION === "true" || process.env.NODE_ENV === "development") {
+            try {
+              const evalVersion = process.env.PROMPT_VERSION || "4.0";
+              for (const [sectionId, content] of Object.entries(sections)) {
+                if (!content?.trim()) continue;
+                const evalResult = await EvaluationEngine.evaluateSection(
+                  sectionId, sectionId, content,
+                  knowledge || {},
+                  cName, evalVersion,
+                );
+                QualityMetricsStore.store(evalResult, { promptId: sectionId });
+              }
+            } catch (evalErr) {
+              console.error("Evaluation error (non-fatal):", evalErr.message);
             }
-          } catch (evalErr) {
-            console.error("Evaluation error (non-fatal):", evalErr.message);
           }
 
           // Order sections consistently
@@ -505,18 +507,6 @@ export async function POST(request) {
     // Build prompt
     let userPrompt;
     switch (dosType) {
-      case "company":
-        const researchText = buildPlainText(companyResearch, null);
-        const facts = await extractCompanyFacts(researchText);
-        if (!facts || facts.length === 0) {
-          const fallbackText = buildPlainText(companyResearch, null);
-          if (fallbackText) {
-            facts.push(...fallbackText.split("\n\n").filter(Boolean));
-          }
-        }
-        const factList = facts.map((f) => `- ${f}`).join("\n");
-        userPrompt = buildCompanyPrompt(cName, factList, rName, jd);
-        break;
       case "role":
         const roleText = buildRoleText(null, jd);
         let roleFacts = await extractRoleFacts(roleText);
@@ -548,7 +538,7 @@ export async function POST(request) {
         userPrompt = buildNewsPrompt(cName, rName || "", null, nsFactStr);
         break;
       default:
-        userPrompt = buildCompanyPrompt(cName, "", companyResearch);
+        throw new Error(`Unsupported legacy dossier type: ${dosType}`);
     }
 
     const messages = [

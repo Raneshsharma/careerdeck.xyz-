@@ -50,7 +50,6 @@ export async function POST(request) {
       avatar_url: user.user_metadata?.avatar_url,
       industry,
       experience_level: experienceLevel,
-      plan_tier: "free",
       onboarded: true,
     })
     if (error) throw error
