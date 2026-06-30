@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import Script from "next/script";
 import SessionProvider from "@/components/SessionProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -49,40 +50,33 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-SXHE8Y3N91";
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={inter.className}>
-      {GA_ID && (
-        <>
-          <Script strategy="afterInteractive" src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
-          <Script id="ga-init" strategy="afterInteractive">
-            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA_ID}');`}
-          </Script>
-        </>
-      )}
-      <Script id="json-ld" type="application/ld+json" strategy="afterInteractive">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: "CareerDeck",
-          url: SITE_URL,
-          description: "AI-powered interview preparation tool that generates company research dossiers for MBA students and job seekers in India.",
-          applicationCategory: "EducationalApplication",
-          operatingSystem: "Web",
-          offers: {
-            "@type": "Offer",
-            price: "0",
-            priceCurrency: "INR",
-            description: "Free tier with 3 dossiers per month",
-          },
-          author: { "@type": "Organization", name: "CareerDeck", url: SITE_URL, sameAs: [
-            "https://www.linkedin.com/company/careerdeck",
-            "https://twitter.com/careerdeckhq",
-            "https://www.instagram.com/careerdeck"
-          ]},
-          inLanguage: ["en", "hi"],
-          countriesSupported: "IN",
-          keywords: "interview preparation, MBA, placement, career, company research, AI, India",
-        })}
-      </Script>
       <body className="min-h-screen antialiased" suppressHydrationWarning>
+        <GoogleAnalytics GA_ID={GA_ID} />
+        <Script id="json-ld" type="application/ld+json" strategy="afterInteractive">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "CareerDeck",
+            url: SITE_URL,
+            description: "AI-powered interview preparation tool that generates company research dossiers for MBA students and job seekers in India.",
+            applicationCategory: "EducationalApplication",
+            operatingSystem: "Web",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "INR",
+              description: "Free tier with 3 dossiers per month",
+            },
+            author: { "@type": "Organization", name: "CareerDeck", url: SITE_URL, sameAs: [
+              "https://www.linkedin.com/company/careerdeck",
+              "https://twitter.com/careerdeckhq",
+              "https://www.instagram.com/careerdeck"
+            ]},
+            inLanguage: ["en", "hi"],
+            countriesSupported: "IN",
+            keywords: "interview preparation, MBA, placement, career, company research, AI, India",
+          })}
+        </Script>
         <SessionProvider>
           <ErrorBoundary>
           <Toaster
