@@ -156,6 +156,24 @@ function applyHardcodedFallbacks(companyName: string, coreFacts: CoreFacts): Cor
     coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Obsession with product perfection", "Deep collaboration and cross-functional teams", "Discretion and secrecy", "Simplicity as the ultimate sophistication"];
     coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["Deep domain-specific technical grilling", "Collaborative case studies and design challenges", "Intense cultural fit and attention to detail review"];
     coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["High confidentiality and product isolation", "Attention to tiny details", "Cross-functional collaborative sprints"];
+  } else if (norm.includes("amd") || norm.includes("advanced micro devices")) {
+    coreFacts.companyName = coreFacts.companyName || "AMD";
+    coreFacts.industry = coreFacts.industry || "Semiconductors";
+    coreFacts.sector = coreFacts.sector || "Information Technology";
+    coreFacts.description = coreFacts.description || "Advanced Micro Devices (AMD) designs high-performance processors and graphics cards.";
+    coreFacts.ceo = coreFacts.ceo || "Lisa Su";
+    coreFacts.revenue = coreFacts.revenue?.value ? coreFacts.revenue : { value: 22680000000, currency: "USD", year: "2023" };
+    coreFacts.revenueGrowth = coreFacts.revenueGrowth || "-4%";
+    coreFacts.netIncome = coreFacts.netIncome?.value ? coreFacts.netIncome : { value: 854000000, currency: "USD" };
+    coreFacts.ebitda = coreFacts.ebitda?.value ? coreFacts.ebitda : { value: 3780000000, currency: "USD" };
+    coreFacts.freeCashFlow = coreFacts.freeCashFlow?.value ? coreFacts.freeCashFlow : { value: 1250000000, currency: "USD" };
+    coreFacts.marketCap = coreFacts.marketCap?.value ? coreFacts.marketCap : { value: 220000000000, currency: "USD" };
+    coreFacts.employees = coreFacts.employees || 26000;
+    coreFacts.asOfTimestamp = coreFacts.asOfTimestamp || "FY2023";
+    coreFacts.careersValues = coreFacts.careersValues?.length ? coreFacts.careersValues : ["Innovation", "Collaboration", "Integrity & high quality", "Customer success"];
+    coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Lisa Su's execution focus", "First-principles chip engineering", "Agile competitor response", "Strategic market expansion"];
+    coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["In-depth silicon design questions", "Coding challenges in C/C++ and Verilog", "Architecture discussion with senior tech leaders"];
+    coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["Silicon engineering intensity", "Cross-continental team sprints", "Performance-oriented development focus"];
   }
   return coreFacts;
 }
