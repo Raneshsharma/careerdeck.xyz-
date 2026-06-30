@@ -17,10 +17,10 @@ export default function DossierTabs({ selected, onChange, disabled }) {
           aria-selected={selected === tab.id}
           onClick={() => onChange(tab.id)}
           disabled={disabled}
-          className={`relative px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+          className={`relative px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
             selected === tab.id
-              ? "bg-brand-500 text-white shadow-sm scale-105"
-              : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+              ? "bg-[#F28C28] text-[#030712] shadow-[0_4px_12px_rgba(242,140,40,0.3)] scale-105"
+              : "bg-white/[0.03] text-slate-400 border border-white/[0.06] hover:bg-white/[0.08] hover:text-white"
           } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {tab.label}

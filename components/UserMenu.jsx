@@ -51,49 +51,49 @@ export default function UserMenu({ refreshTrigger }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-10 w-64 bg-white rounded-xl shadow-lg border border-gray-200 p-4 z-50">
+        <div className="absolute right-0 top-10 w-64 bg-[#0B0F19] rounded-xl shadow-2xl border border-white/[0.08] p-4 z-50 text-slate-200">
           {/* User info */}
-          <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${isPro ? "bg-gradient-to-br from-amber-400 to-yellow-500 shadow-[0_0_10px_rgba(242,140,40,0.3)]" : "bg-amber-500"}`}>
+          <div className="flex items-center gap-3 pb-3 border-b border-white/[0.05]">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${isPro ? "bg-gradient-to-br from-amber-400 to-yellow-500 shadow-[0_0_10px_rgba(242,140,40,0.3)]" : "bg-[#F28C28]/20 border border-[#F28C28]/40"}`}>
               {initial}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-[#0F172A] truncate flex items-center gap-1">
+              <p className="text-sm font-semibold text-white truncate flex items-center gap-1">
                 {profileData?.profile?.name || user?.user_metadata?.full_name || user?.email}
                 {isPro && <span title="Premium">👑</span>}
               </p>
-              <p className="text-xs text-[#64748B] truncate">{user?.email}</p>
+              <p className="text-xs text-slate-400 truncate">{user?.email}</p>
             </div>
           </div>
 
           {/* Usage bar */}
-          <div className="py-3 border-b border-gray-100">
+          <div className="py-3 border-b border-white/[0.05]">
             <div className="flex justify-between text-xs mb-1.5">
-              <span className="text-[#64748B]">{used} of {limit} used this month</span>
-              <span className="font-semibold text-[#0F172A]">{remaining} remaining</span>
+              <span className="text-slate-400">{used} of {limit} used this month</span>
+              <span className="font-semibold text-white">{remaining} remaining</span>
             </div>
-            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
               <div
-                className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                className="h-full bg-[#F28C28] rounded-full transition-all duration-500"
                 style={{ width: `${usagePercent}%` }}
               />
             </div>
-            <p className="text-xs mt-1 flex items-center gap-1">
-              <span className={isPro ? "text-amber-600 font-semibold" : "text-[#94A3B8]"}>
+            <div className="text-xs mt-2 flex items-center gap-1">
+              <span className={isPro ? "text-[#F28C28] font-semibold" : "text-slate-400"}>
                 {isPro ? "👑 " : ""}Plan: {planDisplay}
               </span>
               {isPro && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gradient-to-r from-amber-400 to-yellow-500 text-[#0F172A]">PRO</span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gradient-to-r from-amber-400 to-yellow-500 text-[#0f172a]">PRO</span>
               )}
-            </p>
+            </div>
             {planTier === "free" && remaining <= 1 && remaining > 0 && (
-              <p className="text-xs text-amber-600 mt-0.5 font-medium">
+              <p className="text-xs text-[#F28C28] mt-1.5 font-medium">
                 ⚡ Only {remaining} generation left —{" "}
-                <Link href="/checkout?plan=pro" className="underline hover:text-amber-800">Upgrade</Link>
+                <Link href="/checkout?plan=pro" className="underline hover:text-[#E07E1F]">Upgrade</Link>
               </p>
             )}
             {planTier === "free" && remaining === 0 && (
-              <Link href="/checkout?plan=pro" className="mt-1.5 block w-full text-center text-xs font-bold py-1.5 rounded-lg bg-amber-500 text-[#0F172A] hover:bg-amber-400 transition-colors">
+              <Link href="/checkout?plan=pro" className="mt-2.5 block w-full text-center text-xs font-bold py-1.5 rounded-lg bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] transition-colors">
                 Upgrade to Pro
               </Link>
             )}
@@ -102,7 +102,7 @@ export default function UserMenu({ refreshTrigger }) {
           {/* Profile link */}
           <button
             onClick={() => { router.push("/profile"); setOpen(false); }}
-            className="w-full text-left text-sm text-[#0F172A] hover:bg-gray-50 py-1.5 px-2 rounded-lg transition-colors mt-1"
+            className="w-full text-left text-sm text-slate-300 hover:text-white hover:bg-white/[0.02] py-1.5 px-2 rounded-lg transition-colors mt-1"
           >
             Profile
           </button>
@@ -110,7 +110,7 @@ export default function UserMenu({ refreshTrigger }) {
           {/* Sign out */}
           <button
             onClick={() => { createClient().auth.signOut().then(() => router.push("/")).catch(() => router.push("/")); }}
-            className="w-full text-left text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 py-1.5 px-2 rounded-lg transition-colors mt-0.5"
+            className="w-full text-left text-sm text-slate-400 hover:text-white hover:bg-white/[0.02] py-1.5 px-2 rounded-lg transition-colors mt-0.5"
           >
             Sign Out
           </button>

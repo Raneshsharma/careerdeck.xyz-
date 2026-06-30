@@ -52,8 +52,8 @@ export default function SectionNav({ content, className = "" }) {
   return (
     <nav className={`no-print ${className}`}>
       {/* Desktop: vertical sidebar */}
-      <div className="hidden lg:block bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 p-4 max-h-[calc(100vh-2rem)] overflow-y-auto shadow-sm">
-        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">On this page</h4>
+      <div className="hidden lg:block bg-[#0B0F19]/80 border border-white/[0.08] backdrop-blur-md rounded-lg p-4 max-h-[calc(100vh-2rem)] overflow-y-auto shadow-sm">
+        <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">On this page</h4>
         <ul className="space-y-0.5">
           {headings.map((h) => (
             <li key={h.id} className={h.level === 2 ? "pl-4" : ""}>
@@ -62,12 +62,12 @@ export default function SectionNav({ content, className = "" }) {
                 onClick={(e) => handleClick(e, h.id)}
                 className={`flex items-center gap-2 text-sm py-1.5 rounded px-2 transition-all duration-200 ${
                   activeId === h.id
-                    ? "text-brand-600 font-semibold bg-brand-50"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    ? "text-white font-semibold bg-[#F28C28]/10"
+                    : "text-slate-400 hover:text-white hover:bg-white/[0.02]"
                 } ${h.level === 1 ? "font-medium" : ""}`}
               >
                 {activeId === h.id && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28] shrink-0" />
                 )}
                 <span className="truncate">{h.text}</span>
               </a>
@@ -83,10 +83,10 @@ export default function SectionNav({ content, className = "" }) {
             <button
               key={h.id}
               onClick={(e) => handleClick(e, h.id)}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap min-h-[36px] ${
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap min-h-[36px] ${
                 activeId === h.id
-                  ? "bg-brand-500 text-white shadow-sm"
-                  : "bg-white border border-gray-200 text-[#64748B] hover:bg-gray-50"
+                  ? "bg-[#F28C28] text-[#030712] shadow-sm"
+                  : "bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:bg-white/[0.06] hover:text-white"
               } ${h.level === 2 ? "ml-3" : ""}`}
             >
               {h.text}
