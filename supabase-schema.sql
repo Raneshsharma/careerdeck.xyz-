@@ -92,3 +92,10 @@ create table if not exists newsletter_subscribers (
   email text not null unique,
   created_at timestamp default now()
 );
+
+-- ── Hardening: Enable RLS on all tables to prevent direct client-side access ──
+-- Since all writes/reads go through server-side routes using the Service Role Key,
+-- enabling RLS on these tables without adding policies blocks direct PostgREST client-side CRUD.
+alter table if exists section_feedback enable row level security;
+alter table if exists section_comments enable row level security;
+alter table if exists newsletter_subscribers enable row level security;
