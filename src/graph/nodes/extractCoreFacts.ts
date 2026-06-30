@@ -7,7 +7,7 @@ import { researchGoogleCSE } from "../../research/google";
 const EXTRACTION_SYSTEM_PROMPT = `You are a McKinsey Strategy Analyst. Your task is to compile a Canonical Knowledge Graph of Core Facts for a company from the provided raw multi-source research text.
 
 CRITICAL INSTRUCTIONS:
-1. Extract ALL concrete metrics (Revenue, Revenue Growth, EBITDA, Free Cash Flow, Market Cap, Employees, Founded Year, CEO name, founders, headquarters description). If they are in the text, extract them. Never invent them. If they are absent or unavailable, return null.
+1. Extract ALL concrete metrics (Revenue, Revenue Growth, EBITDA, Free Cash Flow, Market Cap, Employees, Founded Year, CEO name, founders, headquarters description). If they are in the text, extract them. Never invent them. If they are absent or unavailable, return null. If the company is private/unlisted (e.g., Robert Bosch GmbH, Amul, or private startups), set "marketCap" explicitly to null.
 2. For Revenue, EBITDA, Free Cash Flow, and Market Cap, return the raw numeric value (e.g. 150000000 for $150M), the currency code (e.g. "USD", "INR"), and the year if mentioned.
 3. Extract all named products, brands, and business segments.
 4. Assess the competitive advantages (Moat) using this scale:
