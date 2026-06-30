@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import SourceTiles from "@/components/SourceTiles";
 import SectionVoting from "@/components/SectionVoting";
 import SectionFeedback from "@/components/SectionFeedback";
@@ -123,6 +124,7 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
           {sections.map((section, idx) => (
             <div key={section.id || idx} id={section.id}>
               <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 components={{
                   h2: ({ children, ...props }) => <h2 id={section.id} {...props}>{children}</h2>,
                 }}

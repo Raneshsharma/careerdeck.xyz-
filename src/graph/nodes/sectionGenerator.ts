@@ -76,6 +76,7 @@ export function createSectionGenerator(prompt: SectionPrompt) {
           moatSummary: state.coreFacts.moatSummary,
           revenue: state.coreFacts.revenue,
           revenueGrowth: (state.coreFacts as any).revenueGrowth ?? null,
+          netIncome: (state.coreFacts as any).netIncome ?? null,
           ebitda: (state.coreFacts as any).ebitda ?? null,
           freeCashFlow: (state.coreFacts as any).freeCashFlow ?? null,
           marketCap: state.coreFacts.marketCap,

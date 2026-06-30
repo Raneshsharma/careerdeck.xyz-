@@ -20,6 +20,7 @@ export interface CoreFacts {
   // Scale
   revenue: { value: number | null; currency: string | null; year: string | null };
   revenueGrowth: string | null;
+  netIncome: { value: number | null; currency: string | null } | null;
   ebitda: { value: number | null; currency: string | null } | null;
   freeCashFlow: { value: number | null; currency: string | null } | null;
   marketCap: { value: number | null; currency: string | null };
