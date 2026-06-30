@@ -63,6 +63,60 @@ export interface CompanyKnowledge {
   knowledgeBase?: CompanyKnowledgeBase;
 }
 
+export interface RoleFacts {
+  role_name: string;
+  department: string | null;
+  reports_to: string | null;
+  team_size: string | null;
+  core_objective: string | null;
+  daily_work: string[];
+  weekly_work: string[];
+  monthly_work: string[];
+  stakeholders: Array<{
+    stakeholder: string;
+    influence: string;
+    frequency: string;
+    goal: string;
+    conflict: string;
+  }>;
+  north_star_metrics: string[];
+  kpis: string[];
+  tools: string[];
+  skills: string[];
+  projects: Array<{
+    project: string;
+    objective: string;
+    stakeholders: string[];
+    deliverables: string[];
+    success_metrics: string[];
+  }>;
+  decision_authority: {
+    owns: string[];
+    influences: string[];
+    approves: string[];
+    escalates: string[];
+  };
+  success_profile: string[];
+  career_path: Array<{
+    stage: string;
+    timeframe: string;
+    skills_required: string[];
+    projects_expected: string[];
+    promotion_signals: string[];
+    salary_growth: string;
+  }>;
+  salary: {
+    range: string;
+    currency: string;
+    incentives: string;
+  };
+  interview: {
+    questions: Array<{ question: string; type: string; framework: string }>;
+    pitfalls: string[];
+  };
+  company_specific: Record<string, any>;
+}
+
 export const CompanyStateAnnotation = Annotation.Root({
   // ── Raw inputs ──────────────────────────────────────────────────────────
   companyName: Annotation<string>(),
@@ -234,6 +288,12 @@ export const CompanyStateAnnotation = Annotation.Root({
   errors: Annotation<string[]>({
     reducer: (previous, next) => [...previous, ...next],
     default: () => [],
+  }),
+
+  // ── Role Intelligence facts graph ────────────────────────────────────────
+  roleFacts: Annotation<RoleFacts | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
   }),
 
   // ── Metadata / tracing ──────────────────────────────────────────────────

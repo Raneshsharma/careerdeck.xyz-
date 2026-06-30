@@ -13,6 +13,7 @@ import {
   getLimitForTier,
 } from "@/lib/generation-limits";
 import { companyGraph } from "@/src/graph/companyGraph";
+import { roleGraph } from "@/src/graph/roleGraph";
 import { EvaluationEngine } from "@/src/evaluation/evaluationEngine";
 import { QualityMetricsStore } from "@/src/evaluation/qualityMetricsStore";
 import { UNIVERSAL_MASTER_PROMPT, DOMAIN_MASTER_PROMPTS } from "@/src/prompts/masterPrompt";
@@ -402,8 +403,8 @@ export async function POST(request) {
         return Response.json({ error: `Unknown dossier type: ${dosType}` }, { status: 400 });
     }
 
-    // ── LANGGRAPH PIPELINE: company dossier type uses the full 6-layer graph ──
-    if (dosType === "company") {
+    // ── LANGGRAPH PIPELINE: company and role dossier types use parallel graphs ──
+    if (dosType === "company" || dosType === "role") {
       const emitter = createSSEEmitter();
       const { stream } = emitter;
       const stopHeartbeat = startHeartbeat(emitter);
@@ -420,16 +421,18 @@ export async function POST(request) {
         dossierType: dosType,
       };
 
+      const graphToUse = dosType === "company" ? companyGraph : roleGraph;
+
       // Run graph asynchronously — emit sections as they complete
       Promise.resolve()
         .then(async () => {
-          const result = await companyGraph.invoke(initialState);
+          const result = await graphToUse.invoke(initialState);
 
           const sections = { ...(result.reviewedSections || {}), ...(result.generatedSections || {}) };
           const knowledge = result.knowledge?.knowledgeBase;
 
-          // Evaluate each section for dashboard metrics (only in development or if explicitly enabled)
-          if (process.env.ENABLE_EVALUATION === "true" || process.env.NODE_ENV === "development") {
+          // Evaluate each section for dashboard metrics (only for company dossiers in dev)
+          if (dosType === "company" && (process.env.ENABLE_EVALUATION === "true" || process.env.NODE_ENV === "development")) {
             try {
               const evalVersion = process.env.PROMPT_VERSION || "4.0";
               for (const [sectionId, content] of Object.entries(sections)) {
@@ -447,17 +450,25 @@ export async function POST(request) {
           }
 
           // Order sections consistently
-          const SECTION_ORDER = [
-            "companyOverview", "whyExists", "businessModel", "products",
-            "journey", "industry", "competitors", "moat", "financials",
-            "strategy", "culture", "employeeInsights", "interviewQuestions",
-            "executiveSummary", "swot", "portersFiveForces", "interviewPlaybook",
-          ];
+          const SECTION_ORDER = dosType === "company"
+            ? [
+                "companyOverview", "whyExists", "businessModel", "products",
+                "journey", "industry", "competitors", "moat", "financials",
+                "strategy", "culture", "employeeInsights", "interviewQuestions",
+                "executiveSummary", "swot", "portersFiveForces", "interviewPlaybook",
+              ]
+            : [
+                "roleOverview", "businessContext", "roleMission", "roleEvolution",
+                "dayInLife", "responsibilities", "stakeholders", "kpis",
+                "decisionAuthority", "businessImpact", "skills", "tools",
+                "knowledgeAreas", "blueprint", "aiInRole", "careerPath",
+                "compensation", "interviewPrep", "first90Days", "scenarios"
+              ];
           const sectionIds = SECTION_ORDER.filter((id) => sections[id]?.trim());
 
           if (sectionIds.length === 0) {
             emitter.emit("chunk", {
-              content: "Insufficient company data provided. Try a different company name.",
+              content: "Insufficient data provided to generate dossier.",
             });
           } else {
             const separator = "\n\n---\n\n";
@@ -508,16 +519,6 @@ export async function POST(request) {
     // Build prompt
     let userPrompt;
     switch (dosType) {
-      case "role":
-        const roleText = buildRoleText(null, jd);
-        let roleFacts = await extractRoleFacts(roleText);
-        if (!roleFacts || roleFacts.length === 0) {
-          const fallback = roleText.split("\n\n").filter(Boolean);
-          roleFacts = fallback.length > 0 ? fallback : [];
-        }
-        const roleFactStr = roleFacts.length > 0 ? roleFacts.map((f) => `- ${f}`).join("\n") : "";
-        userPrompt = buildRolePrompt(rName, cName || "", roleFactStr, jd, "");
-        break;
       case "jd":
         const jdText = buildJDText(jd, companyResearch, null);
         let jdFacts = await extractJDFacts(jdText);
