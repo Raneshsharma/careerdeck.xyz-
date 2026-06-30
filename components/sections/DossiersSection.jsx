@@ -197,7 +197,7 @@ export default function DossiersSection() {
           >
             Generate Your First Dossier &rarr;
           </Link>
-          <p className="mt-3 text-sm text-slate-500">Takes 90 seconds. No signup required.</p>
+          <p className="mt-3 text-sm text-slate-500">Takes 90 seconds. Free account includes 3 dossiers/month.</p>
         </NonReversingReveal>
       </div>
     </section>

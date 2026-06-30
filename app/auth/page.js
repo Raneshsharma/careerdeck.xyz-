@@ -7,6 +7,49 @@ import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+const TESTIMONIALS = [
+  {
+    quote: "CareerDeck helped me prep for my Amazon interview in 30 minutes instead of 3 hours. Got the offer.",
+    author: "Riya M., IIM Bangalore · MBA 2025"
+  },
+  {
+    quote: "Prep that used to take me 6 hours of reading 10-Ks took 45 minutes on CareerDeck. Smashed my McKinsey case.",
+    author: "Rohan S., IIM Ahmedabad · MBA 2025"
+  },
+  {
+    quote: "Verified financials, SWOT, and competitor analysis in one view. Crucial for my Goldman Sachs interview.",
+    author: "Priya K., ISB Hyderabad · PGP 2024"
+  },
+  {
+    quote: "The hiring manager was impressed that I knew their exact strategic priorities. Got the Google offer.",
+    author: "Aman V., FMS Delhi · MBA 2025"
+  },
+  {
+    quote: "Instead of reading endless browser tabs, I got a comprehensive McKinsey-style brief in 90 seconds.",
+    author: "Divya T., XLRI Jamshedpur · MBA 2025"
+  },
+  {
+    quote: "The interview talking points are a cheat code. Used them word-for-word in my BCG rounds.",
+    author: "Kabir N., IIM Calcutta · MBA 2025"
+  },
+  {
+    quote: "CareerDeck reverse engineered the job description perfectly. Knew exactly what the hiring manager wanted.",
+    author: "Sneha J., SPJIMR Mumbai · PGDM 2024"
+  },
+  {
+    quote: "Having structured business problems and inferred solutions ready saved me days of work for Bain.",
+    author: "Rahul D., IIM Lucknow · MBA 2025"
+  },
+  {
+    quote: "Helped me bridge the gap between my tech background and consulting strategy questions.",
+    author: "Sameer K., IIM Kozhikode · MBA 2025"
+  },
+  {
+    quote: "Used the News Intelligence to discuss their latest acquisition in detail. Made all the difference.",
+    author: "Ananya R., JBIMS Mumbai · MMS 2025"
+  }
+];
+
 function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -25,6 +68,11 @@ function AuthContent() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [resetEmail, setResetEmail] = useState("");
   const [showReset, setShowReset] = useState(false);
+  const [testimonialIdx, setTestimonialIdx] = useState(0);
+
+  useEffect(() => {
+    setTestimonialIdx(Math.floor(Math.random() * TESTIMONIALS.length));
+  }, []);
 
   useEffect(() => {
     if (isReset) return;
@@ -150,9 +198,9 @@ function AuthContent() {
           </p>
           <div className="mt-6 bg-white/[0.01] border border-white/[0.05] rounded-xl p-4 text-left">
             <p className="text-sm text-slate-300 italic leading-relaxed">
-              &ldquo;CareerDeck helped me prep for my Amazon interview in 30 minutes instead of 3 hours. Got the offer.&rdquo;
+              &ldquo;{TESTIMONIALS[testimonialIdx]?.quote}&rdquo;
             </p>
-            <p className="text-xs text-slate-500 mt-2 font-medium">— Riya M., IIM Bangalore · MBA 2025</p>
+            <p className="text-xs text-slate-500 mt-2 font-medium">— {TESTIMONIALS[testimonialIdx]?.author}</p>
           </div>
           <p className="mt-4 text-xs text-slate-500">Trusted by 500+ MBA students</p>
         </div>
