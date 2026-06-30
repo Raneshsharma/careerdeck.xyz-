@@ -5,6 +5,64 @@ import { CacheManager } from "../../cache/cacheManager";
 import { CacheLevel } from "../../cache/types";
 import { getSectionDependency } from "../../cache/dependencyMap";
 
+function getScopedCoreFacts(sectionId: string, cf: any): Record<string, any> {
+  if (!cf) return {};
+
+  const isFinancialOrMoat = ["financials", "strategy", "competitors", "moat"].includes(sectionId);
+  const isPeopleOrCulture = ["culture", "employeeInsights", "interviewQuestions", "interviewPlaybook"].includes(sectionId);
+
+  if (isFinancialOrMoat) {
+    return {
+      brandStrength: cf.brandStrength,
+      scaleAdvantage: cf.scaleAdvantage,
+      switchingCosts: cf.switchingCosts,
+      networkEffects: cf.networkEffects,
+      moatSummary: cf.moatSummary,
+      revenue: cf.revenue,
+      revenueGrowth: cf.revenueGrowth ?? null,
+      netIncome: cf.netIncome ?? null,
+      ebitda: cf.ebitda ?? null,
+      freeCashFlow: cf.freeCashFlow ?? null,
+      marketCap: cf.marketCap,
+      employees: cf.employees,
+      asOfTimestamp: cf.asOfTimestamp ?? null,
+      businessModel: cf.businessModel,
+      namedProducts: cf.namedProducts,
+      namedBrands: cf.namedBrands,
+      careersValues: cf.careersValues,
+      leadershipPrinciples: cf.leadershipPrinciples,
+      interviewExperiences: cf.interviewExperiences,
+      workStyleTrends: cf.workStyleTrends,
+    };
+  }
+
+  if (isPeopleOrCulture) {
+    return {
+      companyName: cf.companyName,
+      employees: cf.employees,
+      asOfTimestamp: cf.asOfTimestamp ?? null,
+      careersValues: cf.careersValues,
+      leadershipPrinciples: cf.leadershipPrinciples,
+      interviewExperiences: cf.interviewExperiences,
+      workStyleTrends: cf.workStyleTrends,
+      employeeInsights: cf.employeeInsights,
+    };
+  }
+
+  return {
+    companyName: cf.companyName,
+    moatSummary: cf.moatSummary,
+    revenue: cf.revenue,
+    revenueGrowth: cf.revenueGrowth ?? null,
+    marketCap: cf.marketCap,
+    employees: cf.employees,
+    asOfTimestamp: cf.asOfTimestamp ?? null,
+    businessModel: cf.businessModel,
+    namedProducts: cf.namedProducts,
+    namedBrands: cf.namedBrands,
+  };
+}
+
 interface SectionPrompt {
   SECTION_ID: string;
   buildPrompt: (
@@ -68,24 +126,11 @@ export function createSectionGenerator(prompt: SectionPrompt) {
 
     // Enrich prompts with CoreFacts (authoritative knowledge graph)
     const coreFactsSuffix = state.coreFacts
-      ? `\n\nCORE FACTS (authoritative knowledge graph — sections MUST NOT contradict these):\n${JSON.stringify({
-          brandStrength: state.coreFacts.brandStrength,
-          scaleAdvantage: state.coreFacts.scaleAdvantage,
-          switchingCosts: state.coreFacts.switchingCosts,
-          networkEffects: state.coreFacts.networkEffects,
-          moatSummary: state.coreFacts.moatSummary,
-          revenue: state.coreFacts.revenue,
-          revenueGrowth: (state.coreFacts as any).revenueGrowth ?? null,
-          netIncome: (state.coreFacts as any).netIncome ?? null,
-          ebitda: (state.coreFacts as any).ebitda ?? null,
-          freeCashFlow: (state.coreFacts as any).freeCashFlow ?? null,
-          marketCap: state.coreFacts.marketCap,
-          employees: state.coreFacts.employees,
-          asOfTimestamp: (state.coreFacts as any).asOfTimestamp ?? null,
-          businessModel: state.coreFacts.businessModel,
-          namedProducts: state.coreFacts.namedProducts,
-          namedBrands: state.coreFacts.namedBrands,
-        }, null, 2)}`
+      ? `\n\nCORE FACTS (authoritative knowledge graph — sections MUST NOT contradict these):\n${JSON.stringify(
+          getScopedCoreFacts(prompt.SECTION_ID, state.coreFacts),
+          null,
+          2
+        )}`
       : "";
 
     const confidenceSuffix = `\n\nCONFIDENCE-AWARE WRITING RULES:

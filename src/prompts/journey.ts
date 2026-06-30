@@ -78,75 +78,7 @@ OUTPUT ONLY valid JSON:
 EVIDENCE RULE: Every milestone must have at least one KB or news reference.
 NULL RULE: No evidence = skip the milestone. Never fabricate dates or events.`;
 
-export function buildAnalystPrompt(
-  knowledge: CompanyKnowledgeBase,
-  companyName: string,
-  _role?: string | undefined,
-): { systemPrompt: string; userPrompt: string } {
-  const kb = JSON.stringify(
-    {
-      history: knowledge.history,
-      company: knowledge.company,
-      business: knowledge.business,
-      products: knowledge.products,
-      leadership: { ceo: knowledge.leadership?.ceo?.value ?? null, founders: knowledge.leadership?.founders?.value ?? null },
-      financials: knowledge.financials
-        ? { revenue: knowledge.financials.revenue?.value, marketCap: knowledge.financials.marketCap?.value }
-        : null,
-      recentNews: knowledge.news?.slice(0, 10).map((n) => ({
-        title: n.title,
-        date: n.publishedDate,
-        category: n.category,
-      })) ?? [],
-    },
-    null,
-    2,
-  );
-
-  return { systemPrompt: ANALYST_SYSTEM_PROMPT, userPrompt: `Identify and score strategic milestones for ${companyName}.\n\nKB:\n${kb}\n\nReturn ONLY the JSON. Only top 5-8 highest-impact milestones.` };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// PASS 2 — Executive Writer: scored milestones → strategic journey prose
-// ═══════════════════════════════════════════════════════════════════════════
-
-const WRITER_SYSTEM_PROMPT = `You are a McKinsey Corporate Strategy Consultant writing a company journey analysis.
-You receive a scored milestone analysis (JSON). Write a strategic journey narrative from it.
-
-RULES:
-1. Use every non-null field. Focus ONLY on high-impact milestones (total_impact top 3-5).
-2. Do NOT narrate a timeline. Interpret events — what changed, why, business impact, long-term significance.
-3. Every event mentioned must be followed by WHY it mattered and HOW it changed the company.
-4. No bullet points. No chronological lists. No "in Year X, the company launched Y" without strategic interpretation.
-5. If a sentence could describe another company, delete and rewrite.
-
-FORBIDDEN STATEMENTS:
-- "launched Product X in 2015" — without explaining why it mattered
-- "expanded to Country Y" — without connecting to competitive positioning
-- "had strong growth" / "was a success" — without evidence of impact
-- Never create a timeline. Always explain business significance.
-
-STRUCTURE:
-## 5. Company Journey
-
-[Para 1 — Founding Purpose (2-3 sentences)]: Why was the company created? What market gap or problem did it address? What was the founder's vision? Connect the founding purpose to what the company is today.
-
-[Para 2-3 — Strategic Phases (3-5 sentences each)]: DON'T write chronologically. Organize around STRATEGIC TRANSFORMATIONS: Phase 1 — Founding & initial market, Phase 2 — Scaling nationally, Phase 3 — Business model pivot or platform expansion, Phase 4 — New business line or IPO, Phase 5 — Current strategic direction. Each phase: what changed, WHY it was a strategic shift, and what it enabled. Only cover the highest-impact milestones.
-
-[Para 4 — Business Evolution (3-4 sentences)]: How has the business model changed over time? What key transitions occurred? Products→Platform, Hardware→Services, Domestic→Global? Explain WHY each shift mattered strategically, not just that it happened.
-
-[Para 5 — Challenges + Lessons (2-3 sentences)]: What major challenge tested the company? How did management respond? What does that response reveal about the company's decision-making? What strategic lessons emerge?
-
-[Para 6 — Strategic Insight (2-3 sentences)]: How did these strategic phases collectively shape the company's current competitive position? The single most important strategic lesson from this journey. End with why understanding this evolution matters for someone interviewing. **Executive Insight:** [one-sentence takeaway].
-
-QUALITY CHECK: ✓ Founding purpose connected to present ✓ Top milestones with WHY ✓ Business evolution explained ✓ Challenges with response analyzed ✓ Strategic lessons ✓ Competitive position connection ✓ No timeline narrative ✓ No bullet points
-SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.
-Output only the polished markdown.`;
-
-export function buildWriterPrompt(analysis: Record<string, unknown>, companyName: string, _role?: string | undefined): { systemPrompt: string; userPrompt: string } {
-  const rc = _role ? `Candidate role: ${_role}. Connect the insight to this role.` : "";
-  return { systemPrompt: WRITER_SYSTEM_PROMPT, userPrompt: `Write the Company Journey analysis for ${companyName}.\n\nMILESTONE ANALYSIS:\n${JSON.stringify(analysis, null, 2)}\n${rc}\n\nStrategic narrative — no timeline, no bullet points. Focus on highest-impact milestones.` };
-}
+// Two-pass prompts removed for single-pass optimization
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Legacy fallback

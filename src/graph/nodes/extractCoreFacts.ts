@@ -72,10 +72,33 @@ function compileRawResearchText(research: AssembledResearch | undefined): string
     parts.push(`--- Wikipedia ---\n${research.wikipedia.extract}`);
   }
   if (research.yahooFinance) {
-    parts.push(`--- Yahoo Finance ---\n${JSON.stringify(research.yahooFinance, null, 2)}`);
+    const y = research.yahooFinance as any;
+    const cleanYahoo = {
+      symbol: y.symbol,
+      shortName: y.price?.shortName,
+      longBusinessSummary: y.summaryProfile?.longBusinessSummary,
+      sector: y.summaryProfile?.sector,
+      industry: y.summaryProfile?.industry,
+      fullTimeEmployees: y.summaryProfile?.fullTimeEmployees,
+      financials: {
+        totalRevenue: y.financialData?.totalRevenue,
+        revenueGrowth: y.financialData?.revenueGrowth,
+        ebitda: y.financialData?.ebitda,
+        freeCashFlow: y.financialData?.freeCashFlow,
+        netIncome: y.defaultKeyStatistics?.netIncomeToCommon || y.financialData?.netIncome,
+        marketCap: y.price?.marketCap || y.defaultKeyStatistics?.marketCap,
+      }
+    };
+    parts.push(`--- Yahoo Finance ---\n${JSON.stringify(cleanYahoo, null, 2)}`);
   }
   if (research.googleFinance) {
-    parts.push(`--- Google Finance ---\n${JSON.stringify(research.googleFinance, null, 2)}`);
+    const gf = research.googleFinance as any;
+    const cleanGF = {
+      summary: gf.summary,
+      financials: gf.financials,
+      stats: gf.stats,
+    };
+    parts.push(`--- Google Finance ---\n${JSON.stringify(cleanGF, null, 2)}`);
   }
   if (research.google?.items) {
     parts.push(`--- Google Search Snippets ---\n${research.google.items.map(i => `${i.title}: ${i.snippet}`).join("\n")}`);
@@ -85,7 +108,7 @@ function compileRawResearchText(research: AssembledResearch | undefined): string
   }
   if (research.website?.pages) {
     const pageTexts = Object.entries(research.website.pages)
-      .map(([name, page]) => `Page: ${name}\n${page.textContent?.slice(0, 1500) ?? ""}`);
+      .map(([name, page]) => `Page: ${name}\n${page.textContent?.slice(0, 1000) ?? ""}`);
     parts.push(`--- Website Pages ---\n${pageTexts.join("\n\n")}`);
   }
   if (research.gnews?.articles) {

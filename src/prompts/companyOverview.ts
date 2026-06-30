@@ -80,37 +80,7 @@ OUTPUT ONLY valid JSON:
   }
 }`;
 
-export function buildAnalystPrompt(
-  knowledge: CompanyKnowledgeBase,
-  companyName: string,
-  _role?: string | undefined,
-): { systemPrompt: string; userPrompt: string } {
-  const kb = JSON.stringify(
-    {
-      company: knowledge.company,
-      leadership: knowledge.leadership,
-      financials: knowledge.financials,
-      history: knowledge.history,
-      business: knowledge.business,
-      products: knowledge.products,
-      mission: knowledge.mission,
-      website: knowledge.website,
-      recentNews: knowledge.news?.slice(0, 5).map((n) => n.title) ?? [],
-    },
-    null,
-    2,
-  );
-
-  return {
-    systemPrompt: ANALYST_SYSTEM_PROMPT,
-    userPrompt: `Analyze ${companyName}.
-
-KB:
-${kb}
-
-Return ONLY the JSON.`,
-  };
-}
+// buildAnalystPrompt removed for single-pass optimization
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PASS 2 — Executive Writer: structured analysis → polished executive briefing
@@ -254,18 +224,7 @@ YOUR ANALYSIS (use every non-null field):
 
 `;
 
-export function buildWriterPrompt(
-  analysis: Record<string, unknown>,
-  companyName: string,
-  _role?: string | undefined,
-): { systemPrompt: string; userPrompt: string } {
-  return {
-    systemPrompt: WRITER_SYSTEM_PROMPT,
-    userPrompt: `${WRITER_USER_PREAMBLE}${JSON.stringify(analysis, null, 2)}
-
-Write the briefing for ${companyName}.`,
-  };
-}
+// buildWriterPrompt removed for single-pass optimization
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Legacy single-pass fallback

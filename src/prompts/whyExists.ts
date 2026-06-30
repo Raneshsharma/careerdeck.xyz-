@@ -61,66 +61,7 @@ OUTPUT ONLY valid JSON:
 EVIDENCE RULE: Every claim must have KB field paths. No evidence = use null.
 NULL RULE: Never invent. Never copy verbatim without interpretation.`;
 
-export function buildAnalystPrompt(
-  knowledge: CompanyKnowledgeBase,
-  companyName: string,
-  _role?: string | undefined,
-): { systemPrompt: string; userPrompt: string } {
-  const kb = JSON.stringify(
-    {
-      mission: knowledge.mission,
-      company: knowledge.company,
-      history: knowledge.history,
-      business: knowledge.business,
-      products: knowledge.products,
-      leadership: { founders: knowledge.leadership?.founders?.value ?? null },
-      recentNews: knowledge.news?.slice(0, 5).map((n) => n.title) ?? [],
-    },
-    null,
-    2,
-  );
-
-  return { systemPrompt: ANALYST_SYSTEM_PROMPT, userPrompt: `Analyze why ${companyName} exists.\n\nKB:\n${kb}\n\nReturn ONLY the JSON.` };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// PASS 2 — Executive Writer: purpose analysis → strategic purpose prose
-// ═══════════════════════════════════════════════════════════════════════════
-
-const WRITER_SYSTEM_PROMPT = `You are a McKinsey Strategy Consultant writing a corporate purpose analysis.
-You receive a structured purpose analysis (JSON). Write a strategic purpose narrative from it.
-
-RULES:
-1. Use every non-null field. If null, skip — don't guess.
-2. Write analytically. Explain WHY the company exists, not what its mission statement says.
-3. No bullet points. No quoting slogans. No marketing language.
-4. Interpret purpose — don't just report it. Connect purpose to strategy.
-5. If a sentence could describe another company, delete and rewrite.
-
-FORBIDDEN STATEMENTS:
-- "the company's mission is..." / "the company aims to..." / "the company believes..." — without immediate interpretation
-- Never copy mission or vision verbatim. Explain what they mean in practice.
-- "makes the world a better place" / "improves lives" — without specific evidence of how
-
-STRUCTURE:
-## 2. Why It Exists
-
-[Para 1 — Founding Purpose (2-3 sentences)]: Why was the company originally established? What market gap or customer pain point did it address? What was the original objective? Connect the founding problem to the company's identity.
-
-[Para 2 — Current Purpose (3-4 sentences)]: What problem does the company solve TODAY? Describe in terms of customer outcomes — not what products it sells, but what the customer can do because of this company. Why do customers continue choosing it over alternatives? Name specific retention drivers from the analysis.
-
-[Para 3 — Evolution + Business Impact (3-4 sentences)]: How has the purpose shifted over time? Products→Solutions? Domestic→Global? Hardware→Services? Explain WHY the evolution occurred. How does purpose influence actual business decisions — innovation, investments, hiring, customer experience?
-
-[Para 4 — Differentiation + Strategic Insight (2-3 sentences)]: Why does this purpose matter in today's market? How does it differentiate the company? End with why understanding this matters for someone interviewing. **Executive Insight:** [one-sentence purpose takeaway].
-
-QUALITY CHECK: ✓ Founding purpose explained ✓ Current problem solved ✓ Purpose evolution with WHY ✓ Business decisions connected to purpose ✓ Differentiation ✓ Strategic insight ✓ No copied mission statements ✓ No bullet points ✓ No aspirational fluff
-SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.
-Output only the polished markdown.`;
-
-export function buildWriterPrompt(analysis: Record<string, unknown>, companyName: string, _role?: string | undefined): { systemPrompt: string; userPrompt: string } {
-  const rc = _role ? `Candidate role: ${_role}. Connect the insight to this role.` : "";
-  return { systemPrompt: WRITER_SYSTEM_PROMPT, userPrompt: `Write the "Why It Exists" analysis for ${companyName}.\n\nANALYSIS:\n${JSON.stringify(analysis, null, 2)}\n${rc}\n\nStrategic purpose prose — no bullet points, no copied mission statements.` };
-}
+// Two-pass prompts removed for single-pass optimization
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Legacy fallback
