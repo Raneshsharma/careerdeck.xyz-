@@ -2,12 +2,13 @@ import type { CompanyState, AssembledResearch } from "../state";
 import { generateSection } from "../../prompts/llm";
 import type { CoreFacts } from "../../knowledge/coreFactsExtractor";
 import type { CompanyKnowledgeBase } from "../../knowledge/types";
+import { researchGoogleCSE } from "../../research/google";
 
 const EXTRACTION_SYSTEM_PROMPT = `You are a McKinsey Strategy Analyst. Your task is to compile a Canonical Knowledge Graph of Core Facts for a company from the provided raw multi-source research text.
 
 CRITICAL INSTRUCTIONS:
-1. Extract ALL concrete metrics (Revenue, Market Cap, Employees, Founded Year, CEO name, founders, headquarters description). If they are in the text, extract them. Never invent them. If they are absent or unavailable, return null.
-2. For Revenue and Market Cap, return the raw numeric value (e.g. 150000000 for $150M), the currency code (e.g. "USD", "INR"), and the year if mentioned.
+1. Extract ALL concrete metrics (Revenue, Revenue Growth, EBITDA, Free Cash Flow, Market Cap, Employees, Founded Year, CEO name, founders, headquarters description). If they are in the text, extract them. Never invent them. If they are absent or unavailable, return null.
+2. For Revenue, EBITDA, Free Cash Flow, and Market Cap, return the raw numeric value (e.g. 150000000 for $150M), the currency code (e.g. "USD", "INR"), and the year if mentioned.
 3. Extract all named products, brands, and business segments.
 4. Assess the competitive advantages (Moat) using this scale:
    - Strong (score 7-10): Consistently verified across high-quality sources, clear structural barrier.
@@ -21,6 +22,7 @@ CRITICAL INSTRUCTIONS:
 7. Extract 3-5 verified strategic/operational weaknesses of the company (e.g. procurement dependence, low margin commodities, regulatory risk) for the "strategicWeaknesses" list. Do NOT include unknown placeholders.
 8. Extract employee review intelligence (Glassdoor, AmbitionBox, or news trends found in Google snippets) and populate the "employeeInsights" object with rating (e.g. "4.1"), pros, cons, and a short culture summary.
 9. Extract 5-10 company-specific or domain-specific key terms (e.g. "GCMMF", "cooperative", "milk union" for Amul; "Gigafactory", "FSD", "Autopilot" for Tesla) in the "domainTerminology" list.
+10. Identify the "asOfTimestamp" (e.g., "FY2024", "Q3 2025") representing when the most recent financial and scale metrics are current.
 
 Output ONLY valid JSON matching this exact structure:
 {
@@ -32,9 +34,13 @@ Output ONLY valid JSON matching this exact structure:
   "description": "Short strategic description...",
   "ceo": "CEO Name or null",
   "revenue": { "value": 123450000, "currency": "USD", "year": "2024" },
+  "revenueGrowth": "+15% or null",
+  "ebitda": { "value": 25000000, "currency": "USD" },
+  "freeCashFlow": { "value": 15000000, "currency": "USD" },
   "marketCap": { "value": 5432100000, "currency": "USD" },
   "employees": 12000,
   "operatingCountries": 5,
+  "asOfTimestamp": "FY2024 or null",
   "primaryRevenueDriver": "...",
   "businessModel": ["segment1", ...],
   "businessSegments": ["segment1", ...],
@@ -168,6 +174,20 @@ function enrichKnowledgeBase(kb: CompanyKnowledgeBase, cf: CoreFacts): CompanyKn
     };
   }
 
+  // Inject ebitda, fcf, growth, and asOfTimestamp
+  if (cf.revenueGrowth) {
+    (enriched.financials as any).revenueGrowth = { value: cf.revenueGrowth, sources: ["llm-extraction"], confidence: 1, last_verified: new Date().toISOString() };
+  }
+  if (cf.ebitda) {
+    (enriched.financials as any).ebitda = { value: cf.ebitda.value, currency: cf.ebitda.currency, sources: ["llm-extraction"], confidence: 1, last_verified: new Date().toISOString() };
+  }
+  if (cf.freeCashFlow) {
+    (enriched.financials as any).freeCashFlow = { value: cf.freeCashFlow.value, currency: cf.freeCashFlow.currency, sources: ["llm-extraction"], confidence: 1, last_verified: new Date().toISOString() };
+  }
+  if (cf.asOfTimestamp) {
+    (enriched as any).asOfTimestamp = cf.asOfTimestamp;
+  }
+
   // Inject strategic priorities, weaknesses, reviews, and domain terms
   if (cf.strategicPriorities) {
     (enriched as any).strategicPriorities = cf.strategicPriorities;
@@ -229,7 +249,37 @@ export async function extractCoreFactsNode(
       throw new Error("No JSON object found in core facts extraction response");
     }
 
-    const coreFacts: CoreFacts = JSON.parse(jsonMatch[0]);
+    let coreFacts: CoreFacts = JSON.parse(jsonMatch[0]);
+
+    // Self-healing re-fetch check
+    const isMissingFinancials =
+      !coreFacts.revenue?.value ||
+      !coreFacts.marketCap?.value ||
+      !coreFacts.employees;
+
+    if (isMissingFinancials) {
+      console.log(`[extractCoreFactsNode] Financial data missing for ${companyName}. Triggering targeted financial re-fetch...`);
+      const financialQueries = [
+        `${companyName} revenue net income EBITDA free cash flow 2024 OR 2023 OR 2025`,
+        `${companyName} market cap valuation shares outstanding`,
+        `${companyName} total employees count 2024 OR 2023 OR 2025`,
+        `${companyName} Glassdoor reviews ratings pros cons work culture`,
+      ];
+      const searchResult = await researchGoogleCSE(companyName, financialQueries);
+      if (searchResult && searchResult.success && searchResult.data) {
+        const reFetchText = searchResult.data.items.map(i => `${i.title}: ${i.snippet}`).join("\n");
+        const reFetchPrompt = `We are doing a targeted financial and employee insight re-fetch for "${companyName}" because some critical indicators were missing.\n\nHere is the new raw search evidence:\n${reFetchText}\n\nCombine this with the previous extraction:\n${JSON.stringify(coreFacts, null, 2)}\n\nUpdate the extraction and return the updated CoreFacts JSON matching the exact structure.`;
+        
+        const updateResponse = await generateSection(EXTRACTION_SYSTEM_PROMPT, reFetchPrompt);
+        const updateJsonMatch = updateResponse.match(/\{[\s\S]*\}/);
+        if (updateJsonMatch) {
+          const updatedCoreFacts = JSON.parse(updateJsonMatch[0]);
+          coreFacts = { ...coreFacts, ...updatedCoreFacts };
+          console.log(`[extractCoreFactsNode] Re-fetch complete. Revenue: ${coreFacts.revenue?.value}, Market Cap: ${coreFacts.marketCap?.value}, Employees: ${coreFacts.employees}`);
+        }
+      }
+    }
+
     coreFacts.extractedAt = new Date().toISOString();
 
     const currentKb = state.knowledge?.knowledgeBase;

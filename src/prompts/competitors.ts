@@ -17,9 +17,10 @@ CRITICAL RULES:
 - Be objective. Acknowledge where competitors are stronger — don't just praise the target company.
 
 COMPETITOR MATRIX — for each competitor, fill in:
-- Competes In: what area do they compete with the target company?
-- Stronger Than Company: where does this competitor have an advantage?
-- Weaker Than Company: where does the target company have an advantage?
+- Market Position: e.g. Market Leader | Challenger | Niche Player
+- Pricing: e.g. Premium | Value | Dynamic | Low-cost
+- Delivery Speed or Quality: e.g. Ultra-fast | Standard | Premium Service
+- Ecosystem: e.g. Super-app / Standalone / Integrated / Focus player
 - Strategic Threat Level: High | Medium | Low
 
 INTERNAL REASONING (do NOT expose):
@@ -39,9 +40,10 @@ OUTPUT ONLY valid JSON:
     {
       "name": "Competitor name",
       "type": "direct | indirect | emerging | substitute",
-      "competes_in": "Specific area of competition",
-      "stronger_than_company": "Where this competitor has an advantage",
-      "weaker_than_company": "Where the target company has an advantage",
+      "market_position": "Market Leader | Challenger | Niche Player",
+      "pricing": "Premium | Value | Dynamic | Low-cost",
+      "delivery_speed_or_quality": "Ultra-fast | Standard | Premium Service",
+      "ecosystem": "Super-app / Standalone / Integrated",
       "threat_level": "high | medium | low",
       "evidence": ["kb field paths or industry context"]
     }
@@ -119,10 +121,10 @@ STRUCTURE:
 [Para 1 — Competitive Landscape (2-3 sentences)]: Summarize the market structure. How concentrated or fragmented? What type of competition defines this market? Set the context for the competitors that follow.
 
 [COMPETITOR MATRIX TABLE — Insert this markdown table between Paras 1 and 2]:
-| Competitor | Delivery | Quick Commerce | Restaurant Discovery | Threat Level |
-|---|---|---|---|---|
-| [Name] | ✅/❌ | ✅/❌ | ✅/❌ | High/Med/Low |
-Map the competitor matrix from the analysis data. Choose the 3-4 most relevant competitive dimensions for this industry (not necessarily the example columns above). Use the actual dimensions from the analysis data.
+| Competitor | Market Position | Pricing | Delivery Speed / Quality | Ecosystem | Threat Level |
+|---|---|---|---|---|---|
+| [Name] | [e.g. Market Leader / Challenger] | [e.g. Premium / Value / Dynamic] | [e.g. Ultra-fast / Standard] | [e.g. Super-app / Standalone] | High/Med/Low |
+Map the competitor matrix from the analysis data. Ensure the matrix uses this exact set of columns.
 
 [Para 2 — Direct Competitors (3-4 sentences)]: Name the top direct competitors. For each, describe what they compete on, where they are stronger, where the target company is stronger. Refer to the competitor matrix table above. Don't just list — explain strategic implications.
 
@@ -158,6 +160,12 @@ RULES:
 
 STRUCTURE:
 ## 7. Competitor Analysis
+
+[COMPETITOR MATRIX TABLE — Insert this markdown table after Para 1]:
+| Competitor | Market Position | Pricing | Delivery Speed / Quality | Ecosystem | Threat Level |
+|---|---|---|---|---|---|
+| [Name] | [e.g. Market Leader / Challenger] | [e.g. Premium / Value / Dynamic] | [e.g. Ultra-fast / Standard] | [e.g. Super-app / Standalone] | High/Med/Low |
+
 [Para 1: Landscape — market structure, competition type]
 [Para 2: Direct competitors — who, what they compete on, where each is stronger]
 [Para 3: Indirect + emerging threats — where gaining ground, threat level]

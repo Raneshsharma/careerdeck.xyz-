@@ -16,7 +16,7 @@ async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response
   }
 }
 
-async function fetchGoogleResults(companyName: string): Promise<GoogleSearchResult> {
+async function fetchGoogleResults(companyName: string, queryOverride?: string[]): Promise<GoogleSearchResult> {
   const apiKey = process.env.GOOGLE_CSE_API_KEY;
   const cx = process.env.GOOGLE_CSE_ID;
   const serpApiKey = process.env.SERP_API_KEY;
@@ -25,7 +25,7 @@ async function fetchGoogleResults(companyName: string): Promise<GoogleSearchResu
     throw new Error("Neither Google CSE keys nor SerpAPI key is configured");
   }
 
-  const queries = [
+  const queries = queryOverride || [
     `${companyName} official website`,
     `${companyName} investor relations`,
     `${companyName} annual report`,
@@ -82,18 +82,20 @@ async function fetchGoogleResults(companyName: string): Promise<GoogleSearchResu
 
 export async function researchGoogleCSE(
   companyName: string,
+  queryOverride?: string[],
 ): Promise<ResearchEnvelope<GoogleSearchResult>> {
-  const cacheKey = ResearchCache.buildKey(companyName, SOURCE);
+  const cacheSuffix = queryOverride ? `_custom_${queryOverride.length}` : "";
+  const cacheKey = ResearchCache.buildKey(companyName + cacheSuffix, SOURCE);
   const cached = await ResearchCache.get(cacheKey);
   if (cached) {
-    ResearchLogger.cacheHit(SOURCE, companyName);
+    ResearchLogger.cacheHit(SOURCE, companyName + cacheSuffix);
     return cached as ResearchEnvelope<GoogleSearchResult>;
   }
 
-  const { logStart, startTime } = ResearchLogger.start(SOURCE, companyName);
+  const { logStart, startTime } = ResearchLogger.start(SOURCE, companyName + cacheSuffix);
 
   try {
-    const data = await withRetry(() => fetchGoogleResults(companyName), {
+    const data = await withRetry(() => fetchGoogleResults(companyName, queryOverride), {
       maxAttempts: 3,
       baseDelayMs: 1000,
     });

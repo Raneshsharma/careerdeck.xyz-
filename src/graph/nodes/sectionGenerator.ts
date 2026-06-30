@@ -75,13 +75,25 @@ export function createSectionGenerator(prompt: SectionPrompt) {
           networkEffects: state.coreFacts.networkEffects,
           moatSummary: state.coreFacts.moatSummary,
           revenue: state.coreFacts.revenue,
+          revenueGrowth: (state.coreFacts as any).revenueGrowth ?? null,
+          ebitda: (state.coreFacts as any).ebitda ?? null,
+          freeCashFlow: (state.coreFacts as any).freeCashFlow ?? null,
           marketCap: state.coreFacts.marketCap,
           employees: state.coreFacts.employees,
+          asOfTimestamp: (state.coreFacts as any).asOfTimestamp ?? null,
           businessModel: state.coreFacts.businessModel,
           namedProducts: state.coreFacts.namedProducts,
           namedBrands: state.coreFacts.namedBrands,
         }, null, 2)}`
       : "";
+
+    const confidenceSuffix = `\n\nCONFIDENCE-AWARE WRITING RULES:
+1. Classify information internally into three confidence tiers:
+   - VERIFIED: Directly supported by concrete numbers/dates (e.g. "Revenue of $2.3B in FY2024"). Present these as definitive facts.
+   - EVIDENCE-BACKED INFERENCE: Strategic conclusions derived from patterns (e.g. Swiggy has faster delivery times, suggesting..."). Use qualifying verbs ("indicates", "suggests", "implies", "appears to").
+   - HYPOTHESIS: Extrapolations from limited news snippets or proxy metrics. Use speculative qualifiers ("likely", "could be", "potentially").
+2. HISTORICAL VS CURRENT FOOTPRINT: For any international operations or scale descriptors, distinguish between past peaks (historical expansion) and current operational reality. Use terms like "historically operated in..." vs "currently operates in..." and ground with the asOfTimestamp if available.
+3. Keep the report trustworthy by never stating a hypothesis or inference as a verified fact.`;
 
     try {
       let content: string;
@@ -91,22 +103,22 @@ export function createSectionGenerator(prompt: SectionPrompt) {
           // ── Two-pass: Business Analyst → Executive Writer ──
           const { systemPrompt: analystSys, userPrompt: analystUser } =
             prompt.buildAnalystPrompt(knowledge, companyName, role);
-          const analystRaw = await generateSection(analystSys, analystUser + coreFactsSuffix);
+          const analystRaw = await generateSection(analystSys, analystUser + coreFactsSuffix + confidenceSuffix);
           const analysis = parseStructuredAnalysis(analystRaw);
 
           const { systemPrompt: writerSys, userPrompt: writerUser } =
             prompt.buildWriterPrompt(analysis, companyName, role);
-          content = await generateSection(writerSys, writerUser + coreFactsSuffix);
+          content = await generateSection(writerSys, writerUser + coreFactsSuffix + confidenceSuffix);
         } catch (twoPassError) {
           console.error(`${prompt.SECTION_ID}: two-pass failed, falling back to single-pass:`, twoPassError);
           // Fallback to legacy single-pass
           const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
-          content = await generateSection(systemPrompt, userPrompt + coreFactsSuffix);
+          content = await generateSection(systemPrompt, userPrompt + coreFactsSuffix + confidenceSuffix);
         }
       } else {
         // ── Legacy single-pass ──
         const { systemPrompt, userPrompt } = prompt.buildPrompt(knowledge, companyName, role);
-        content = await generateSection(systemPrompt, userPrompt + coreFactsSuffix);
+        content = await generateSection(systemPrompt, userPrompt + coreFactsSuffix + confidenceSuffix);
       }
 
       if (versionTag && content) {

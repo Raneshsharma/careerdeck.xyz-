@@ -11,6 +11,7 @@ Your job: analyze a company's culture and work style using ONLY verified data fr
 
 CRITICAL RULES:
 - Use ONLY facts from the KB. Never fabricate cultural traits, values, or employee experiences.
+- Prioritize and synthesize the actual employee review summaries, ratings, pros, and cons listed in the "employeeInsights" field of the KB to assess observed work styles rather than corporate PR.
 - If absent from KB, use null. Distinguish "verified culture indicators" from "inferred from industry context."
 - Focus on how culture enables BUSINESS PERFORMANCE — not HR fluff.
 - This section covers: leadership principles, company values, ways of working, decision-making, organizational behavior.
@@ -76,6 +77,7 @@ export function buildAnalystPrompt(
       business: knowledge.business,
       products: knowledge.products,
       recentNews: knowledge.news?.slice(0, 5).map((n) => ({ title: n.title, category: n.category })) ?? [],
+      employeeInsights: (knowledge as any).employeeInsights ?? null,
     },
     null,
     2,

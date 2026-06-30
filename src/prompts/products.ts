@@ -30,7 +30,7 @@ OUTPUT ONLY valid JSON:
 {
   "portfolio_overview": {
     "major_categories": [
-      { "name": "Category name", "description": "Strategic role", "business_function": "Acquisition | Engagement | Retention | Monetization | B2B Expansion", "key_products": ["product1 from KB or null"] }
+      { "name": "Category name", "description": "Strategic role", "business_function": "Core revenue engine | User acquisition | Engagement | Retention | Merchant monetization | B2B Expansion", "key_products": ["product1 from KB or null"] }
     ],
     "evidence": ["kb field paths"]
   },
@@ -116,6 +116,11 @@ FORBIDDEN STATEMENTS:
 STRUCTURE:
 ## 4. Products & Services
 
+[Strategic Product Role Matrix]: You MUST generate a Markdown table mapping major products/services to their strategic business roles. Use ONLY categories present in the analysis. Format:
+| Product / Service | Business Role | Strategic Description |
+| --- | --- | --- |
+| [Product name] | [Business Role, must be one of: Core revenue engine, User acquisition, Engagement, Retention, Merchant monetization, B2B Expansion] | [1-sentence strategic description of its function] |
+
 [Para 1 — Portfolio Overview (3-4 sentences)]: Major product/service categories — grouped strategically as an ECOSYSTEM, not a list. How they support each other. Which categories define the company's identity. Show how products interlock: Core product → Customer acquisition, Secondary product → Higher frequency, Subscription/ecosystem → Retention, Enterprise services → Revenue diversification.
 
 [Para 2 — Revenue-Driving Products (3-4 sentences)]: Which products/services contribute most to the business. Primary and secondary revenue drivers. Which have highest margins. Explain WHY, not just what.
@@ -149,6 +154,12 @@ RULES:
 
 STRUCTURE:
 ## 4. Products & Services
+
+[Strategic Product Role Matrix]: You MUST generate a Markdown table mapping major products/services to their strategic business roles. Format:
+| Product / Service | Business Role | Strategic Description |
+| --- | --- | --- |
+| [Product name] | [Business Role, e.g. Core revenue engine, User acquisition, Engagement, Retention, Merchant monetization, B2B Expansion] | [1-sentence strategic description of its function] |
+
 [Para 1: Portfolio overview — strategic categories, not a list]
 [Para 2: Revenue drivers — primary and secondary, highest-margin]
 [Para 3: Customer segments + strategic role — who buys, ecosystem effects]
