@@ -42,16 +42,16 @@ INTERNAL REASONING (do NOT expose):
 OUTPUT ONLY valid JSON:
 {
   "moat_scores": {
-    "brand": { "score": 9, "why": "Evidence-based explanation of the score", "evidence": ["kb field paths"] },
-    "network_effects": { "score": null, "why": "Unknown — insufficient evidence in the provided Knowledge Base", "evidence": [] },
-    "switching_costs": { "score": 8, "why": "...", "evidence": [] },
-    "cost_advantage": { "score": null, "why": "...", "evidence": [] },
-    "scale": { "score": 7, "why": "...", "evidence": [] },
-    "technology": { "score": null, "why": "...", "evidence": [] },
-    "intellectual_property": { "score": null, "why": "...", "evidence": [] },
-    "distribution": { "score": null, "why": "...", "evidence": [] },
-    "data": { "score": null, "why": "...", "evidence": [] },
-    "regulatory": { "score": null, "why": "...", "evidence": [] }
+    "brand": { "score": 9, "why": "Evidence-based explanation of the score", "why_bullets": ["bullet 1 explaining why", "bullet 2"], "evidence": ["kb field paths"] },
+    "network_effects": { "score": null, "why": "Unknown — insufficient evidence in the provided Knowledge Base", "why_bullets": [], "evidence": [] },
+    "switching_costs": { "score": 8, "why": "...", "why_bullets": ["..."], "evidence": [] },
+    "cost_advantage": { "score": null, "why": "...", "why_bullets": [], "evidence": [] },
+    "scale": { "score": 7, "why": "...", "why_bullets": ["..."], "evidence": [] },
+    "technology": { "score": null, "why": "...", "why_bullets": [], "evidence": [] },
+    "intellectual_property": { "score": null, "why": "...", "why_bullets": [], "evidence": [] },
+    "distribution": { "score": null, "why": "...", "why_bullets": [], "evidence": [] },
+    "data": { "score": null, "why": "...", "why_bullets": [], "evidence": [] },
+    "regulatory": { "score": null, "why": "...", "why_bullets": [], "evidence": [] }
   },
   "core_moats": ["Top 2-3 categories with highest scores"],
   "temporary_advantages": ["Advantages competitors could replicate within 3-5 years"],
@@ -108,9 +108,10 @@ RULES:
 1. For categories with score > 0: write analytically, explaining why the advantage exists and why it is difficult to replicate.
 2. For categories with score null (Unknown): explicitly state that the evidence in the provided materials is currently insufficient to verify the strength of this competitive dimension. Do NOT assert that the company has a weak moat or lacks the advantage. Never invent weaknesses for unknown categories.
 3. For categories with score < 0: explain it as a verified strategic vulnerability or competitive headwind.
-4. No marketing language. No bullet points. No SWOT-style lists.
-5. Distinguish DURABLE moats (score 7+, strengthen over time) from TEMPORARY advantages (score 4-6, competitors can replicate).
-6. If a sentence could describe another company, delete and rewrite.
+4. No marketing language. No bullet points in the Moat Overview, Moat Reinforcement, Threats, or Strategic Insight sections.
+5. In the Core Moats section, you MUST format the score and rationale bullets exactly as structured below.
+6. Distinguish DURABLE moats (score 7+, strengthen over time) from TEMPORARY advantages (score 4-6, competitors can replicate).
+7. If a sentence could describe another company, delete and rewrite.
 
 FORBIDDEN STATEMENTS:
 - "has a strong brand" / "has loyal customers" / "is a market leader" — explain WHY, with evidence
@@ -123,11 +124,16 @@ STRUCTURE:
 
 [Para 1 — Moat Overview (2-3 sentences)]: Summarize the company's overall competitive position. Which categories define its moat? What is the overall durability assessment? Connect to the business model — the moat should explain why the business model works.
 
-[Para 2-3 — Core Moats (3-5 sentences each)]: Explain the top 2-3 highest-scoring categories in detail. For each:
-- What the advantage IS (name the category)
-- WHY it is difficult to replicate (the mechanism — not just "they have a strong brand" but WHAT makes the brand powerful)
-- Supporting evidence from the analysis
-- Business impact — what does this advantage enable? Premium pricing? Lower churn? Market share dominance?
+[Core Moats Section — top 2-3 highest-scoring categories]: For each of the core moats, output exactly:
+### [Moat Category Name] (Score: X/10)
+
+**Why?**
+- [Bullet 1 explaining the score from the why_bullets array]
+- [Bullet 2 explaining the score from the why_bullets array]
+- [Bullet 3 explaining the score from the why_bullets array]
+
+**Analysis**:
+[2-3 sentences of strategic consultant-grade prose explaining the mechanism, evidence, and business impact. No bullet points in this paragraph.]
 
 [Para 4 — Moat Reinforcement (2-3 sentences)]: How does the company actively strengthen its competitive position? Acquisitions, R&D investment, platform expansion, vertical integration, partnerships. Connect to evidence from the analysis.
 
@@ -135,7 +141,7 @@ STRUCTURE:
 
 [Para 6 — Strategic Insight (2-3 sentences)]: The single most important competitive takeaway. How durable is this moat over 5-10 years? End with why understanding these competitive advantages matters for someone interviewing at the company. **Executive Insight:** [one-sentence takeaway].
 
-QUALITY CHECK: ✓ Top moats named with scores ✓ Why-they-work explained per moat ✓ Durable vs temporary distinguished ✓ Reinforcement mechanisms ✓ Threats assessed ✓ Evolution discussed ✓ Strategic insight ✓ No bullet points ✓ No unsupported claims
+QUALITY CHECK: ✓ Top moats named with scores and rationale bullets ✓ Why-they-work explained per moat ✓ Durable vs temporary distinguished ✓ Reinforcement mechanisms ✓ Threats assessed ✓ Evolution discussed ✓ Strategic insight ✓ No bullet points in prose paragraphs ✓ No unsupported claims
 SELF-EVALUATION (internal): all dimensions 9+/10 or rewrite once.
 Output only the polished markdown.`;
 

@@ -14,9 +14,13 @@ CRITICAL INSTRUCTIONS:
    - Moderate (score 4-6): Supported by some evidence, but replicable or limited.
    - Weak (score 1-3): Clear evidence of structural weakness or commodity status.
    - Unknown (score null): NO evidence exists in the text. Return null for the score. Do NOT return 0.
+   - For each moat score, provide a "rationale" list of 3-5 specific facts or evidence bullets that justify the score (e.g. "Supercharger network with 50k+ stalls").
 5. Distinguish between 'Weak' (evidence shows high churn, low pricing power, high competition) and 'Unknown' (absence of evidence in the text).
    - If a dimension is Unknown, the assessment MUST state 'Unknown - insufficient evidence in the source material.'
-6. Extract the top 3-5 strategic priorities of the company (e.g. AI initiatives, product expansions, market pivots) and return them in the "strategicPriorities" list.
+6. Extract the top 3-5 strategic priorities of the company.
+7. Extract 3-5 verified strategic/operational weaknesses of the company (e.g. procurement dependence, low margin commodities, regulatory risk) for the "strategicWeaknesses" list. Do NOT include unknown placeholders.
+8. Extract employee review intelligence (Glassdoor, AmbitionBox, or news trends found in Google snippets) and populate the "employeeInsights" object with rating (e.g. "4.1"), pros, cons, and a short culture summary.
+9. Extract 5-10 company-specific or domain-specific key terms (e.g. "GCMMF", "cooperative", "milk union" for Amul; "Gigafactory", "FSD", "Autopilot" for Tesla) in the "domainTerminology" list.
 
 Output ONLY valid JSON matching this exact structure:
 {
@@ -36,12 +40,15 @@ Output ONLY valid JSON matching this exact structure:
   "businessSegments": ["segment1", ...],
   "namedProducts": ["product1", ...],
   "namedBrands": ["brand1", ...],
-  "brandStrength": { "score": 8, "assessment": "Detailed McKinsey-style assessment..." },
-  "scaleAdvantage": { "score": 6, "assessment": "..." },
-  "switchingCosts": { "score": null, "assessment": "Unknown — insufficient evidence in the source material." },
-  "networkEffects": { "score": null, "assessment": "Unknown — insufficient evidence in the source material." },
+  "brandStrength": { "score": 8, "assessment": "Detailed McKinsey-style assessment...", "rationale": ["bullet 1", "bullet 2"] },
+  "scaleAdvantage": { "score": 6, "assessment": "...", "rationale": [] },
+  "switchingCosts": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
+  "networkEffects": { "score": null, "assessment": "Unknown — insufficient evidence in the source material.", "rationale": [] },
   "moatSummary": "One-sentence competitive strategy summary",
   "strategicPriorities": ["priority1", "priority2", ...],
+  "strategicWeaknesses": ["weakness1", "weakness2", ...],
+  "employeeInsights": { "rating": "4.2", "pros": ["Pro 1", ...], "cons": ["Con 1", ...], "cultureSummary": "Culture details..." },
+  "domainTerminology": ["Term 1", "Term 2", ...],
   "recentMilestones": ["milestone1", ...],
   "evidenceSources": ["wikipedia", "yahoo", ...]
 }`;
@@ -161,29 +168,42 @@ function enrichKnowledgeBase(kb: CompanyKnowledgeBase, cf: CoreFacts): CompanyKn
     };
   }
 
-  // Inject strategic priorities
+  // Inject strategic priorities, weaknesses, reviews, and domain terms
   if (cf.strategicPriorities) {
     (enriched as any).strategicPriorities = cf.strategicPriorities;
+  }
+  if (cf.strategicWeaknesses) {
+    (enriched as any).strategicWeaknesses = cf.strategicWeaknesses;
+  }
+  if (cf.employeeInsights) {
+    (enriched as any).employeeInsights = cf.employeeInsights;
+  }
+  if (cf.domainTerminology) {
+    (enriched as any).domainTerminology = cf.domainTerminology;
   }
 
   // Map competitive advantage (Moat) scores
   enriched.competitive_advantage = {
     brand: {
       confidence: cf.brandStrength.score !== null ? cf.brandStrength.score / 10 : 0,
-      assessment: cf.brandStrength.assessment
-    },
+      assessment: cf.brandStrength.assessment,
+      rationale: cf.brandStrength.rationale
+    } as any,
     scale: {
       confidence: cf.scaleAdvantage.score !== null ? cf.scaleAdvantage.score / 10 : 0,
-      assessment: cf.scaleAdvantage.assessment
-    },
+      assessment: cf.scaleAdvantage.assessment,
+      rationale: cf.scaleAdvantage.rationale
+    } as any,
     switching_costs: {
       confidence: cf.switchingCosts.score !== null ? cf.switchingCosts.score / 10 : 0,
-      assessment: cf.switchingCosts.assessment
-    },
+      assessment: cf.switchingCosts.assessment,
+      rationale: cf.switchingCosts.rationale
+    } as any,
     network_effects: {
       confidence: cf.networkEffects.score !== null ? cf.networkEffects.score / 10 : 0,
-      assessment: cf.networkEffects.assessment
-    }
+      assessment: cf.networkEffects.assessment,
+      rationale: cf.networkEffects.rationale
+    } as any
   };
 
   return enriched;

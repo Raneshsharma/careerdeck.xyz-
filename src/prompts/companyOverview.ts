@@ -133,7 +133,7 @@ Every paragraph MUST contain at least ONE specific company fact.
 Specific facts include:
 - Revenue (with year if available)
 - Market cap (with date if available)
-- Employees
+- Employees (Note: For cooperative organizations, distinguish member farmers/producers from direct corporate employees; do NOT refer to cooperative members/farmers as employees).
 - Countries of operation
 - Named products (use EXACT product, service, or segment name)
 - Named business segments
@@ -279,7 +279,7 @@ RULES:
 3. If a sentence could describe another company, delete it.
 4. Do NOT write "Role Connection:" as a tagged line. End with a concluding strategic insight instead.
 
-CRITICAL: Every paragraph MUST contain at least ONE specific company fact (revenue, market cap, employees, countries, named products, named segments, installed base, subscribers, acquisitions, technologies, customer count).
+CRITICAL: Every paragraph MUST contain at least ONE specific company fact (revenue, market cap, employees, countries, named products, named segments, installed base, subscribers, acquisitions, technologies, customer count). Note: For cooperative organizations, distinguish member farmers/producers from direct corporate employees; do NOT refer to cooperative members/farmers as employees.
 
 PRODUCT NAMING: Always use the EXACT product, service, or segment name.
 Bad: "consumer electronics" → Good: "iPhone"

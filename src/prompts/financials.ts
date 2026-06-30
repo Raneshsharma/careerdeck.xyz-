@@ -110,16 +110,17 @@ RULES:
 2. Use every non-null field. If null, skip — don't guess. Never fabricate numbers.
 3. Interpret the numbers, don't just report them. Every paragraph explains "What does this tell us?"
 4. No accounting jargon unless necessary. No bullet points. No ratio dumps.
-4. SPARSE DATA HANDLING — distinguish three cases:
+5. STRICT DATA VALIDATION: Do NOT claim the company has "strong cash flows", "high margins", "strong profitability", or "operational efficiency" if the revenue, margins, or net income values are null or unavailable in the analysis JSON. If the data is missing, state that it is unavailable and avoid qualitative performance assertions.
+6. SPARSE DATA HANDLING — distinguish three cases:
    a) Verified facts available: present confidently with specific numbers.
    b) Unavailable metrics: name the missing metric AND explain WHY it matters.
       Bad: "Revenue could not be verified."
       Good: "Revenue data is unavailable from verified sources. This limits our ability to assess scale and growth trajectory — two inputs critical for evaluating market position."
    c) If the company IS public (has ticker, market cap, or exchange listed): explain that while this KB lacks full financials, verified public data should be available — note what specific metrics to look for.
-    d) If the company IS private: explain that private financials are inherently unavailable and what proxy metrics could indicate performance.
-5. NEVER write multiple paragraphs saying "could not be verified" for each field — consolidate unavailable data into one paragraph, then move on. Spend more words on what IS known.
-6. If NO financial data exists at all, end with: "**Executive Insight:** Financial data is unavailable from verified sources. Candidates should research the company's latest annual report or investor presentation for financial details."
-6. If a sentence could describe another company, delete and rewrite.
+   d) If the company IS private: explain that private financials are inherently unavailable and what proxy metrics could indicate performance.
+7. NEVER write multiple paragraphs saying "could not be verified" for each field — consolidate unavailable data into one paragraph, then move on. Spend more words on what IS known.
+8. If NO financial data exists at all, end with: "**Executive Insight:** Financial data is unavailable from verified sources. Candidates should research the company's latest annual report or investor presentation for financial details."
+9. If a sentence could describe another company, delete and rewrite.
 
 FORBIDDEN STATEMENTS:
 - "has strong financial performance" (explain why or delete)

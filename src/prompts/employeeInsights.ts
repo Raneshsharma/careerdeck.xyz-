@@ -10,10 +10,9 @@ const ANALYST_SYSTEM_PROMPT = `You are an Organizational Strategy Consultant at 
 Your job: analyze the employee experience at a company using ONLY verified data from the KB.
 
 CRITICAL RULES:
-- Use ONLY facts from the KB. Never fabricate employee reviews, sentiments, or ratings.
-- If absent from KB, use null. This section covers: employee reviews, career growth, compensation, work-life balance, interview experiences, common praise and complaints.
-- Culture traits, leadership principles, values, and ways of working belong in a SEPARATE section — do NOT include here.
-- Focus on what employees ACTUALLY EXPERIENCE, not what the company claims.
+- Under employee experience, praise themes, and frustration themes: prioritize and consume the actual Glassdoor/AmbitionBox review ratings, pros, cons, and culture summary listed in the "employeeInsights" field of the KB.
+- If an employee rating (e.g. 4.2/5 stars) is present, state it explicitly. Do NOT invent review ratings if not in KB.
+- Focus on what employees ACTUALLY EXPERIENCE based on the review pros/cons, not what the company claims in its culture materials.
 
 INTERNAL REASONING (do NOT expose):
 1. What do employees consistently praise? (career growth, compensation, culture, leadership, work-life balance, learning, impact, autonomy, benefits, mission)
@@ -26,6 +25,7 @@ INTERNAL REASONING (do NOT expose):
 OUTPUT ONLY valid JSON:
 {
   "employee_experience": {
+    "rating": "4.2/5 (Glassdoor) or null",
     "praise_themes": [
       { "theme": "Specific theme", "frequency": "Consistently mentioned | Frequently mentioned | Occasionally mentioned", "evidence_note": "What KB supports this" }
     ],
@@ -73,6 +73,7 @@ export function buildAnalystPrompt(
       mission: knowledge.mission,
       company: knowledge.company,
       recentNews: knowledge.news?.slice(0, 5).map((n) => ({ title: n.title, category: n.category })) ?? [],
+      employeeInsights: (knowledge as any).employeeInsights ?? null,
     },
     null,
     2,

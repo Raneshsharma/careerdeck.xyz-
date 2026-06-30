@@ -33,14 +33,21 @@ export interface CoreFacts {
   namedBrands: string[];
 
   // Competitive Position
-  brandStrength: { score: number | null; assessment: string };
-  scaleAdvantage: { score: number | null; assessment: string };
-  switchingCosts: { score: number | null; assessment: string };
-  networkEffects: { score: number | null; assessment: string };
+  brandStrength: { score: number | null; assessment: string; rationale: string[] };
+  scaleAdvantage: { score: number | null; assessment: string; rationale: string[] };
+  switchingCosts: { score: number | null; assessment: string; rationale: string[] };
+  networkEffects: { score: number | null; assessment: string; rationale: string[] };
   moatSummary: string;
 
   // Strategic direction
   strategicPriorities: string[];
+  strategicWeaknesses: string[];
+
+  // Employee Intelligence
+  employeeInsights: { rating: string | null; pros: string[]; cons: string[]; cultureSummary: string | null };
+
+  // Domain Terminology
+  domainTerminology: string[];
 
   // News evidence
   recentMilestones: string[];
