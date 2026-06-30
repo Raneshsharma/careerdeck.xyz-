@@ -17,12 +17,13 @@ CRITICAL INSTRUCTIONS:
    - Unknown (score null): NO evidence exists in the text. Return null for the score. Do NOT return 0.
    - For each moat score, provide a "rationale" list of 3-5 specific facts or evidence bullets that justify the score (e.g. "Supercharger network with 50k+ stalls").
 5. Distinguish between 'Weak' (evidence shows high churn, low pricing power, high competition) and 'Unknown' (absence of evidence in the text).
-   - If a dimension is Unknown, the assessment MUST state 'Unknown - insufficient evidence in the source material.'
+    - If a dimension is Unknown, the assessment MUST state 'Unknown - insufficient evidence in the source material.'
 6. Extract the top 3-5 strategic priorities of the company.
 7. Extract 3-5 verified strategic/operational weaknesses of the company (e.g. procurement dependence, low margin commodities, regulatory risk) for the "strategicWeaknesses" list. Do NOT include unknown placeholders.
 8. Extract employee review intelligence (Glassdoor, AmbitionBox, or news trends found in Google snippets) and populate the "employeeInsights" object with rating (e.g. "4.1"), pros, cons, and a short culture summary.
-9. Extract 5-10 company-specific or domain-specific key terms (e.g. "GCMMF", "cooperative", "milk union" for Amul; "Gigafactory", "FSD", "Autopilot" for Tesla) in the "domainTerminology" list.
-10. Identify the "asOfTimestamp" (e.g., "FY2024", "Q3 2025") representing when the most recent financial and scale metrics are current.
+9. Extract Careers page values, Leadership principles, common Interview experiences, and Work style trends from the source materials.
+10. Extract 5-10 company-specific or domain-specific key terms (e.g. "GCMMF", "cooperative", "milk union" for Amul; "Gigafactory", "FSD", "Autopilot" for Tesla) in the "domainTerminology" list.
+11. Identify the "asOfTimestamp" (e.g., "FY2024", "Q3 2025") representing when the most recent financial and scale metrics are current.
 
 Output ONLY valid JSON matching this exact structure:
 {
@@ -54,6 +55,10 @@ Output ONLY valid JSON matching this exact structure:
   "strategicPriorities": ["priority1", "priority2", ...],
   "strategicWeaknesses": ["weakness1", "weakness2", ...],
   "employeeInsights": { "rating": "4.2", "pros": ["Pro 1", ...], "cons": ["Con 1", ...], "cultureSummary": "Culture details..." },
+  "careersValues": ["value1", "value2", ...],
+  "leadershipPrinciples": ["principle1", "principle2", ...],
+  "interviewExperiences": ["experience1", "experience2", ...],
+  "workStyleTrends": ["trend1", "trend2", ...],
   "domainTerminology": ["Term 1", "Term 2", ...],
   "recentMilestones": ["milestone1", ...],
   "evidenceSources": ["wikipedia", "yahoo", ...]
@@ -104,6 +109,10 @@ function applyHardcodedFallbacks(companyName: string, coreFacts: CoreFacts): Cor
     coreFacts.marketCap = coreFacts.marketCap?.value ? coreFacts.marketCap : { value: 1800000000000, currency: "INR" };
     coreFacts.employees = coreFacts.employees || 6000;
     coreFacts.asOfTimestamp = coreFacts.asOfTimestamp || "FY2024";
+    coreFacts.careersValues = coreFacts.careersValues?.length ? coreFacts.careersValues : ["Ownership & accountability", "Customer obsession", "Continuous improvement (Kaizen)", "Integrity & transparency"];
+    coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Always Be Learning", "Speed of execution", "Focus on user experience", "Bias for action"];
+    coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["Rigorous technical screening (DS & Algorithms)", "System design and architecture assessments", "Culture alignment and bar-raiser rounds"];
+    coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["High-autonomy project ownership", "Fast-paced product iterations", "Data-driven decision making"];
   } else if (norm.includes("amul")) {
     coreFacts.companyName = coreFacts.companyName || "Amul";
     coreFacts.revenue = coreFacts.revenue?.value ? coreFacts.revenue : { value: 800000000000, currency: "INR", year: "2024" };
@@ -113,6 +122,10 @@ function applyHardcodedFallbacks(companyName: string, coreFacts: CoreFacts): Cor
     coreFacts.marketCap = null;
     coreFacts.employees = coreFacts.employees || 3600000;
     coreFacts.asOfTimestamp = coreFacts.asOfTimestamp || "FY2024";
+    coreFacts.careersValues = coreFacts.careersValues?.length ? coreFacts.careersValues : ["Cooperative progress", "Fair value for farmers", "Consumer health and trust", "Nation building"];
+    coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Farmer-first decision making", "Democratic management", "Value pricing for consumers", "Uncompromising quality control"];
+    coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["Dairy technology and field operations interviews", "Supply chain logistics and distribution case studies", "Commitment to the cooperative model alignment"];
+    coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["Long-term job security and cooperative ethos", "Rural-urban link management focus", "Collaborative cross-functional operations"];
   } else if (norm.includes("tesla")) {
     coreFacts.companyName = coreFacts.companyName || "Tesla";
     coreFacts.revenue = coreFacts.revenue?.value ? coreFacts.revenue : { value: 96770000000, currency: "USD", year: "2023" };
@@ -122,6 +135,10 @@ function applyHardcodedFallbacks(companyName: string, coreFacts: CoreFacts): Cor
     coreFacts.marketCap = coreFacts.marketCap?.value ? coreFacts.marketCap : { value: 650000000000, currency: "USD" };
     coreFacts.employees = coreFacts.employees || 140000;
     coreFacts.asOfTimestamp = coreFacts.asOfTimestamp || "FY2023";
+    coreFacts.careersValues = coreFacts.careersValues?.length ? coreFacts.careersValues : ["Accelerate sustainable energy transition", "Do the impossible", "Constant innovation", "First-principles thinking"];
+    coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["First principles reasoning", "Extreme ownership", "Move fast and break barriers", "Integrated engineering focus"];
+    coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["Hardcore technical problem-solving tests", "Detailed presentations on previous engineering projects", "Executive review and passion for mission alignment"];
+    coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["High pressure, high reward environment", "Rapid scaling and factory-floor involvement", "Cross-disciplinary innovation"];
   } else if (norm.includes("apple")) {
     coreFacts.companyName = coreFacts.companyName || "Apple";
     coreFacts.revenue = coreFacts.revenue?.value ? coreFacts.revenue : { value: 383280000000, currency: "USD", year: "2023" };
@@ -131,6 +148,10 @@ function applyHardcodedFallbacks(companyName: string, coreFacts: CoreFacts): Cor
     coreFacts.marketCap = coreFacts.marketCap?.value ? coreFacts.marketCap : { value: 2800000000000, currency: "USD" };
     coreFacts.employees = coreFacts.employees || 161000;
     coreFacts.asOfTimestamp = coreFacts.asOfTimestamp || "FY2023";
+    coreFacts.careersValues = coreFacts.careersValues?.length ? coreFacts.careersValues : ["Think different", "Simplicity and user-centric design", "Inclusion and diversity", "Environmental responsibility"];
+    coreFacts.leadershipPrinciples = coreFacts.leadershipPrinciples?.length ? coreFacts.leadershipPrinciples : ["Obsession with product perfection", "Deep collaboration and cross-functional teams", "Discretion and secrecy", "Simplicity as the ultimate sophistication"];
+    coreFacts.interviewExperiences = coreFacts.interviewExperiences?.length ? coreFacts.interviewExperiences : ["Deep domain-specific technical grilling", "Collaborative case studies and design challenges", "Intense cultural fit and attention to detail review"];
+    coreFacts.workStyleTrends = coreFacts.workStyleTrends?.length ? coreFacts.workStyleTrends : ["High confidentiality and product isolation", "Attention to tiny details", "Cross-functional collaborative sprints"];
   }
   return coreFacts;
 }
@@ -248,6 +269,19 @@ function enrichKnowledgeBase(kb: CompanyKnowledgeBase, cf: CoreFacts): CompanyKn
   }
   if (cf.domainTerminology) {
     (enriched as any).domainTerminology = cf.domainTerminology;
+  }
+
+  if (cf.careersValues) {
+    (enriched as any).careersValues = cf.careersValues;
+  }
+  if (cf.leadershipPrinciples) {
+    (enriched as any).leadershipPrinciples = cf.leadershipPrinciples;
+  }
+  if (cf.interviewExperiences) {
+    (enriched as any).interviewExperiences = cf.interviewExperiences;
+  }
+  if (cf.workStyleTrends) {
+    (enriched as any).workStyleTrends = cf.workStyleTrends;
   }
 
   // Map competitive advantage (Moat) scores

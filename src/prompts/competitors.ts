@@ -42,9 +42,9 @@ OUTPUT ONLY valid JSON:
       "type": "direct | indirect | emerging | substitute",
       "market_position": "Market Leader | Challenger | Niche Player",
       "pricing": "Premium | Value | Dynamic | Low-cost",
-      "delivery_speed_or_quality": "Ultra-fast | Standard | Premium Service",
+      "delivery_speed": "Ultra-fast | Standard | Premium Service",
       "ecosystem": "Super-app / Standalone / Integrated",
-      "threat_level": "high | medium | low",
+      "threat": "high | medium | low",
       "evidence": ["kb field paths or industry context"]
     }
   ],
@@ -121,7 +121,7 @@ STRUCTURE:
 [Para 1 — Competitive Landscape (2-3 sentences)]: Summarize the market structure. How concentrated or fragmented? What type of competition defines this market? Set the context for the competitors that follow.
 
 [COMPETITOR MATRIX TABLE — Insert this markdown table between Paras 1 and 2]:
-| Competitor | Market Position | Pricing | Delivery Speed / Quality | Ecosystem | Threat Level |
+| Competitor | Market Position | Pricing | Delivery Speed | Ecosystem | Threat |
 |---|---|---|---|---|---|
 | [Name] | [e.g. Market Leader / Challenger] | [e.g. Premium / Value / Dynamic] | [e.g. Ultra-fast / Standard] | [e.g. Super-app / Standalone] | High/Med/Low |
 Map the competitor matrix from the analysis data. Ensure the matrix uses this exact set of columns.
@@ -162,7 +162,7 @@ STRUCTURE:
 ## 7. Competitor Analysis
 
 [COMPETITOR MATRIX TABLE — Insert this markdown table after Para 1]:
-| Competitor | Market Position | Pricing | Delivery Speed / Quality | Ecosystem | Threat Level |
+| Competitor | Market Position | Pricing | Delivery Speed | Ecosystem | Threat |
 |---|---|---|---|---|---|
 | [Name] | [e.g. Market Leader / Challenger] | [e.g. Premium / Value / Dynamic] | [e.g. Ultra-fast / Standard] | [e.g. Super-app / Standalone] | High/Med/Low |
 

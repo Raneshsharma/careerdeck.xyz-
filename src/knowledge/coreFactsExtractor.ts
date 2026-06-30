@@ -49,6 +49,10 @@ export interface CoreFacts {
 
   // Employee Intelligence
   employeeInsights: { rating: string | null; pros: string[]; cons: string[]; cultureSummary: string | null };
+  careersValues: string[];
+  leadershipPrinciples: string[];
+  interviewExperiences: string[];
+  workStyleTrends: string[];
 
   // Domain Terminology
   domainTerminology: string[];

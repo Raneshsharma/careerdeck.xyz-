@@ -78,6 +78,10 @@ export function buildAnalystPrompt(
       products: knowledge.products,
       recentNews: knowledge.news?.slice(0, 5).map((n) => ({ title: n.title, category: n.category })) ?? [],
       employeeInsights: (knowledge as any).employeeInsights ?? null,
+      careersValues: (knowledge as any).careersValues ?? null,
+      leadershipPrinciples: (knowledge as any).leadershipPrinciples ?? null,
+      interviewExperiences: (knowledge as any).interviewExperiences ?? null,
+      workStyleTrends: (knowledge as any).workStyleTrends ?? null,
     },
     null,
     2,
@@ -103,6 +107,7 @@ RULES:
    
    **Executive Insight:** Cultural data is unavailable from verified sources. Candidates should research values pages and employee reviews during interview preparation to assess company culture."
 6. If a sentence could describe another company, delete and rewrite.
+7. Synthesize and explicitly describe Careers page values, Leadership principles, and Work style trends (balancing official corporate statements with observed employee review realities).
 
 FORBIDDEN STATEMENTS:
 - "values innovation" / "promotes collaboration" / "culture is great" — without business impact evidence

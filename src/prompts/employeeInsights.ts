@@ -74,6 +74,10 @@ export function buildAnalystPrompt(
       company: knowledge.company,
       recentNews: knowledge.news?.slice(0, 5).map((n) => ({ title: n.title, category: n.category })) ?? [],
       employeeInsights: (knowledge as any).employeeInsights ?? null,
+      careersValues: (knowledge as any).careersValues ?? null,
+      leadershipPrinciples: (knowledge as any).leadershipPrinciples ?? null,
+      interviewExperiences: (knowledge as any).interviewExperiences ?? null,
+      workStyleTrends: (knowledge as any).workStyleTrends ?? null,
     },
     null,
     2,
@@ -99,6 +103,7 @@ RULES:
    **Executive Insight:** Employee experience data is unavailable from verified sources. Candidates should research recent reviews on Glassdoor or Blind during interview preparation to understand the employee experience."
 5. Never fabricate employee sentiment. Null is acceptable.
 6. If a sentence could describe another company, delete and rewrite.
+7. Synthesize and explicitly describe observed employee review themes, work style trends, and common interview experiences.
 
 FORBIDDEN STATEMENTS:
 - "employees are satisfied" / "employees love working here" — without specific evidence
