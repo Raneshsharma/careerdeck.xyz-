@@ -12,7 +12,59 @@ function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner, genId, sourceMetadata, isFreeUser = true }) {
+const TYPE_ACCENT = {
+  company: "border-indigo-500/30 text-indigo-400",
+  role: "border-emerald-500/30 text-emerald-400",
+  jd: "border-amber-500/30 text-amber-400",
+  news: "border-blue-500/30 text-blue-400",
+};
+
+function ActionBar({ onReset, handleCopy, handleDownload, handleExportWord, copied, isTop = false }) {
+  return (
+    <div className={`flex items-center gap-2 flex-wrap ${isTop ? "" : ""}`}>
+      {isTop && (
+        <button
+          onClick={onReset}
+          className="px-3 py-1.5 text-xs font-semibold rounded-full border border-white/[0.08] text-slate-300 hover:bg-white/[0.03] hover:text-white transition-all duration-200"
+        >
+          ← New
+        </button>
+      )}
+      <button
+        onClick={handleCopy}
+        className={`flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border ${
+          copied
+            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+            : "border-white/[0.08] text-slate-300 hover:bg-white/[0.03] hover:text-white"
+        }`}
+      >
+        {copied ? "✓ Copied!" : "📋 Copy"}
+      </button>
+      <button
+        onClick={handleDownload}
+        className="flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-white/[0.08] text-slate-300 hover:bg-white/[0.03] hover:text-white transition-all duration-200"
+      >
+        📥 Markdown
+      </button>
+      <button
+        onClick={handleExportWord}
+        className="flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-white/[0.08] text-slate-300 hover:bg-white/[0.03] hover:text-white transition-all duration-200"
+      >
+        📄 Word Doc
+      </button>
+      {!isTop && (
+        <button
+          onClick={onReset}
+          className="flex-1 min-w-[120px] inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] transition-all duration-200 shadow-sm"
+        >
+          ← New Dossier
+        </button>
+      )}
+    </div>
+  );
+}
+
+export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner, genId, sourceMetadata, isFreeUser = true, dossierType = "company" }) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
   const resultRef = useRef(null);
@@ -20,8 +72,6 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
   }, []);
-
-  const handlePrint = () => { window.print(); };
 
   const handleDownload = () => {
     const blob = new Blob([content], { type: "text/markdown" });
@@ -72,53 +122,37 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
     }).filter((s) => s.body);
   }, [content]);
 
+  const accentClass = TYPE_ACCENT[dossierType] || TYPE_ACCENT.company;
+  const barProps = { onReset, handleCopy, handleDownload, handleExportWord, copied };
+
   return (
     <div ref={resultRef} className={`transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-      {/* Toolbar */}
+
+      {/* ── TOP STICKY TOOLBAR ── */}
       {!hideToolbar && (
-      <div className="sticky top-0 z-10 bg-[#0B0F19]/80 border border-white/[0.08] backdrop-blur-md rounded-xl shadow-sm p-3 mb-6 no-print flex items-center justify-between gap-3">
-        <span className="text-xs text-slate-400 bg-white/[0.03] px-2.5 py-1 rounded-full font-medium">
-          {wordCount.toLocaleString()} words &middot; ~{Math.ceil(wordCount / 250)} min read
-        </span>
-        <div className="flex items-center gap-1.5">
-          <button onClick={onReset} className="px-3 py-1.5 text-xs font-semibold rounded-full border border-white/[0.08] text-slate-300 hover:bg-white/[0.03] hover:text-white transition-all duration-200">
-            &larr; New
-          </button>
-          <button onClick={handleCopy} className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition-all duration-200 ${copied ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "border-white/[0.08] text-slate-300 hover:bg-white/[0.03] hover:text-white"}`}>
-            {copied ? "Copied!" : "Copy"}
-          </button>
-          <button onClick={handleDownload} className="px-3 py-1.5 text-xs font-semibold rounded-full border border-white/[0.08] text-slate-300 hover:bg-white/[0.03] hover:text-white transition-all duration-200">
-            .md
-          </button>
-          <button onClick={handlePrint} className="px-3 py-1.5 text-xs font-bold rounded-full bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] transition-all duration-200 shadow-sm">
-            Print
-          </button>
+        <div className="sticky top-0 z-10 bg-[#0B0F19]/90 border border-white/[0.08] backdrop-blur-md rounded-xl shadow-sm p-2.5 mb-4 no-print">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-slate-400 bg-white/[0.03] px-2.5 py-1 rounded-full font-medium shrink-0">
+              {wordCount.toLocaleString()} words · ~{Math.ceil(wordCount / 250)} min
+            </span>
+            <ActionBar {...barProps} isTop />
+          </div>
         </div>
-      </div>
       )}
 
       {isPartial && (
         <div className="bg-amber-500/10 border border-[#F28C28]/20 rounded-lg p-4 mb-4 no-print">
-          <p className="text-sm text-amber-400"><strong>&#x26A0;&#xFE0F; Partial output:</strong> Generation was cut short — some later sections may be incomplete. What was generated is fully usable.</p>
+          <p className="text-sm text-amber-400"><strong>⚠️ Partial output:</strong> Generation was cut short — what was generated is fully usable.</p>
         </div>
       )}
 
       {!hideShortBanner && (
-      <div className="bg-[#F28C28]/10 border border-[#F28C28]/20 rounded-lg p-4 mb-6 no-print">
-        <p className="text-sm text-[#F28C28]"><strong>&#x23F0; Short on time?</strong> Jump to the Interview Intelligence and Smart Questions sections for quick prep.</p>
-      </div>
+        <div className={`bg-white/[0.03] border ${accentClass} rounded-lg p-4 mb-6 no-print`}>
+          <p className="text-sm"><strong>⏰ Short on time?</strong> Use the section navigator on the right to jump directly to Interview Prep or Key Financials.</p>
+        </div>
       )}
 
-      {/* Top action bar — quick back to generator */}
-      <div className="mb-4 no-print">
-        <button
-          onClick={onReset}
-          className="w-full min-h-[44px] py-2.5 rounded-xl bg-white hover:bg-slate-200 text-[#030712] font-bold text-sm transition-all duration-200 shadow-sm"
-        >
-          &larr; Generate Another Dossier
-        </button>
-      </div>
-
+      {/* ── DOSSIER CONTENT ── */}
       <div className="bg-[#0B0F19]/60 border border-white/[0.08] backdrop-blur-md rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 sm:p-10 text-slate-200">
         <article className="dossier-markdown">
           {sections.map((section, idx) => (
@@ -132,7 +166,7 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
                 {section.body}
               </ReactMarkdown>
               {section.title && (
-                <div className="mb-8 border-t border-white/[0.05] pt-6">
+                <div className="mb-8 border-t border-white/[0.05] pt-4">
                   <SourceTiles sources={sourceMetadata} />
                   <SectionVoting dossierId={genId} sectionKey={section.title} />
                   <SectionFeedback dossierId={genId} sectionKey={section.title} />
@@ -142,52 +176,25 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
           ))}
         </article>
 
-        {/* Post‑dossier upgrade CTA — only for free users */}
+        {/* Post-dossier upgrade CTA — only for free users */}
         {isFreeUser && (
-        <div className="mt-8 pt-6 border-t border-white/[0.05] text-center no-print">
-          <p className="text-sm text-slate-400 mb-3">Want unlimited dossiers and PDF exports?</p>
-          <Link
-            href="/checkout?plan=pro"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] text-sm font-bold transition-all duration-200 shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
-          >
-            Upgrade to Pro — just ₹149/mo
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </Link>
-        </div>
+          <div className="mt-8 pt-6 border-t border-white/[0.05] text-center no-print">
+            <p className="text-sm text-slate-400 mb-3">Want unlimited dossiers and Word/PDF exports?</p>
+            <Link
+              href="/checkout?plan=pro"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] text-sm font-bold transition-all duration-200 shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
+            >
+              Upgrade to Pro — just ₹149/mo
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
         )}
 
-        {/* Bottom action bar — Generate Another + Copy + Download */}
+        {/* ── BOTTOM ACTION BAR ── */}
         <div className="mt-8 pt-6 border-t border-white/[0.05] no-print">
-          <button
-            onClick={onReset}
-            className="w-full min-h-[48px] mb-3 py-3 rounded-xl bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] font-bold text-sm transition-all duration-200 shadow-[0_4px_14px_rgba(242,140,40,0.3)]"
-          >
-            Generate Another Dossier
-          </button>
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={handleCopy}
-              className={`flex-1 min-w-[120px] min-h-[44px] py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                copied ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-white/[0.03] border border-white/[0.08] text-slate-300 hover:bg-white/[0.06] hover:text-white"
-              }`}
-            >
-              {copied ? "✓ Copied!" : "📋 Copy"}
-            </button>
-            <button
-              onClick={handleDownload}
-              className="flex-1 min-w-[120px] min-h-[44px] py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-slate-300 hover:bg-white/[0.06] hover:text-white text-sm font-bold transition-all duration-200"
-            >
-              📥 Markdown
-            </button>
-            <button
-              onClick={handleExportWord}
-              className="flex-1 min-w-[120px] min-h-[44px] py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-slate-300 hover:bg-white/[0.06] hover:text-white text-sm font-bold transition-all duration-200"
-            >
-              📄 Word Doc
-            </button>
-          </div>
+          <ActionBar {...barProps} isTop={false} />
         </div>
       </div>
     </div>

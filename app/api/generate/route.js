@@ -359,7 +359,7 @@ export async function POST(request) {
       const usedThisMonth = await getGenerationsThisMonth(user.id).catch(() => 0);
       if (usedThisMonth >= planLimit) {
         return Response.json(
-          { error: "You've used all generations for this month. Upgrade coming soon." },
+          { error: "You've used all generations for this month. Please upgrade your plan to continue.", code: "UPGRADE_REQUIRED" },
           { status: 403 },
         );
       }

@@ -28,31 +28,38 @@ export default function SectionFeedback({ dossierId, sectionKey }) {
       {!open && !submitted ? (
         <button
           onClick={() => setOpen(true)}
-          className="text-xs text-[#94A3B8] hover:text-[#64748B] transition-colors"
+          className="text-xs text-slate-500 hover:text-slate-300 transition-colors duration-200 flex items-center gap-1"
         >
-          💬 Feedback
+          <span>💬</span>
+          <span>Leave feedback</span>
         </button>
       ) : submitted ? (
-        <p className="text-xs text-green-600">Thank you for your feedback!</p>
+        <p className="text-xs text-emerald-400 flex items-center gap-1">
+          <span>✓</span> Thank you for your feedback!
+        </p>
       ) : (
-        <form onSubmit={handleSubmit} className="mt-1">
+        <form onSubmit={handleSubmit} className="mt-2 space-y-2">
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="How can we improve this section?"
             maxLength={2000}
             rows={2}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 resize-none"
+            className="w-full px-3 py-2 text-xs rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#F28C28]/40 focus:border-[#F28C28]/40 resize-none transition-all duration-200"
           />
-          <div className="flex items-center gap-2 mt-1.5">
+          <div className="flex items-center gap-2">
             <button
               type="submit"
               disabled={saving || !comment.trim()}
-              className="px-3 py-1 text-xs font-medium rounded-lg bg-brand-500 text-white hover:bg-brand-600 disabled:opacity-50 transition-all"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] disabled:opacity-40 transition-all duration-200"
             >
-              {saving ? "Sending..." : "Send"}
+              {saving ? "Sending…" : "Send"}
             </button>
-            <button type="button" onClick={() => setOpen(false)} className="text-xs text-[#94A3B8] hover:text-[#64748B]">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="text-xs text-slate-500 hover:text-slate-300 transition-colors duration-200"
+            >
               Cancel
             </button>
           </div>

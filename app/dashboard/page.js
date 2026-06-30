@@ -16,6 +16,7 @@ import MobileNavbar from "@/components/MobileNavbar";
 import BottomNav from "@/components/BottomNav";
 import HistoryButton from "@/components/HistoryButton";
 import OnboardingTour, { shouldShowTour } from "@/components/OnboardingTour";
+import UpgradeModal from "@/components/UpgradeModal";
 
 const DOSSIER_LABELS = {
   company: "Company Dossier",
@@ -40,6 +41,7 @@ function DashboardContent() {
   const [sourceMetadata, setSourceMetadata] = useState(null);
   const [tourVisible, setTourVisible] = useState(false);
   const [loadingDossier, setLoadingDossier] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const abortRef = useRef(null);
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
 
@@ -110,6 +112,16 @@ function DashboardContent() {
   const handleSubmit = useCallback(async (data) => {
     if (generating || abortRef.current) return
 
+    // Quick local limit check for free users
+    const used = profileData?.usage?.used ?? 0;
+    const limit = profileData?.usage?.limit ?? 3;
+    const remaining = Math.max(limit - used, 0);
+    const planTier = profileData?.profile?.plan_tier || "free";
+    if (planTier === "free" && remaining <= 0) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setGenerating(true)
     setContent("")
     setNewsCount(null)
@@ -144,7 +156,14 @@ function DashboardContent() {
 
       if (!res.ok) {
         let errMsg = "Failed to generate dossier"
-        try { const err = await res.json(); errMsg = err.error || errMsg } catch {}
+        let errCode = null
+        try { const err = await res.json(); errMsg = err.error || errMsg; errCode = err.code; } catch {}
+        if (errCode === "UPGRADE_REQUIRED" || res.status === 403) {
+          setShowUpgradeModal(true)
+          setGenerating(false)
+          abortRef.current = null
+          return
+        }
         throw new Error(errMsg)
       }
 
@@ -271,7 +290,6 @@ function DashboardContent() {
           </Link>
           <nav className="flex items-center gap-6">
             <Link href="/dashboard" className="text-sm font-semibold text-[#F28C28]">Dashboard</Link>
-            <Link href="/pricing" className="text-sm text-slate-400 hover:text-white">Pricing</Link>
             <span data-tour="user-menu"><UserMenu refreshTrigger={usageVersion} /></span>
           </nav>
         </div>
@@ -286,45 +304,52 @@ function DashboardContent() {
           <aside className="hidden lg:block w-72 shrink-0" data-tour="history">
             <div className="lg:sticky lg:top-24"><HistorySidebar key={sidebarVersion} onSelect={loadDossier} activeId={activeDossierId} onDelete={handleDeleteDossier} /></div>
           </aside>
-          <div className="flex-1 min-w-0 max-w-2xl">
-        {loadingDossier && <div className="text-center py-16"><div className="w-14 h-14 rounded-full border-[3px] border-white/10 border-t-[#F28C28] animate-spin mx-auto mb-6 bg-transparent" /><p className="text-sm text-slate-500 animate-pulse">Loading...</p></div>}
+          <div className="flex-1 min-w-0">
+            {loadingDossier && <div className="text-center py-16"><div className="w-14 h-14 rounded-full border-[3px] border-white/10 border-t-[#F28C28] animate-spin mx-auto mb-6 bg-transparent" /><p className="text-sm text-slate-500 animate-pulse">Loading...</p></div>}
 
-        {!loadingDossier && !content && !generating && (
-          <>
-            {errorMessage && (
-              <div className="bg-red-500/10 border border-red-500/25 rounded-lg p-4 mb-4 animate-shake">
-                <div className="flex items-start gap-3">
-                  <span className="text-red-400 shrink-0 mt-0.5">&#x26A0;&#xFE0F;</span>
-                  <div className="flex-1"><p className="text-sm text-red-400">{errorMessage}</p><button onClick={() => setErrorMessage(null)} className="text-xs text-red-400 underline mt-1 hover:text-red-300">Dismiss</button></div>
-                </div>
-                {(errorMessage.includes("used all generations") || errorMessage.includes("Upgrade")) && (
-                  <div className="mt-3 pt-3 border-t border-white/[0.08]"><Link href="/checkout?plan=pro" className="inline-flex items-center gap-2 px-4 py-2 bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] text-xs font-bold rounded-lg shadow-md">Upgrade to Pro</Link></div>
+            {!loadingDossier && !content && !generating && (
+              <div className="max-w-2xl">
+                {errorMessage && (
+                  <div className="bg-red-500/10 border border-red-500/25 rounded-lg p-4 mb-4 animate-shake">
+                    <div className="flex items-start gap-3">
+                      <span className="text-red-400 shrink-0 mt-0.5">&#x26A0;&#xFE0F;</span>
+                      <div className="flex-1"><p className="text-sm text-red-400">{errorMessage}</p><button onClick={() => setErrorMessage(null)} className="text-xs text-red-400 underline mt-1 hover:text-red-300">Dismiss</button></div>
+                    </div>
+                    {(errorMessage.includes("used all generations") || errorMessage.includes("Upgrade") || errorMessage.includes("upgrade")) && (
+                      <div className="mt-3 pt-3 border-t border-white/[0.08]"><button onClick={() => setShowUpgradeModal(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-[#F28C28] hover:bg-[#E07E1F] text-[#030712] text-xs font-bold rounded-lg shadow-md">Upgrade to Pro</button></div>
+                    )}
+                  </div>
                 )}
+                <span data-tour="form">
+                <NonReversingReveal id="form-card" className="bg-[#0B0F19]/60 border border-white/[0.08] backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 sm:p-8">
+                  <div className="mb-6"><h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{DOSSIER_LABELS[dossierType]}</h1>
+                  <p className="text-sm text-slate-400 mt-1">{dossierType === "company" && "Deep dive into a company's business model, strategy, culture, and interview prep."}{dossierType === "role" && "Understand a role's responsibilities, skills, career path, and interview expectations."}{dossierType === "jd" && "Decode a specific job description — hidden expectations, STAR blueprints, and hiring manager perspective."}{dossierType === "news" && "Last 30 days of high-signal developments, analyzed for business and interview relevance."}</p></div>
+                  <DossierTabs selected={dossierType} onChange={(t) => { setDossierType(t); setErrorMessage(null) }} disabled={generating} />
+                  <div className="mt-6"><DossierForm onSubmit={handleSubmit} generating={generating} dossierType={dossierType} /></div>
+                </NonReversingReveal>
+                </span>
               </div>
             )}
-            <span data-tour="form">
-            <NonReversingReveal id="form-card" className="bg-[#0B0F19]/60 border border-white/[0.08] backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 sm:p-8">
-              <div className="mb-6"><h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{DOSSIER_LABELS[dossierType]}</h1>
-              <p className="text-sm text-slate-400 mt-1">{dossierType === "company" && "Deep dive into a company's business model, strategy, culture, and interview prep."}{dossierType === "role" && "Understand a role's responsibilities, skills, career path, and interview expectations."}{dossierType === "jd" && "Decode a specific job description — hidden expectations, STAR blueprints, and hiring manager perspective."}{dossierType === "news" && "Last 30 days of high-signal developments, analyzed for business and interview relevance."}</p></div>
-              <DossierTabs selected={dossierType} onChange={(t) => { setDossierType(t); setErrorMessage(null) }} disabled={generating} />
-              <div className="mt-6"><DossierForm onSubmit={handleSubmit} generating={generating} dossierType={dossierType} /></div>
-            </NonReversingReveal>
-            </span>
-          </>
-        )}
 
-        {content && !generating && (
-          <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} hideToolbar hideShortBanner genId={genId} sourceMetadata={sourceMetadata} isFreeUser={!profileData?.profile?.plan_tier || profileData?.profile?.plan_tier === "free"} />
-        )}
+            {content && !generating && (
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+                <div className="flex-1 min-w-0">
+                  <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} hideToolbar={false} hideShortBanner={false} genId={genId} sourceMetadata={sourceMetadata} isFreeUser={!profileData?.profile?.plan_tier || profileData?.profile?.plan_tier === "free"} dossierType={dossierType} />
+                </div>
+                <aside className="hidden lg:block w-56 shrink-0 lg:sticky lg:top-24">
+                  <SectionNav content={content} dossierType={dossierType} />
+                </aside>
+              </div>
+            )}
 
-        {generating && (
-          <div className="max-w-2xl"><div className="text-center">
-            <div className="w-14 h-14 rounded-full border-[3px] border-white/10 border-t-[#F28C28] animate-spin mx-auto mb-5 bg-transparent" />
-            <h2 className="text-xl font-bold text-white mb-1">Building Your {DOSSIER_LABELS[dossierType]}</h2>
-            <p className="text-sm text-slate-400 mb-8">Gathering intelligence, analyzing data, and structuring your dossier</p>
-            <button onClick={handleCancel} className="mt-8 text-xs text-slate-500 hover:text-red-400 transition-colors">Cancel generation</button>
-          </div></div>
-        )}
+            {generating && (
+              <div className="max-w-2xl"><div className="text-center">
+                <div className="w-14 h-14 rounded-full border-[3px] border-white/10 border-t-[#F28C28] animate-spin mx-auto mb-5 bg-transparent" />
+                <h2 className="text-xl font-bold text-white mb-1">Building Your {DOSSIER_LABELS[dossierType]}</h2>
+                <p className="text-sm text-slate-400 mb-8">Gathering intelligence, analyzing data, and structuring your dossier</p>
+                <button onClick={handleCancel} className="mt-8 text-xs text-slate-500 hover:text-red-400 transition-colors">Cancel generation</button>
+              </div></div>
+            )}
           </div>
         </div>
       </main>
@@ -339,6 +364,12 @@ function DashboardContent() {
       {tourVisible && (
         <OnboardingTour onComplete={() => setTourVisible(false)} />
       )}
+
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onSuccess={() => setUsageVersion((v) => v + 1)}
+      />
     </div>
   );
 }

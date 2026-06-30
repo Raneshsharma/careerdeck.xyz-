@@ -1,8 +1,37 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
-export default function SectionNav({ content, className = "" }) {
+const TYPE_COLORS = {
+  company: {
+    dot: "bg-indigo-400",
+    desktopActive: "text-indigo-300 font-semibold bg-indigo-500/10",
+    mobileActive: "bg-indigo-500 text-white shadow-sm shadow-indigo-500/20",
+  },
+  role: {
+    dot: "bg-emerald-400",
+    desktopActive: "text-emerald-300 font-semibold bg-emerald-500/10",
+    mobileActive: "bg-emerald-500 text-white shadow-sm shadow-emerald-500/20",
+  },
+  jd: {
+    dot: "bg-amber-400",
+    desktopActive: "text-amber-300 font-semibold bg-amber-500/10",
+    mobileActive: "bg-amber-500 text-white shadow-sm shadow-amber-500/20",
+  },
+  news: {
+    dot: "bg-blue-400",
+    desktopActive: "text-blue-300 font-semibold bg-blue-500/10",
+    mobileActive: "bg-blue-500 text-white shadow-sm shadow-blue-500/20",
+  },
+};
+
+const DEFAULT_COLORS = {
+  dot: "bg-[#F28C28]",
+  desktopActive: "text-white font-semibold bg-[#F28C28]/10",
+  mobileActive: "bg-[#F28C28] text-[#030712] shadow-sm",
+};
+
+export default function SectionNav({ content, className = "", dossierType = "company" }) {
   const [headings, setHeadings] = useState([]);
   const [activeId, setActiveId] = useState(null);
 
@@ -49,6 +78,8 @@ export default function SectionNav({ content, className = "" }) {
 
   if (headings.length === 0) return null;
 
+  const colors = TYPE_COLORS[dossierType] || DEFAULT_COLORS;
+
   return (
     <nav className={`no-print ${className}`}>
       {/* Desktop: vertical sidebar */}
@@ -62,12 +93,12 @@ export default function SectionNav({ content, className = "" }) {
                 onClick={(e) => handleClick(e, h.id)}
                 className={`flex items-center gap-2 text-sm py-1.5 rounded px-2 transition-all duration-200 ${
                   activeId === h.id
-                    ? "text-white font-semibold bg-[#F28C28]/10"
+                    ? colors.desktopActive
                     : "text-slate-400 hover:text-white hover:bg-white/[0.02]"
                 } ${h.level === 1 ? "font-medium" : ""}`}
               >
                 {activeId === h.id && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#F28C28] shrink-0" />
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${colors.dot}`} />
                 )}
                 <span className="truncate">{h.text}</span>
               </a>
@@ -85,7 +116,7 @@ export default function SectionNav({ content, className = "" }) {
               onClick={(e) => handleClick(e, h.id)}
               className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap min-h-[36px] ${
                 activeId === h.id
-                  ? "bg-[#F28C28] text-[#030712] shadow-sm"
+                  ? colors.mobileActive
                   : "bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:bg-white/[0.06] hover:text-white"
               } ${h.level === 2 ? "ml-3" : ""}`}
             >

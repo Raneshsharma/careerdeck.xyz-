@@ -9,6 +9,41 @@ const TYPE_LABELS = {
   news: "News",
 };
 
+// Distinct color per dossier type
+const TYPE_COLORS = {
+  company: {
+    badge: "bg-indigo-500/15 text-indigo-400 border border-indigo-500/20",
+    activeBadge: "bg-indigo-500/25 text-indigo-300 border border-indigo-400/30",
+    activeBg: "bg-indigo-500/10 border-l-2 border-indigo-500",
+    dot: "bg-indigo-400",
+  },
+  role: {
+    badge: "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20",
+    activeBadge: "bg-emerald-500/25 text-emerald-300 border border-emerald-400/30",
+    activeBg: "bg-emerald-500/10 border-l-2 border-emerald-500",
+    dot: "bg-emerald-400",
+  },
+  jd: {
+    badge: "bg-amber-500/15 text-amber-400 border border-amber-500/20",
+    activeBadge: "bg-amber-500/25 text-amber-300 border border-amber-400/30",
+    activeBg: "bg-amber-500/10 border-l-2 border-amber-500",
+    dot: "bg-amber-400",
+  },
+  news: {
+    badge: "bg-blue-500/15 text-blue-400 border border-blue-500/20",
+    activeBadge: "bg-blue-500/25 text-blue-300 border border-blue-400/30",
+    activeBg: "bg-blue-500/10 border-l-2 border-blue-500",
+    dot: "bg-blue-400",
+  },
+};
+
+const DEFAULT_COLORS = {
+  badge: "bg-white/[0.06] text-slate-400 border border-white/[0.08]",
+  activeBadge: "bg-white/10 text-slate-300 border border-white/[0.12]",
+  activeBg: "bg-white/[0.05] border-l-2 border-white/20",
+  dot: "bg-slate-400",
+};
+
 export default function HistorySidebar({ onSelect, activeId, onDelete }) {
   const [generations, setGenerations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -96,47 +131,52 @@ export default function HistorySidebar({ onSelect, activeId, onDelete }) {
 
       {!loading && !error && generations.length > 0 && (
         <ul className="space-y-1 max-h-[60vh] overflow-y-auto pr-1">
-          {generations.map((gen) => (
-            <li key={gen.id} className="group flex items-stretch">
-              <button
-                onClick={() => onSelect(gen.id)}
-                className={`flex-1 text-left px-3 py-2.5 rounded-l-lg transition-all duration-200 ${
-                  activeId === gen.id
-                    ? "bg-[#F28C28]/10 border border-white/[0.08] text-white font-semibold"
-                    : "hover:bg-white/[0.02] border border-transparent text-slate-400 hover:text-white"
-                }`}
-              >
-                <p className="text-sm font-semibold truncate leading-tight">
-                  {gen.company_name || gen.role || "Untitled"}
-                </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                    activeId === gen.id
-                      ? "bg-[#F28C28]/20 text-[#F28C28]"
-                      : "bg-white/[0.03] text-slate-500"
-                  }`}>
-                    {TYPE_LABELS[gen.dossier_type] || gen.dossier_type}
-                  </span>
-                  <span className="text-[10px] text-slate-500">
-                    {new Date(gen.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                  </span>
-                </div>
-              </button>
-              <button
-                onClick={(e) => handleDelete(e, gen.id)}
-                className="px-2 rounded-r-lg opacity-0 group-hover:opacity-100 hover:bg-red-500/10 transition-all duration-200 flex items-center"
-                aria-label="Delete dossier"
-              >
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#EF4444" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="3 4.5 4.5 4.5 11 4.5" />
-                  <path d="M4.5 4.5V3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1.5" />
-                  <path d="M5.5 6.5v4" />
-                  <path d="M8.5 6.5v4" />
-                  <path d="M2.5 4.5h9l-1 8H3.5z" />
-                </svg>
-              </button>
-            </li>
-          ))}
+          {generations.map((gen) => {
+            const isActive = activeId === gen.id;
+            const colors = TYPE_COLORS[gen.dossier_type] || DEFAULT_COLORS;
+            return (
+              <li key={gen.id} className="group flex items-stretch">
+                <button
+                  onClick={() => onSelect(gen.id)}
+                  className={`flex-1 text-left px-3 py-2.5 rounded-l-lg transition-all duration-200 ${
+                    isActive
+                      ? `${colors.activeBg} text-white font-semibold`
+                      : "hover:bg-white/[0.02] border border-transparent text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    {isActive && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${colors.dot}`} />}
+                    <p className="text-sm font-semibold truncate leading-tight">
+                      {gen.company_name || gen.role || "Untitled"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                      isActive ? colors.activeBadge : colors.badge
+                    }`}>
+                      {TYPE_LABELS[gen.dossier_type] || gen.dossier_type}
+                    </span>
+                    <span className="text-[10px] text-slate-500">
+                      {new Date(gen.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    </span>
+                  </div>
+                </button>
+                <button
+                  onClick={(e) => handleDelete(e, gen.id)}
+                  className="px-2 rounded-r-lg opacity-0 group-hover:opacity-100 hover:bg-red-500/10 transition-all duration-200 flex items-center"
+                  aria-label="Delete dossier"
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#EF4444" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 4.5 4.5 4.5 11 4.5" />
+                    <path d="M4.5 4.5V3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1.5" />
+                    <path d="M5.5 6.5v4" />
+                    <path d="M8.5 6.5v4" />
+                    <path d="M2.5 4.5h9l-1 8H3.5z" />
+                  </svg>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
