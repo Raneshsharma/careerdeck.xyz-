@@ -23,62 +23,83 @@ export function buildResumeWriterPrompt(
   const careerIntel = state.careerIntelligence || {};
 
   const structures: Record<string, string> = {
-    masterDashboard: `Generate a 'Master Dashboard' homepage layout:
+    masterDashboard: `Generate a 'Master Dashboard' homepage:
 1. Write a 2-3 line **Candidate Intelligence Summary**.
-2. Generate an **ATS Match & Readiness** scorecard table formatted exactly as:
+2. Display the **Hero Metrics**:
+- **Overall Hiring Readiness**: [score out of 100]
+- **Key Strength**: [e.g. Growth Analytics]
+- **Key Risk**: [e.g. Limited PM Ownership]
+- **Next High-ROI Action**: [e.g. Rewrite Blinkit bullets]
+- **Expected Score Gain**: [e.g. +6 Hiring Readiness]
+3. Generate the **Readiness & Fit Scorecard** table formatted exactly as:
 | Metric | Score | Rating | Recommendation |
-Include these 7 metrics: 'Candidate Intelligence', 'Hiring Readiness', 'Interview Readiness', 'Resume Quality', 'Company Fit', 'Role Fit', 'JD Fit'.
-Score from 0-100 and rate (e.g. Elite for 90+, High for 80+, Medium for 70+).
-3. List **Candidate DNA** (star ratings 1-5 stars, e.g. Builder: ★★★★★, Analyst: ★★★★★, Leader: ★★★☆☆, Operator: ★★★★☆, Strategist: ★★★★☆).
-4. List **Biggest Strength** and **Biggest Risk**.
-5. Conclude with **Today's Mission** (the single highest-ROI improvement) and **Expected Improvement** (e.g., '+6 Hiring Score').`,
+Include these 6 metrics: 'Hiring Readiness', 'Interview Readiness', 'Resume Quality', 'Company Fit', 'Role Fit', 'JD Fit'. Rate 0-100 (e.g. Elite, High, Medium). ATS details must live inside the recommendation text of 'Resume Quality', not as a hero.
+4. Write a **Why This Score?** explanation list for all 6 metrics, detailing positive (+) and negative (-) contributors:
+e.g.
+- **Hiring Readiness**:
+  + Blinkit Impact
+  + SQL proficiency
+  - Short tenure
+5. List **Candidate DNA** traits (Builder, Analyst, Leader, Operator, Strategist). For each, show:
+- Star rating (e.g. Builder: ★★★★☆)
+- Concrete Evidence from the resume (e.g. 'Built startup', 'Led GTM')
+- Analysis Confidence: [High/Medium/Low]`,
 
-    resumeStrategy: `Generate the 'Resume Strategy' configuration:
-1. **Core Optimization Angle**: (e.g. Product Thinking vs. Technology Scale).
-2. **Strategy Rationale**: 3-4 lines explaining why this angle is selected based on target Job Description/competency demands (e.g. 'JD highlights product discovery and roadmap ownership over implementation details').
-3. **Strategic Alignment Rules**: 2-3 actionable guidelines to frame experiences downstream (e.g. 'Translate technical implementation to customer conversion metrics').`,
+    resumeStrategy: `Generate the 'Master Resume Strategy':
+1. Format as a config list:
+- **Target Strategy**: [e.g. Growth Product Manager]
+- **Resume Tone**: [e.g. Analytical]
+- **Evidence Priority**: [e.g. Metrics & Telemetry]
+- **Keywords Priority**: [e.g. Product Discovery]
+- **Interview Focus**: [e.g. End-to-End Ownership]
+2. Write a brief 3-4 line **Strategy Rationale** explaining why this strategy is chosen based on JD requirements.
+3. List 2-3 **Strategic Alignment Rules** for downstream updates.`,
 
     roiImprovements: `Generate the 'Highest ROI Improvements' table (Global Recommendation Engine):
 1. Format as a table:
-| Improvement | Estimated Hiring Impact | Effort | Priority | Reference Section |
-2. Do NOT write repetitive advice. Map all key improvements across the candidate's profile into this single unified matrix.
-3. Use categorical rankings: Impact (High/Medium/Low), Effort (Low/Medium/High), Priority (🔴 Do Today / 🔴 This Week / 🟡 Before Interview / 🟢 Long Term).`,
+| Improvement | Hiring Gain | Time | ROI |
+Ensure Hiring Gain shows the expected score improvement (e.g. +6, +3). ROI must be star-rated (e.g. ⭐⭐⭐⭐⭐ for highest).
+2. Do NOT write repetitive advice throughout the dossier. Group all key optimizations here.`,
 
-    attentionHeatmap: `Generate an 'Attention Heatmap' audit:
-- 🔥 **Strong Attention (Recruiter scans here first)**: 2-3 specific entries/metrics in the resume that stand out immediately.
-- 👁 **Weak Attention (Recruiter skims quickly)**: 2-3 sections/formatting elements that get low visual focus.
-- 💤 **Ignored / Skipped (Recruiter completely bypasses)**: 2-3 elements that do not influence decision-making.`,
+    attentionHeatmap: `Generate the 'Attention Heatmap' audit:
+List the visual scan zones with explicit confidence tags:
+- 🔥 **Strong Attention (Recruiter reads first)**: [entries] (Confidence: High/Medium/Low)
+- 👁 **Weak Attention (Recruiter skims)**: [entries] (Confidence: High/Medium/Low)
+- 💤 **Ignored / Skipped (Recruiter bypasses)**: [entries] (Confidence: High/Medium/Low)`,
 
-    candidateMoat: `Generate the 'Candidate Moat & DNA Evidence':
-1. Identify the candidate's core professional Moat (e.g., Growth Analytics, Scale Architecture).
-2. Detail **Moat Evidence**: List concrete facts, metrics, and technologies from the candidate's resume (e.g., ₹32L GMV, SQL, Blinkit experience). Do NOT write generic definitions.
-3. Write a brief 3-line **Moat Story** explaining how this moat positions them above average candidates.`,
+    candidateMoat: `Generate the 'Candidate Moat & Competitor Comparison':
+1. Define the candidate's core professional Moat and its resume evidence.
+2. Generate a **Competitor Comparison Matrix** showing:
+- **Why You (Your Strengths)**: [e.g. ✓ SQL, ✓ Growth, ✓ GTM]
+- **Average Candidate (Gaps)**: [e.g. ✗ SQL, ✗ GTM, ✗ Analytics]`,
 
-    recruiterSimulation: `Generate a 'Recruiter Persona Simulation':
-1. Simulate feedback from three distinct screening perspectives:
-   - **Recruiter (10-second screening check)**: Verdict (Would Interview/Hold/Reject), Confidence (High/Medium/Low), and Evidence (e.g. Clear Brand, matching Title).
-   - **Hiring Manager (Competency check)**: Verdict (Would Interview/Hold/Reject), Confidence (High/Medium/Low), and Evidence (e.g. Scope of ownership, metrics density).
-   - **Panel / Interviewers (Technical/Behavioral check)**: Verdict (Strong Hire/Lean Hire/No Hire), Confidence (High/Medium/Low), and Evidence (e.g. STAR structure match).
-2. Eliminate fake precision percentages—always express evaluation confidence as High/Medium/Low and provide evidence.`,
+    recruiterSimulation: `Generate the 'Recruiter Persona Simulation':
+Draft simulated feedback comments with real professional personality:
+- **Recruiter (10s screening)**: "[Descriptive quote showing screening mindset]" | Verdict: [Would Interview/Hold/Reject] | Confidence: [High/Medium/Low] | Evidence: [e.g. clear target title]
+- **Hiring Manager (Competency check)**: "[Descriptive quote showing execution/metrics focus]" | Verdict: [Would Interview/Hold/Reject] | Confidence: [High/Medium/Low] | Evidence: [e.g. STAR structuring]
+- **Director / Panel (Strategic fit)**: "[Descriptive quote showing long-term strategy focus]" | Verdict: [Strong Hire/Lean Hire/No Hire] | Confidence: [High/Medium/Low] | Evidence: [e.g. scope size]`,
 
-    bulletAudits: `Generate 'Interactive Bullet Audits & Rewrites':
-1. Enforce the **Evidence Validator**—never fabricate or invent metrics. If a bullet lacks metrics, write a template with placeholder fields (e.g., "[X]%") and explain how to calculate it.
+    bulletAudits: `Generate 'Interactive Bullet Audits & STAR Rewrites':
+1. Strictly follow the **Evidence Validator**—never fabricate or invent metrics. If a bullet lacks metrics, write a template with placeholder fields (e.g., "[X]%") and explain how to calculate it.
 2. Format as a table:
 | Original Bullet | Detected Weakness | Optimized STAR Rewrite (Template) | Why Better |
-3. Follow with **Missing Evidence Prompts**: Write 2-3 direct questions asking the candidate for the exact metrics needed to fill the template placeholders (e.g. 'Can you estimate the increase in CTR?').`,
+Ensure rewrite templates use descriptive brackets like \`[Add metrics: e.g. CTR % increase]\` instead of raw \`[X]%\` to avoid placeholder fatigue.
+3. Follow with **Missing Evidence Prompts**: Write 2-3 direct questions asking the candidate for the exact metrics needed to fill the template placeholders (e.g. 'Can you estimate the CTR increase?').`,
 
-    candidateStory: `Generate the 'Candidate Story' pitches:
-Generate three distinct elevator pitch versions of the candidate's professional narrative:
-1. **30-Second Elevator Pitch**: Ultra-short, high-impact overview.
-2. **60-Second "Tell Me About Yourself" Pitch**: Standard behavioral interview overview.
-3. **2-Minute Deep-Dive Pitch**: Structured walkthrough detailing background, key moat experiences, and role motivation.`,
+    candidateStory: `Generate 5 distinct versions of the candidate's professional pitch:
+- **30-Second Networking Pitch**: Ultra-short overview for quick outreach.
+- **45-Second HR / Screener Pitch**: Punchy introduction for recruiters.
+- **60-Second Interview Pitch**: Standard "Tell Me About Yourself" baseline.
+- **90-Second Executive Pitch**: High-level, value-focused summary for directors.
+- **2-Minute Leadership Pitch**: In-depth story showcasing ownership, scope, and target role motivation.`,
 
-    learningRoadmap: `Generate the 'Targeted Learning Roadmap':
-List 3-4 skills/topics the candidate must acquire to address role gaps. For each item show:
-- **Skill to Learn**: [topic]
-- **Time Required**: [e.g. 8 hours, 12 hours]
-- **Hiring Impact**: [star rating, e.g. ★★★★★]
-- **ROI Action**: [specific task/resource to complete]`
+    learningRoadmap: `Generate the 'Targeted Learning Roadmap & Coach Session':
+1. List 3-4 skills to acquire with Time, Hiring Impact stars, and ROI actions.
+2. Conclude the section with a styled **Interactive AI Resume Coach** call-to-action block:
+---
+### 🤖 Interactive AI Resume Coach
+"I found [number] bullets in your resume. Only [number] key bullets are causing [percentage]% of your hiring gap. Let's fix them together in an interactive coaching loop! Ready?"
+**[Start Coaching Session]**`
   };
 
   const structure = structures[sectionId] || "Write the section in McKinsey-grade consulting prose.";
