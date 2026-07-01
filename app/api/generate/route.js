@@ -489,7 +489,7 @@ export async function POST(request) {
               ]
             : dosType === "resume"
             ? [
-                "masterDashboard", "resumeStrategy", "roiImprovements", "attentionHeatmap",
+                "resumeStrategy", "masterDashboard", "roiImprovements", "attentionHeatmap",
                 "candidateMoat", "recruiterSimulation", "bulletAudits", "candidateStory", "learningRoadmap"
               ]
             : [
