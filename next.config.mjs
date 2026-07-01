@@ -2,6 +2,9 @@
 const nextConfig = {
   poweredByHeader: false,
   compress: true,
+  experimental: {
+    serverComponentsExternalPackages: ["pdf-parse", "pdfjs-dist"]
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
