@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import { createRequire } from "module";
+import path from "path";
+import { pathToFileURL } from "url";
 
 const require = createRequire(import.meta.url);
 const { PDFParse } = require("pdf-parse");
+
+const workerPath = path.join(process.cwd(), "node_modules/pdf-parse/dist/pdf-parse/cjs/pdf.worker.mjs");
+PDFParse.setWorker(pathToFileURL(workerPath).href);
 
 export async function POST(request) {
   const supabaseAuth = await createClient();
