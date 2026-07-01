@@ -15,18 +15,7 @@ const candidates = [
   path.join(process.cwd(), "../node_modules/pdf-parse/dist/pdf-parse/cjs/pdf.worker.mjs"),
 ];
 
-console.log("PDF PARSE WORKER DIAGNOSTICS:");
-console.log("- process.cwd():", process.cwd());
-candidates.forEach((c, idx) => {
-  console.log(`- Candidate ${idx} exists:`, fs.existsSync(c), "path:", c);
-});
 
-const localDist = path.join(process.cwd(), "node_modules/pdf-parse/dist");
-if (fs.existsSync(localDist)) {
-  console.log("- localDist contents:", fs.readdirSync(localDist));
-} else {
-  console.log("- localDist does not exist:", localDist);
-}
 
 let workerPath = candidates[0]; // fallback
 for (const c of candidates) {
