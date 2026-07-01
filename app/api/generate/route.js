@@ -16,6 +16,7 @@ import { companyGraph } from "@/src/graph/companyGraph";
 import { roleGraph } from "@/src/graph/roleGraph";
 import { jdGraph } from "@/src/graph/jdGraph";
 import { newsGraph } from "@/src/graph/newsGraph";
+import { resumeGraph } from "@/src/graph/resumeGraph";
 import { EvaluationEngine } from "@/src/evaluation/evaluationEngine";
 import { QualityMetricsStore } from "@/src/evaluation/qualityMetricsStore";
 import { UNIVERSAL_MASTER_PROMPT, DOMAIN_MASTER_PROMPTS } from "@/src/prompts/masterPrompt";
@@ -372,11 +373,12 @@ export async function POST(request) {
     }
     acquired = true;
 
-    const { dossierType, companyName, role, jobDescription } = await request.json();
+    const { dossierType, companyName, role, jobDescription, resumeText } = await request.json();
 
     const cName = sanitize(companyName || "");
     const rName = sanitize(role || "");
     const jd = sanitize(jobDescription || "");
+    const rText = sanitize(resumeText || "");
     const dosType = dossierType || "company";
 
     // Validation
@@ -401,17 +403,21 @@ export async function POST(request) {
         if (!cName) return Response.json({ error: "Company name is required" }, { status: 400 });
         if (cName.length > 100) return Response.json({ error: "Company name must be ≤100 characters" }, { status: 400 });
         break;
+      case "resume":
+        if (!rText.trim()) return Response.json({ error: "Resume text is required" }, { status: 400 });
+        if (rText.length > 50000) return Response.json({ error: "Resume text must be ≤50,000 characters" }, { status: 400 });
+        break;
       default:
         return Response.json({ error: `Unknown dossier type: ${dosType}` }, { status: 400 });
     }
 
-    // ── LANGGRAPH PIPELINE: company, role, jd, and news dossier types use parallel graphs ──
-    if (dosType === "company" || dosType === "role" || dosType === "jd" || dosType === "news") {
+    // ── LANGGRAPH PIPELINE: company, role, jd, news, and resume dossier types use parallel graphs ──
+    if (dosType === "company" || dosType === "role" || dosType === "jd" || dosType === "news" || dosType === "resume") {
       const emitter = createSSEEmitter();
       const { stream } = emitter;
       const stopHeartbeat = startHeartbeat(emitter);
 
-      const genId = await recordGeneration(user.id, dosType, cName, rName);
+      const genId = await recordGeneration(user.id, dosType, cName || "Resume", rName || "Candidate");
       if (genId) {
         try { emitter.emit("gen-id", { id: genId }); } catch {}
       }
@@ -420,12 +426,14 @@ export async function POST(request) {
         companyName: cName,
         role: rName || undefined,
         jobDescription: jd || undefined,
+        resumeText: rText || undefined,
         dossierType: dosType,
       };
 
       const graphToUse = dosType === "company" ? companyGraph
         : dosType === "role" ? roleGraph
         : dosType === "jd" ? jdGraph
+        : dosType === "resume" ? resumeGraph
         : newsGraph;
 
       // Run graph asynchronously — emit sections as they complete
@@ -478,6 +486,14 @@ export async function POST(request) {
                 "stakeholderMap", "kpiIntelligence", "interviewPrediction", "starBlueprint",
                 "resumeMatch", "expectations3060", "redFlags", "companyAlignment",
                 "fitScore", "interviewCheatSheet"
+              ]
+            : dosType === "resume"
+            ? [
+                "resumeOneMinute", "atsMatch", "keywordIntel", "hiringProbability", "gapAnalysis",
+                "sectionAnalysis", "bulletIntel", "starIntel", "metricsIntel", "languageIntel",
+                "achievementIntel", "skillsIntel", "projectIntel", "experienceIntel", "companyAlignment",
+                "roleAlignment", "jdAlignment", "missingEvidence", "rewriteEngine", "beforeAfter",
+                "eyeTracking", "hiringManagerFeedback", "atsSimulator", "roadmap", "finalDashboard"
               ]
             : [
                 "newsOverview", "executiveSummary", "whatHappened", "whyItHappened",

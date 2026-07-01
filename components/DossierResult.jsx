@@ -17,6 +17,7 @@ const TYPE_ACCENT = {
   role: "border-emerald-500/30 text-emerald-400",
   jd: "border-amber-500/30 text-amber-400",
   news: "border-blue-500/30 text-blue-400",
+  resume: "border-orange-500/30 text-orange-400",
 };
 
 function ActionBar({ onReset, handleCopy, handleDownload, handleExportWord, copied, isTop = false }) {

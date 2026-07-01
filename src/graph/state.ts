@@ -531,6 +531,17 @@ export const CompanyStateAnnotation = Annotation.Root({
     default: () => null,
   }),
 
+  // ── Resume & Candidate Intelligence state ──────────────────────────────
+  resumeText: Annotation<string | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  resumeFacts: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
   // ── Metadata / tracing ──────────────────────────────────────────────────
   startedAt: Annotation<string>(),
 

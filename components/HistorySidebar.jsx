@@ -7,6 +7,7 @@ const TYPE_LABELS = {
   role: "Role",
   jd: "JD",
   news: "News",
+  resume: "Candidate",
 };
 
 // Distinct color per dossier type
@@ -34,6 +35,12 @@ const TYPE_COLORS = {
     activeBadge: "bg-blue-500/25 text-blue-300 border border-blue-400/30",
     activeBg: "bg-blue-500/10 border-l-2 border-blue-500",
     dot: "bg-blue-400",
+  },
+  resume: {
+    badge: "bg-orange-500/15 text-orange-400 border border-orange-500/20",
+    activeBadge: "bg-orange-500/25 text-orange-300 border border-orange-400/30",
+    activeBg: "bg-orange-500/10 border-l-2 border-orange-500",
+    dot: "bg-orange-400",
   },
 };
 

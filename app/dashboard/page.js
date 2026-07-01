@@ -23,6 +23,7 @@ const DOSSIER_LABELS = {
   role: "Role Dossier",
   jd: "JD Dossier",
   news: "News Dossier",
+  resume: "Candidate Intelligence",
 };
 
 function DashboardContent() {
