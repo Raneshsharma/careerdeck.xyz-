@@ -3,11 +3,26 @@ import { createClient } from "@/lib/supabase-server";
 import { createRequire } from "module";
 import path from "path";
 import { pathToFileURL } from "url";
+import fs from "fs";
 
 const require = createRequire(import.meta.url);
 const { PDFParse } = require("pdf-parse");
 
-const workerPath = path.join(process.cwd(), "node_modules/pdf-parse/dist/pdf-parse/cjs/pdf.worker.mjs");
+// Resolve first existing candidate path for the worker file to handle dev, prod, and standalone environments
+const candidates = [
+  path.join(process.cwd(), "node_modules/pdf-parse/dist/pdf-parse/cjs/pdf.worker.mjs"),
+  path.join(process.cwd(), ".next/standalone/node_modules/pdf-parse/dist/pdf-parse/cjs/pdf.worker.mjs"),
+  path.join(process.cwd(), "../node_modules/pdf-parse/dist/pdf-parse/cjs/pdf.worker.mjs"),
+];
+
+let workerPath = candidates[0]; // fallback
+for (const c of candidates) {
+  if (fs.existsSync(c)) {
+    workerPath = c;
+    break;
+  }
+}
+
 PDFParse.setWorker(pathToFileURL(workerPath).href);
 
 export async function POST(request) {
