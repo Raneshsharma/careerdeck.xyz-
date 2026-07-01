@@ -1,9 +1,13 @@
 export const RESUME_SECTION_IDS = [
-  "resumeOneMinute", "atsMatch", "keywordIntel", "hiringProbability", "gapAnalysis",
-  "sectionAnalysis", "bulletIntel", "starIntel", "metricsIntel", "languageIntel",
-  "achievementIntel", "skillsIntel", "projectIntel", "experienceIntel", "companyAlignment",
-  "roleAlignment", "jdAlignment", "missingEvidence", "rewriteEngine", "beforeAfter",
-  "eyeTracking", "hiringManagerFeedback", "atsSimulator", "roadmap", "finalDashboard"
+  "masterDashboard",
+  "resumeStrategy",
+  "roiImprovements",
+  "attentionHeatmap",
+  "candidateMoat",
+  "recruiterSimulation",
+  "bulletAudits",
+  "candidateStory",
+  "learningRoadmap"
 ];
 
 export function buildResumeWriterPrompt(
@@ -19,80 +23,62 @@ export function buildResumeWriterPrompt(
   const careerIntel = state.careerIntelligence || {};
 
   const structures: Record<string, string> = {
-    resumeOneMinute: `Write a high-impact 'Candidate in One Minute' summary:
-- **Core Summary**: [from CKG identity/brand]
-- **Years of Experience**: [total years]
-- **Best-Fit Roles**: [list best-fit roles from CKG]
-- **Biggest Strength**: [from CKG strengths]
-- **Biggest Weakness**: [from CKG gaps/weaknesses]
-Make it punchy, using bold labels.`,
-
-    atsMatch: `Generate an 'ATS Match & Compatibility' scorecard. Format as a table:
+    masterDashboard: `Generate a 'Master Dashboard' homepage layout:
+1. Write a 2-3 line **Candidate Intelligence Summary**.
+2. Generate an **ATS Match & Readiness** scorecard table formatted exactly as:
 | Metric | Score | Rating | Recommendation |
-Metrics to include: Overall Match, Technical Match, Leadership Match, Ownership Match, Formatting, and Parsing Risk.
-Rate from 0-100 based on matching/optimization intelligence.`,
+Include these 7 metrics: 'Candidate Intelligence', 'Hiring Readiness', 'Interview Readiness', 'Resume Quality', 'Company Fit', 'Role Fit', 'JD Fit'.
+Score from 0-100 and rate (e.g. Elite for 90+, High for 80+, Medium for 70+).
+3. List **Candidate DNA** (star ratings 1-5 stars, e.g. Builder: ★★★★★, Analyst: ★★★★★, Leader: ★★★☆☆, Operator: ★★★★☆, Strategist: ★★★★☆).
+4. List **Biggest Strength** and **Biggest Risk**.
+5. Conclude with **Today's Mission** (the single highest-ROI improvement) and **Expected Improvement** (e.g., '+6 Hiring Score').`,
 
-    keywordIntel: `Create a 'Keyword Intelligence' table showing target keywords:
-| Keyword Cluster | Match Status | Importance | Placement Strategy |
-Statuses: Matched (✓), Missing (✗), Weak Usage (⚠), or Overused (↑).
-Use optimization intelligence keywords data.`,
+    resumeStrategy: `Generate the 'Resume Strategy' configuration:
+1. **Core Optimization Angle**: (e.g. Product Thinking vs. Technology Scale).
+2. **Strategy Rationale**: 3-4 lines explaining why this angle is selected based on target Job Description/competency demands (e.g. 'JD highlights product discovery and roadmap ownership over implementation details').
+3. **Strategic Alignment Rules**: 2-3 actionable guidelines to frame experiences downstream (e.g. 'Translate technical implementation to customer conversion metrics').`,
 
-    hiringProbability: `Project 'Hiring Probability' based on matching intelligence:
-- **Interview Probability**: [X]% (Confidence: High/Medium/Low)
-- **Offer Probability**: [Y]% (Confidence: High/Medium/Low)
-Follow with 3-4 bullet points detailing explainable factors driving these probabilities.`,
+    roiImprovements: `Generate the 'Highest ROI Improvements' table (Global Recommendation Engine):
+1. Format as a table:
+| Improvement | Estimated Hiring Impact | Effort | Priority | Reference Section |
+2. Do NOT write repetitive advice. Map all key improvements across the candidate's profile into this single unified matrix.
+3. Use categorical rankings: Impact (High/Medium/Low), Effort (Low/Medium/High), Priority (🔴 Do Today / 🔴 This Week / 🟡 Before Interview / 🟢 Long Term).`,
 
-    gapAnalysis: `Write a 'Candidate Gap Analysis'. Rate dimensions (Experience, Projects, Metrics, Leadership, Ownership) out of 10.
-For each, provide a brief McKinsey-grade analysis paragraph outlining the gap and how to bridge it.`,
+    attentionHeatmap: `Generate an 'Attention Heatmap' audit:
+- 🔥 **Strong Attention (Recruiter scans here first)**: 2-3 specific entries/metrics in the resume that stand out immediately.
+- 👁 **Weak Attention (Recruiter skims quickly)**: 2-3 sections/formatting elements that get low visual focus.
+- 💤 **Ignored / Skipped (Recruiter completely bypasses)**: 2-3 elements that do not influence decision-making.`,
 
-    sectionAnalysis: `Score and review each major resume section (Professional Summary, Experience, Projects, Skills, Achievements).
-Identify 1 actionable improvement fix for each.`,
+    candidateMoat: `Generate the 'Candidate Moat & DNA Evidence':
+1. Identify the candidate's core professional Moat (e.g., Growth Analytics, Scale Architecture).
+2. Detail **Moat Evidence**: List concrete facts, metrics, and technologies from the candidate's resume (e.g., ₹32L GMV, SQL, Blinkit experience). Do NOT write generic definitions.
+3. Write a brief 3-line **Moat Story** explaining how this moat positions them above average candidates.`,
 
-    bulletIntel: `Generate a 'Bullet Intelligence & STAR Rewrites' table.
-Strictly enforce the **Evidence Validator**—never invent metrics or fabricate achievements. If a bullet lacks metrics, write a template with placeholder fields (e.g., "[X]%") and explain how to calculate it.
-Show:
-| Original Bullet | Detected Weakness | Optimized STAR Rewrite (Template) | Why Better |`,
+    recruiterSimulation: `Generate a 'Recruiter Persona Simulation':
+1. Simulate feedback from three distinct screening perspectives:
+   - **Recruiter (10-second screening check)**: Verdict (Would Interview/Hold/Reject), Confidence (High/Medium/Low), and Evidence (e.g. Clear Brand, matching Title).
+   - **Hiring Manager (Competency check)**: Verdict (Would Interview/Hold/Reject), Confidence (High/Medium/Low), and Evidence (e.g. Scope of ownership, metrics density).
+   - **Panel / Interviewers (Technical/Behavioral check)**: Verdict (Strong Hire/Lean Hire/No Hire), Confidence (High/Medium/Low), and Evidence (e.g. STAR structure match).
+2. Eliminate fake precision percentages—always express evaluation confidence as High/Medium/Low and provide evidence.`,
 
-    starIntel: `Deconstruct key resume experiences into the STAR framework:
-- **Situation**: [context]
-- **Task**: [what needed to be done]
-- **Action**: [specific action taken]
-- **Result**: [measurable outcome or target template]`,
+    bulletAudits: `Generate 'Interactive Bullet Audits & Rewrites':
+1. Enforce the **Evidence Validator**—never fabricate or invent metrics. If a bullet lacks metrics, write a template with placeholder fields (e.g., "[X]%") and explain how to calculate it.
+2. Format as a table:
+| Original Bullet | Detected Weakness | Optimized STAR Rewrite (Template) | Why Better |
+3. Follow with **Missing Evidence Prompts**: Write 2-3 direct questions asking the candidate for the exact metrics needed to fill the template placeholders (e.g. 'Can you estimate the increase in CTR?').`,
 
-    metricsIntel: `Write a 'Metrics Density' audit. Show current density vs. 90% target.
-Detail missing telemetry points (e.g. revenue, time savings, scale) and show templates to quantify them.`,
+    candidateStory: `Generate the 'Candidate Story' pitches:
+Generate three distinct elevator pitch versions of the candidate's professional narrative:
+1. **30-Second Elevator Pitch**: Ultra-short, high-impact overview.
+2. **60-Second "Tell Me About Yourself" Pitch**: Standard behavioral interview overview.
+3. **2-Minute Deep-Dive Pitch**: Structured walkthrough detailing background, key moat experiences, and role motivation.`,
 
-    languageIntel: `Analyze resume action verbs. List weak verbs found in the resume (helped, worked, assisted) vs. strong power verbs to replace them with.`,
-
-    achievementIntel: `Critique the candidate's achievements. Map achievements into Business, Leadership, or Generic Activities, highlighting missing gaps.`,
-
-    skillsIntel: `Present a Skill Cluster Overlap analysis comparing candidate skills vs. target role clusters in a table, highlighting overlapping strengths.`,
-
-    projectIntel: `Audit candidate projects for Business Problem, Solution, Tools, and Impact. Suggest 2 custom project templates based on target JD/Role.`,
-
-    experienceIntel: `Assess the depth of experience: ownership scope, cross-functional collaboration, budget, and business results.`,
-
-    companyAlignment: `Write a 'Company × Candidate Alignment' section. Detail how well the candidate's profile matches "${companyName}" core principles or leadership pillars (e.g., Amazon Leadership Principles).`,
-
-    roleAlignment: `Analyze role fit for "${roleTitle}". Detail competency gaps and how to address them in the resume.`,
-
-    jdAlignment: `Highlight the top 3 strongest overlaps with the Job Description and explain why they stand out.`,
-
-    missingEvidence: `Highlight missing evidence gaps in the resume and suggest 3-4 prompting questions to help the candidate remember hidden achievements.`,
-
-    rewriteEngine: `Generate a clean, high-impact rewrite of the candidate's Professional Summary and 2 key Experience entries. Focus on elite McKinsey style.`,
-
-    beforeAfter: `Build a 'Before vs. After' comparison table showing side-by-side metric increases (ATS Score, Keyword Match, Metrics Density).`,
-
-    eyeTracking: `Map out a simulated 'Recruiter Gaze Path' (10-second scan). List the first 3 things they look at and the top 3 cognitive friction points.`,
-
-    hiringManagerFeedback: `Draft the simulated feedback card from a Hiring Manager: Pros, Cons, and a final verdict ('Would Interview', 'Hold', 'Reject') with reasons.`,
-
-    atsSimulator: `List all ATS formatting risks (columns, headers, tables, fonts) found in the resume layout and how to resolve them.`,
-
-    roadmap: `Build a Resume Roadmap table: actions to complete Today, this Week, before the Interview, and Long Term.`,
-
-    finalDashboard: `Present a summary dashboard with overall ratings for Resume Quality, ATS Match, Hiring Probability, Interview Readiness, and Leadership.`
+    learningRoadmap: `Generate the 'Targeted Learning Roadmap':
+List 3-4 skills/topics the candidate must acquire to address role gaps. For each item show:
+- **Skill to Learn**: [topic]
+- **Time Required**: [e.g. 8 hours, 12 hours]
+- **Hiring Impact**: [star rating, e.g. ★★★★★]
+- **ROI Action**: [specific task/resource to complete]`
   };
 
   const structure = structures[sectionId] || "Write the section in McKinsey-grade consulting prose.";
@@ -104,9 +90,10 @@ SECTION INSTRUCTIONS:
 ${structure}
 
 RULES:
-1. Write with absolute precision, strategic depth, and executive clarity.
+1. Write with absolute precision, strategic depth, and executive clarity. Ensure every section can be consumed in 30 seconds (keep it extremely concise and direct).
 2. Address the candidate as "you".
-3. Conclude each section with a bolded "**Resume Action:** [one concrete edit to make today]".`;
+3. Do NOT put scores in individual sections to prevent score fatigue. All scores must be in the Master Dashboard only.
+4. Conclude each section (except the Master Dashboard) with a bolded "**Resume Action:** [one concrete edit to make today]".`;
 
   const userPrompt = `Write the section "${sectionId}" for the resume.
 

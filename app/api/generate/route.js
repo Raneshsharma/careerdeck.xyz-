@@ -489,11 +489,8 @@ export async function POST(request) {
               ]
             : dosType === "resume"
             ? [
-                "resumeOneMinute", "atsMatch", "keywordIntel", "hiringProbability", "gapAnalysis",
-                "sectionAnalysis", "bulletIntel", "starIntel", "metricsIntel", "languageIntel",
-                "achievementIntel", "skillsIntel", "projectIntel", "experienceIntel", "companyAlignment",
-                "roleAlignment", "jdAlignment", "missingEvidence", "rewriteEngine", "beforeAfter",
-                "eyeTracking", "hiringManagerFeedback", "atsSimulator", "roadmap", "finalDashboard"
+                "masterDashboard", "resumeStrategy", "roiImprovements", "attentionHeatmap",
+                "candidateMoat", "recruiterSimulation", "bulletAudits", "candidateStory", "learningRoadmap"
               ]
             : [
                 "newsOverview", "executiveSummary", "whatHappened", "whyItHappened",
