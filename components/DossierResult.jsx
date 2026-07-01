@@ -1,15 +1,85 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef, createContext, useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import SourceTiles from "@/components/SourceTiles";
 import SectionVoting from "@/components/SectionVoting";
 import SectionFeedback from "@/components/SectionFeedback";
 import Link from "next/link";
+import InlineBulletCoach from "@/components/InlineBulletCoach";
 
 function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+// ── Inline Coach Context ──────────────────────────────────────────────────────
+const InlineCoachContext = createContext(null);
+
+function extractText(node) {
+  if (!node) return "";
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (node?.props?.children) return extractText(node.props.children);
+  return "";
+}
+
+function applyBulletRewrite(rawContent, originalText, newText) {
+  const lines = rawContent.split("\n");
+  let replaced = false;
+  const updated = lines.map((line) => {
+    if (replaced) return line;
+    const m = line.match(/^(\s*[-*+]\s+)(.*)/);
+    if (m) {
+      const lineText = m[2].replace(/\*\*/g, "").replace(/\*/g, "").replace(/`/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").trim();
+      const clean = originalText.replace(/\*\*/g, "").replace(/\*/g, "").replace(/`/g, "").trim();
+      if (lineText === clean || (clean.length > 30 && lineText.startsWith(clean.slice(0, 30)))) {
+        replaced = true;
+        return `${m[1]}${newText}`;
+      }
+    }
+    return line;
+  });
+  return updated.join("\n");
+}
+
+function EnhancedListItem({ children }) {
+  const ctx = useContext(InlineCoachContext);
+  const [showCoach, setShowCoach] = useState(false);
+  const bulletText = extractText(children);
+
+  if (!ctx) return <li>{children}</li>;
+
+  const handleApply = (original, rewrite) => {
+    if (!ctx.onContentUpdate) return;
+    const updated = applyBulletRewrite(ctx.content, original, rewrite);
+    ctx.onContentUpdate(updated);
+    setShowCoach(false);
+  };
+
+  return (
+    <li className="group relative">
+      <span>{children}</span>
+      {!showCoach && (
+        <button
+          onClick={() => setShowCoach(true)}
+          className="ml-2 opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-violet-500/10 border border-violet-500/20 text-violet-400 text-[10px] font-semibold hover:bg-violet-500/20 transition-all duration-200 align-middle no-print"
+          title="Get AI coaching on this bullet"
+        >
+          ✨ Improve
+        </button>
+      )}
+      {showCoach && (
+        <InlineBulletCoach
+          bulletText={bulletText}
+          dossierContent={ctx.content}
+          onClose={() => setShowCoach(false)}
+          onApply={handleApply}
+        />
+      )}
+    </li>
+  );
 }
 
 const TYPE_ACCENT = {
@@ -212,7 +282,7 @@ function ActionBar({ onReset, handleCopy, handleDownload, handleExportWord, copi
   );
 }
 
-export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner, genId, sourceMetadata, isFreeUser = true, dossierType = "company" }) {
+export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner, genId, sourceMetadata, isFreeUser = true, dossierType = "company", onContentUpdate }) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
   const resultRef = useRef(null);
@@ -303,6 +373,7 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
       {/* ── DOSSIER CONTENT ── */}
       <div className="bg-[#0B0F19]/60 border border-white/[0.08] backdrop-blur-md rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 sm:p-10 text-slate-200">
         <article className="dossier-markdown">
+          <InlineCoachContext.Provider value={dossierType === "resume" && onContentUpdate ? { content, onContentUpdate } : null}>
           {sections.map((section, idx) => (
             <div key={section.id || idx} id={section.id}>
               <ReactMarkdown
@@ -310,6 +381,7 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
                 components={{
                   h2: ({ children, ...props }) => <h2 id={section.id} {...props}>{children}</h2>,
                   table: CustomTable,
+                  li: dossierType === "resume" && onContentUpdate ? EnhancedListItem : undefined,
                 }}
               >
                 {section.body}
@@ -323,6 +395,7 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
               )}
             </div>
           ))}
+          </InlineCoachContext.Provider>
         </article>
 
         {/* Post-dossier upgrade CTA — only for free users */}
