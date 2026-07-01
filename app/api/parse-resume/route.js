@@ -24,7 +24,8 @@ export async function POST(request) {
     const buffer = Buffer.from(bytes);
 
     // Parse PDF
-    const data = await pdf(buffer);
+    const parser = pdf.PDFParse || pdf;
+    const data = await parser(buffer);
     const text = data.text || "";
 
     if (!text.trim()) {
