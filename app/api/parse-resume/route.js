@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase-server";
 import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
-const pdf = require("pdf-parse");
+const { PDFParse } = require("pdf-parse");
 
 export async function POST(request) {
   const supabaseAuth = await createClient();
@@ -24,9 +24,9 @@ export async function POST(request) {
     const buffer = Buffer.from(bytes);
 
     // Parse PDF
-    const parser = pdf.PDFParse || pdf;
-    const data = await parser(buffer);
-    const text = data.text || "";
+    const parser = new PDFParse({ data: buffer });
+    const result = await parser.getText();
+    const text = result.text || "";
 
     if (!text.trim()) {
       return NextResponse.json({ error: "Could not extract text from PDF. Please make sure the PDF contains selectable text or copy-paste it directly." }, { status: 400 });
