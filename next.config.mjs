@@ -2,14 +2,6 @@
 const nextConfig = {
   poweredByHeader: false,
   compress: true,
-  experimental: {
-    outputFileTracingIncludes: {
-      "/api/parse-resume": [
-        "./node_modules/pdf-parse/**/*",
-        "./node_modules/pdfjs-dist/**/*"
-      ]
-    }
-  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
