@@ -17,6 +17,7 @@ import BottomNav from "@/components/BottomNav";
 import HistoryButton from "@/components/HistoryButton";
 import OnboardingTour, { shouldShowTour } from "@/components/OnboardingTour";
 import UpgradeModal from "@/components/UpgradeModal";
+import ResumeCoach from "@/components/ResumeCoach";
 
 const DOSSIER_LABELS = {
   company: "Company Dossier",
@@ -43,6 +44,7 @@ function DashboardContent() {
   const [tourVisible, setTourVisible] = useState(false);
   const [loadingDossier, setLoadingDossier] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showCoach, setShowCoach] = useState(false);
   const abortRef = useRef(null);
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
 
@@ -386,6 +388,29 @@ function DashboardContent() {
         onClose={() => setShowUpgradeModal(false)}
         onSuccess={() => setUsageVersion((v) => v + 1)}
       />
+
+      {/* ── AI Resume Coach floating button (resume dossier only) ── */}
+      {dossierType === "resume" && content && !generating && (
+        <>
+          {!showCoach && (
+            <button
+              onClick={() => setShowCoach(true)}
+              className="fixed bottom-20 right-4 lg:bottom-8 lg:right-8 z-40 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-bold shadow-[0_8px_30px_rgba(124,58,237,0.4)] hover:shadow-[0_8px_40px_rgba(124,58,237,0.6)] hover:scale-105 transition-all duration-200 no-print"
+              aria-label="Open AI Resume Coach"
+            >
+              <span className="text-base">🎯</span>
+              <span>Resume Coach</span>
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-[10px] font-black">AI</span>
+            </button>
+          )}
+          {showCoach && (
+            <ResumeCoach
+              dossierContent={content}
+              onClose={() => setShowCoach(false)}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }
