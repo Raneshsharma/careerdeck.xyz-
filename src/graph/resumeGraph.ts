@@ -1,42 +1,26 @@
 import { StateGraph, START, END } from "@langchain/langgraph";
 import { CompanyStateAnnotation } from "./state";
-import { extractResumeFactsNode } from "./nodes/extractResumeFacts";
+import { resumeIntelligenceNode } from "./nodes/resumeIntelligenceNode";
+import { matchingIntelligenceNode } from "./nodes/matchingIntelligenceNode";
+import { optimizationIntelligenceNode } from "./nodes/optimizationIntelligenceNode";
+import { hiringIntelligenceNode } from "./nodes/hiringIntelligenceNode";
+import { careerIntelligenceNode } from "./nodes/careerIntelligenceNode";
 import { generateSection } from "../prompts/llm";
-import { buildResumeAnalystPrompt, buildResumeWriterPrompt, RESUME_SECTION_IDS } from "../prompts/resumeSections";
+import { buildResumeWriterPrompt, RESUME_SECTION_IDS } from "../prompts/resumeSections";
 import { UNIVERSAL_MASTER_PROMPT, DOMAIN_MASTER_PROMPTS } from "../prompts/masterPrompt";
 
 function createResumeSectionNode(sectionId: string) {
   return async (state: any) => {
-    const resumeFacts = state.resumeFacts;
     const companyName = state.companyName || "";
-    const roleTitle = state.role || "Target Candidate";
-    const jdText = state.jobDescription || "";
+    const roleTitle = state.role || "Target Role";
 
     const domainMasterPrompt = DOMAIN_MASTER_PROMPTS["resume"] || "";
     const fullMasterSystemPrompt = `${UNIVERSAL_MASTER_PROMPT}\n\n${domainMasterPrompt}`;
 
     try {
-      // Pass 1: Analyst
-      const { systemPrompt: analystSys, userPrompt: analystUser } =
-        buildResumeAnalystPrompt(sectionId, resumeFacts, companyName, roleTitle, jdText);
-      const fullAnalystSys = `${fullMasterSystemPrompt}\n\n${analystSys}`;
-      const analystRaw = await generateSection(fullAnalystSys, analystUser);
-
-      let analysis: any = {};
-      try {
-        const jsonMatch = analystRaw.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          analysis = JSON.parse(jsonMatch[0]);
-        } else {
-          analysis = { raw: analystRaw };
-        }
-      } catch {
-        analysis = { raw: analystRaw };
-      }
-
-      // Pass 2: Writer
+      // Direct Writer Pass
       const { systemPrompt: writerSys, userPrompt: writerUser } =
-        buildResumeWriterPrompt(sectionId, analysis, companyName, roleTitle);
+        buildResumeWriterPrompt(sectionId, state, companyName, roleTitle);
       const fullWriterSys = `${fullMasterSystemPrompt}\n\n${writerSys}`;
       const content = await generateSection(fullWriterSys, writerUser);
 
@@ -53,12 +37,24 @@ function createResumeSectionNode(sectionId: string) {
 
 const g = new StateGraph(CompanyStateAnnotation) as any;
 
-g.addNode("extractResumeFacts", extractResumeFactsNode);
-g.addEdge(START, "extractResumeFacts");
+// Add 5 Sequential Intelligence Engines
+g.addNode("resumeIntelligenceEngine", resumeIntelligenceNode);
+g.addNode("matchingIntelligenceEngine", matchingIntelligenceNode);
+g.addNode("optimizationIntelligenceEngine", optimizationIntelligenceNode);
+g.addNode("hiringIntelligenceEngine", hiringIntelligenceNode);
+g.addNode("careerIntelligenceEngine", careerIntelligenceNode);
 
+// Connect Engines sequentially
+g.addEdge(START, "resumeIntelligenceEngine");
+g.addEdge("resumeIntelligenceEngine", "matchingIntelligenceEngine");
+g.addEdge("matchingIntelligenceEngine", "optimizationIntelligenceEngine");
+g.addEdge("optimizationIntelligenceEngine", "hiringIntelligenceEngine");
+g.addEdge("hiringIntelligenceEngine", "careerIntelligenceEngine");
+
+// Connect from Career Intelligence to 25 parallel section nodes
 RESUME_SECTION_IDS.forEach((s) => {
   g.addNode(s, createResumeSectionNode(s));
-  g.addEdge("extractResumeFacts", s);
+  g.addEdge("careerIntelligenceEngine", s);
   g.addEdge(s, END);
 });
 

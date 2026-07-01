@@ -542,6 +542,31 @@ export const CompanyStateAnnotation = Annotation.Root({
     default: () => null,
   }),
 
+  resumeIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  matchingIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  optimizationIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  hiringIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  careerIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
   // ── Metadata / tracing ──────────────────────────────────────────────────
   startedAt: Annotation<string>(),
 
