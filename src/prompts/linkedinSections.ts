@@ -40,7 +40,7 @@ export function buildLinkedInWriterPrompt(
     linkedinDashboard: `Generate the 'LinkedIn Career Intelligence Dashboard' — the unified metric first screen.
 Format the dashboard EXACTLY like this (using this structure, replacing values based on actual analysis):
 
-## 📊 Career Intelligence Dashboard
+## 📊 Career Brand Dashboard
 
 | Metric | Score | Detail / Evidence |
 | :--- | :--- | :--- |
@@ -58,7 +58,15 @@ Format the dashboard EXACTLY like this (using this structure, replacing values b
 * **Today's Mission:** [Direct next action, e.g., Rewrite Profile Headline]
 * **Expected Gain:** [Visibility score boost, e.g., +5 Recruiter Visibility]
 
-Ensure that ALL scores are numbers (out of 100) and are realistic based on the LKG analysis. Do not include other content.`,
+### 📈 Outcome Probability
+Based on the profile's current state and target goal, estimate outcome probability metrics:
+| Outcome Opportunity | Probability % | Context / Rationale |
+| :--- | :--- | :--- |
+| **Recruiter Message Response** | [Percentage]% | [Brief reason based on visibility] |
+| **Interview Shortlist Rate** | [Percentage]% | [Brief reason based on experience/titles] |
+| **Cold Outreach Reply Rate** | [Percentage]% | [Brief reason based on brand authority] |
+| **Referral Acceptance Rate** | [Percentage]% | [Brief reason based on shared credentials] |
+| **Content Organic Reach** | [Percentage]% | [Brief reason based on content pillars] |`,
 
     linkedinSnapshot: `Generate 'LinkedIn in One Minute' — one focused paragraph.
 Explain in plain, recruiter-readable language:
@@ -69,21 +77,36 @@ Explain in plain, recruiter-readable language:
 Do NOT use jargon. Write as if explaining to a hiring manager in 60 seconds.`,
 
     professionalBrand: `Generate the 'Professional Brand & Strategy' section.
-1. State the **Primary Brand Strategy** (Professional Identity, Brand Tone, target recruiter goal).
+1. Draw the **Professional Brand Graph** showing how different professional components feed into the central brand. Format it as a text-based ASCII flow or graph:
+\`\`\`text
+  [Resume] ──────┐
+  [LinkedIn] ────┼───> [Experience & Accomplishments] ───> [Professional Brand]
+  [Projects] ────┤                  ▲
+  [Portfolio] ───┘                  │
+  [Posts] ──────────────────────────┴───> [Skills & Keywords]
+\`\`\`
+Explain how the user's specific assets (Resume, LinkedIn, Projects, Portfolio, Posts, Skills, Experience) relate in their brand.
 2. Detail the **Target Positioning**:
    - Current Market Position: [Where the candidate stands today, e.g. Growth Product Intern]
    - Future Position: [The targeted next step, e.g. Associate Product Manager]
-   - Brand Gaps: [Gaps to close to qualify for the future position, e.g. Leadership/Experimentation]
+   - Brand Gaps: [Gaps to close to qualify for the future position, e.g. Leadership/Ownership/Experimentation]
 3. Define the **Brand Moat**: what makes this candidate uniquely difficult to replace.
-4. Set the **Engagement Pillars**: Target networking goal and primary content themes.`,
+4. Set the **Engagement Strategy**: Target networking goal and primary content themes.`,
 
     recruiterFirstImpression: `Generate the 'Recruiter First Impression' section.
-Simulate the 8-second recruiter scan:
-1. **What stands out immediately** (positive signals that stop the scroll).
-2. **What gets ignored or skipped** (weak sections, sparse content).
-3. **Recruiter Verdict**: Would Continue / Maybe / Skip — with one-sentence reasoning.
-4. **Scroll Audit**: Walk through what a recruiter sees in order: headline → photo → current role → about → experience.
-5. **First Impression Score**: [score/100] with evidence.
+Simulate the recruiter funnel scroll behavior step-by-step:
+\`\`\`text
+  [Recruiter Opens Profile] ───> [Looks at Headline] ───> [Stops at key role/metric] ───> [Skips/Reads About] ───> [Skip or Proceed Verdict]
+\`\`\`
+1. **Funnel Scroll Simulation:** Explain exactly what happens when a recruiter scans the profile:
+   - What stops their scroll (the hook)?
+   - What gets skipped or ignored?
+   - Why they would make a decision to message or skip.
+2. **Company Targeting Audit:** Compare targeting alignment for "${targetCompany || "Target Company"}":
+   - E.g. "This profile is optimized for Amazon but not for Google" or specific feedback on the target company.
+   - Explain why the branding fits or misses the specific target company's culture and hiring criteria.
+3. **Recruiter Verdict:** Would Continue / Maybe / Skip — with one-sentence reasoning.
+4. **First Impression Score:** [score/100] with evidence.
 Be direct and honest. Recruiters are blunt. Do not over-praise.`,
 
     profileStrengthScorecard: `Generate the 'Profile Strength Scorecard'.
@@ -131,7 +154,16 @@ Format as: Company Name → Role → Duration → then a comparison table:
     skillsIntelligence: `Generate the 'Skills & SEO Keyword Audit' section.
 1. **Skill Cluster Map** — organize current skills into 4 clusters:
    - Technical, Business, Leadership, Industry.
-2. **SEO Keyword Placement Map** — show where critical target keywords appear today and where they should be added:
+2. **SEO Keyword Placement Heatmap** — show where critical target keywords appear today using text-based bar charts (e.g., █████████░):
+\`\`\`text
+Headline        [█████████░ / 90%]
+About           [███████░░░ / 70%]
+Experience      [███░░░░░░░ / 30%]
+Skills          [██████░░░░ / 60%]
+Featured        [░░░░░░░░░░ /  0%]
+Posts           [░░░░░░░░░░ /  0%]
+\`\`\`
+Verify keyword placement density and add a recommendation table:
 | Keyword | Headline | About | Experience | Skills | Recommendation |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 3. **Missing Skills**: high-priority and medium-priority skills absent from the profile.
@@ -153,23 +185,33 @@ Include roles related to target role (e.g. Associate PM, Growth PM, Product Anal
 2. Detail the exact SEO adjustments required to move LOW/PARTIAL terms to YES.`,
 
     networkingIntelligence: `Generate the 'Networking Intelligence & Outreach targets' section.
-1. **Target Networking Connection Categories**: Recommend specific connection target counts by group:
+1. **Network Quality Analysis**: Evaluate current connection metrics split by specific categories:
+   - Recruiters (e.g. 5%)
+   - Alumni (e.g. 20%)
+   - Founders (e.g. 10%)
+   - Hiring Managers (e.g. 15%)
+   - Peers (e.g. 40%)
+   - Thought Leaders (e.g. 10%)
+   Detail gaps in connection representation.
+2. **Outreach Rationale Targets**: Recommend connection targets by category:
    - APMs / Peers (e.g. 20)
    - Product Directors / Hiring Managers (e.g. 10)
    - School / Company Alumni (e.g. 10)
    - Talent Acquisition / Recruiters (e.g. 15)
    - Startup Founders (e.g. 5)
-For each group, specify the exact networking outreach rationale.
-2. **Outreach Messaging Template**: Provide a 3-sentence, high-response outreach message template.`,
+For each group, specify the exact networking outreach reason.
+3. **Outreach Messaging Template**: Provide a 3-sentence, high-response outreach message template.`,
 
-    contentIntelligence: `Generate the 'Content Strategy & Pillars' section.
-Rather than generic posting suggestions, generate a structured calendar and pillars based on the candidate's experience:
+    contentIntelligence: `Generate the 'Content Engine & Pillars' section.
+Rather than generic posting suggestions, generate a 30-day authority content calendar based on the candidate's experience:
 1. **Content Pillars**: Define 3 core themes (e.g. Product Reviews, Growth Insight, Consumer Behavior).
-2. **Content Posting Calendar**:
-   - **Monday**: [Pillar theme, e.g. Product Breakdown] — Description & post trigger.
-   - **Thursday**: [Pillar theme, e.g. Growth Insight] — Description & post trigger.
-   - **Saturday**: [Pillar theme, e.g. Learning / Behind-the-scenes] — Description & post trigger.
-3. **Posting Frequency & format** recommendations.`,
+2. **30-Day Posting Calendar Plan**:
+   - **Week 1-4 Schedule**:
+     - **Monday**: [Pillar theme, e.g. Product Breakdown] — Description & post trigger.
+     - **Wednesday**: [Pillar theme, e.g. Case Study] — Description & post trigger.
+     - **Friday**: [Pillar theme, e.g. Internship Learning] — Description & post trigger.
+     - **Sunday**: [Pillar theme, e.g. Career Reflection] — Description & post trigger.
+3. Provide a brief click-to-draft template outline for Week 1.`,
 
     careerDirection: `Generate the 'Career Direction' section.
 1. **Current Career Trajectory**: Where is this career heading based on evidence?
@@ -180,14 +222,16 @@ Rather than generic posting suggestions, generate a structured calendar and pill
 4. **Industries to Target** with reasoning.
 5. **Career Acceleration Actions**: 3 specific actions to accelerate trajectory.`,
 
-    profileGapAnalysis: `Generate the 'Profile Gap Analysis' section.
-Compare the current LinkedIn profile against the ideal profile for the target role${targetRole ? ` "${targetRole}"` : ""}${targetCompany ? ` at "${targetCompany}"` : ""}.
-Format as:
-| Dimension | Current | Ideal | Gap | Action |
+    profileGapAnalysis: `Generate the 'Profile Gap Analysis & Timeline' section.
+1. **Competitive Target Role Benchmark:** Compare current profile against specific role targets (Google PM, Amazon PM, Startup PM, Consultant, etc.) depending on targetGoal:
+| Dimension | User Profile | Ideal Target PM | Gap | Action |
 | :--- | :--- | :--- | :--- | :--- |
 Include: Headline, About, Experience, Skills, Recommendations, Featured, Certifications, Network.
-2. **Gap Priority Matrix**: Rank gaps by impact (High/Medium/Low) and time to fix (Quick/Medium/Long).
-3. **Profile Score vs. Target Role**: [current score] → [target score] — what it would take to close the gap.`,
+2. **Profile Score Timeline:** Show how the profile score evolves incrementally after each optimization step:
+\`\`\`text
+  [Current Score: 62] ───> [+Headline: 70] ───> [+About: 78] ───> [+Experience: 87] ───> [+Skills: 91] ───> [Final Target: 95]
+\`\`\`
+Explain the score jump reasoning for each segment.`,
 
     recruiterPersonas: `Generate the 'Recruiter Personas' section.
 Simulate 4 different evaluators reviewing this LinkedIn profile:
@@ -197,13 +241,15 @@ Simulate 4 different evaluators reviewing this LinkedIn profile:
 4. **Talent Acquisition Specialist**: Brand-focused, evaluating cultural and professional fit.
 For each: Write a 3-4 sentence direct feedback quote in their authentic voice. Then: Verdict (Would Interview / Hold / Reject), Confidence (High/Medium/Low), and Key Evidence used.`,
 
-    candidateMoat: `Generate the 'Candidate Moat' section.
-Answer: Why should recruiters remember THIS LinkedIn profile?
-1. **Professional Moat**: What combination of experience, skills, and achievements is uniquely difficult to replicate?
-2. **Moat Evidence**: Specific bullets, roles, and achievements that build the moat.
-3. **Moat Strength**: Strong / Moderate / Weak — with reasoning.
-4. **Moat Gaps**: What is missing that would make the moat unassailable?
-5. **Competitor Benchmark**:
+    candidateMoat: `Generate the 'Candidate Moat & Authority Engine' section.
+Analyze professional credibility using the **Authority Engine Checklist**:
+* **Recommendations Score:** [Evaluation based on quality/frequency]
+* **Endorsements Score:** [Evaluation based on top skills]
+* **Featured Projects:** [Audit of case studies, portfolio, or publications]
+* **Articles & Content Authority:** [Proof of writing]
+* **Speaking & Industry Engagement:** [Speaking, teaching, or event attendance]
+* **Certifications & Open Source:** [Verify Moat strength]
+Evaluate Moat metrics:
 | Dimension | This Profile | Top 10% Profile | Gap |
 | :--- | :--- | :--- | :--- |
 Rate dimensions with stars (★★★★★).`,
