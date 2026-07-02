@@ -23,6 +23,11 @@ const TYPE_COLORS = {
     desktopActive: "text-blue-300 font-semibold bg-blue-500/10",
     mobileActive: "bg-blue-500 text-white shadow-sm shadow-blue-500/20",
   },
+  linkedin: {
+    dot: "bg-sky-400",
+    desktopActive: "text-sky-300 font-semibold bg-sky-500/10",
+    mobileActive: "bg-sky-500 text-white shadow-sm shadow-sky-500/20",
+  },
 };
 
 const DEFAULT_COLORS = {

@@ -348,7 +348,7 @@ export const CompanyStateAnnotation = Annotation.Root({
 
   jobDescription: Annotation<string | undefined>(),
 
-  dossierType: Annotation<"company" | "role" | "jd" | "news">(),
+  dossierType: Annotation<"company" | "role" | "jd" | "news" | "resume" | "linkedin">(),
 
   // ── Validation ──────────────────────────────────────────────────────────
   validation: Annotation<ValidationResult>({

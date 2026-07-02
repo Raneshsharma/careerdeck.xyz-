@@ -8,6 +8,7 @@ const TYPE_LABELS = {
   jd: "JD",
   news: "News",
   resume: "Candidate",
+  linkedin: "LinkedIn",
 };
 
 // Distinct color per dossier type
@@ -41,6 +42,12 @@ const TYPE_COLORS = {
     activeBadge: "bg-orange-500/25 text-orange-300 border border-orange-400/30",
     activeBg: "bg-orange-500/10 border-l-2 border-orange-500",
     dot: "bg-orange-400",
+  },
+  linkedin: {
+    badge: "bg-sky-500/15 text-sky-400 border border-sky-500/20",
+    activeBadge: "bg-sky-500/25 text-sky-300 border border-sky-400/30",
+    activeBg: "bg-sky-500/10 border-l-2 border-sky-500",
+    dot: "bg-sky-400",
   },
 };
 

@@ -92,141 +92,145 @@ const TYPE_ACCENT = {
 };
 
 function CustomTable({ children, ...props }) {
-  const thead = children?.find?.(c => c?.type === 'thead');
-  const tbody = children?.find?.(c => c?.type === 'tbody');
-  
-  const headers = thead?.props?.children?.props?.children?.map?.(th => {
-    const rawVal = th?.props?.children;
-    if (typeof rawVal === 'string') return rawVal.trim();
-    if (Array.isArray(rawVal)) return rawVal.map(x => typeof x === 'string' ? x : x?.props?.children || '').join('').trim();
-    return '';
-  }) || [];
+  try {
+    const thead = children?.find?.(c => c?.type === 'thead');
+    const tbody = children?.find?.(c => c?.type === 'tbody');
+    
+    const headers = thead?.props?.children?.props?.children?.map?.(th => {
+      const rawVal = th?.props?.children;
+      if (typeof rawVal === 'string') return rawVal.trim();
+      if (Array.isArray(rawVal)) return rawVal.map(x => typeof x === 'string' ? x : x?.props?.children || '').join('').trim();
+      return '';
+    }) || [];
 
-  const rows = tbody?.props?.children;
-  const rowArray = Array.isArray(rows) ? rows : rows ? [rows] : [];
+    const rows = tbody?.props?.children;
+    const rowArray = Array.isArray(rows) ? rows : rows ? [rows] : [];
 
-  // 1. ATS Match Table: | Metric | Score | Rating | Recommendation |
-  if (headers.includes('Metric') && headers.includes('Score') && headers.includes('Rating')) {
-    const data = rowArray.map(tr => {
-      const tds = tr?.props?.children?.map?.(td => td?.props?.children || '') || [];
-      return {
-        metric: tds[0],
-        score: parseInt(tds[1]) || 0,
-        rating: tds[2],
-        recommendation: tds[3]
-      };
-    });
+    // 1. ATS Match Table: | Metric | Score | Rating | Recommendation |
+    if (headers.includes('Metric') && headers.includes('Score') && headers.includes('Rating')) {
+      const data = rowArray.map(tr => {
+        const tds = tr?.props?.children?.map?.(td => td?.props?.children || '') || [];
+        return {
+          metric: tds[0],
+          score: parseInt(tds[1]) || 0,
+          rating: tds[2],
+          recommendation: tds[3]
+        };
+      });
 
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 no-print">
-        {data.map((row, idx) => (
-          <div key={idx} className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between hover:border-orange-500/20 transition-all duration-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-slate-300">{row.metric}</span>
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                row.score >= 85 ? 'bg-emerald-500/10 text-emerald-400' :
-                row.score >= 70 ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'
-              }`}>{row.rating} ({row.score}%)</span>
-            </div>
-            <div className="w-full bg-white/[0.04] h-2 rounded-full overflow-hidden mb-2">
-              <div 
-                className={`h-full rounded-full transition-all duration-500 ${
-                  row.score >= 85 ? 'bg-emerald-500' :
-                  row.score >= 70 ? 'bg-amber-500' : 'bg-red-500'
-                }`}
-                style={{ width: `${row.score}%` }}
-              />
-            </div>
-            <p className="text-xs text-slate-400">{row.recommendation}</p>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  // 2. Keyword Intelligence Table: | Keyword Cluster | Match Status | Importance | Placement Strategy |
-  if (headers.includes('Keyword Cluster') && headers.includes('Match Status')) {
-    const data = rowArray.map(tr => {
-      const tds = tr?.props?.children?.map?.(td => td?.props?.children || '') || [];
-      return {
-        keyword: tds[0],
-        status: tds[1],
-        importance: tds[2],
-        strategy: tds[3]
-      };
-    });
-
-    return (
-      <div className="my-6 space-y-3 no-print">
-        <div className="grid grid-cols-4 text-xs font-semibold text-slate-500 uppercase tracking-wider px-4">
-          <div>Keyword</div>
-          <div>Status</div>
-          <div>Importance</div>
-          <div>Strategy</div>
-        </div>
-        {data.map((row, idx) => {
-          const status = row.status?.toString() || '';
-          const isMatched = status.includes('✓') || status.toLowerCase().includes('match');
-          const isMissing = status.includes('✗') || status.toLowerCase().includes('miss');
-          const isWeak = status.includes('⚠') || status.toLowerCase().includes('weak');
-          
-          return (
-            <div key={idx} className="grid grid-cols-4 items-center bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 text-sm hover:bg-white/[0.04] transition-all duration-150">
-              <div className="font-bold text-white">{row.keyword}</div>
-              <div>
-                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                  isMatched ? 'bg-emerald-500/10 text-emerald-400' :
-                  isMissing ? 'bg-red-500/10 text-red-400' :
-                  isWeak ? 'bg-amber-500/10 text-amber-400' : 'bg-purple-500/10 text-purple-400'
-                }`}>
-                  {row.status}
-                </span>
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 no-print">
+          {data.map((row, idx) => (
+            <div key={idx} className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between hover:border-orange-500/20 transition-all duration-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-slate-300">{row.metric}</span>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                  row.score >= 85 ? 'bg-emerald-500/10 text-emerald-400' :
+                  row.score >= 70 ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'
+                }`}>{row.rating} ({row.score}%)</span>
               </div>
-              <div className="text-slate-400">{row.importance}</div>
-              <div className="text-xs text-slate-500">{row.strategy}</div>
+              <div className="w-full bg-white/[0.04] h-2 rounded-full overflow-hidden mb-2">
+                <div 
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    row.score >= 85 ? 'bg-emerald-500' :
+                    row.score >= 70 ? 'bg-amber-500' : 'bg-red-500'
+                  }`}
+                  style={{ width: `${row.score}%` }}
+                />
+              </div>
+              <p className="text-xs text-slate-400">{row.recommendation}</p>
             </div>
-          );
-        })}
-      </div>
-    );
-  }
+          ))}
+        </div>
+      );
+    }
 
-  // 3. Bullet Intelligence Table: | Original Bullet | Detected Weakness | Optimized STAR Rewrite (Template) | Why Better |
-  if (headers.includes('Original Bullet') && headers.includes('Optimized STAR Rewrite (Template)')) {
-    const data = rowArray.map(tr => {
-      const tds = tr?.props?.children?.map?.(td => td?.props?.children || '') || [];
-      return {
-        original: tds[0],
-        weakness: tds[1],
-        rewrite: tds[2],
-        why: tds[3]
-      };
-    });
+    // 2. Keyword Intelligence Table: | Keyword Cluster | Match Status | Importance | Placement Strategy |
+    if (headers.includes('Keyword Cluster') && headers.includes('Match Status')) {
+      const data = rowArray.map(tr => {
+        const tds = tr?.props?.children?.map?.(td => td?.props?.children || '') || [];
+        return {
+          keyword: tds[0],
+          status: tds[1],
+          importance: tds[2],
+          strategy: tds[3]
+        };
+      });
 
-    return (
-      <div className="my-6 space-y-6 no-print">
-        {data.map((row, idx) => (
-          <div key={idx} className="border border-white/[0.06] rounded-xl overflow-hidden bg-white/[0.01] hover:border-orange-500/20 transition-all duration-200">
-            <div className="bg-red-500/5 px-4 py-3 border-b border-white/[0.05]">
-              <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Original Bullet</span>
-              <p className="text-sm text-slate-400 mt-1 italic">"{row.original}"</p>
-            </div>
-            <div className="px-4 py-3 bg-white/[0.01] border-b border-white/[0.05]">
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Detected Weaknesses</span>
-              <p className="text-sm text-slate-300 mt-1">{row.weakness}</p>
-            </div>
-            <div className="bg-emerald-500/5 px-4 py-3 border-b border-white/[0.05]">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Optimized STAR Rewrite (Template)</span>
-              <p className="text-sm text-white font-semibold mt-1">"{row.rewrite}"</p>
-            </div>
-            <div className="px-4 py-3 bg-white/[0.02]">
-              <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Why It's Better</span>
-              <p className="text-xs text-slate-400 mt-1">{row.why}</p>
-            </div>
+      return (
+        <div className="my-6 space-y-3 no-print">
+          <div className="grid grid-cols-4 text-xs font-semibold text-slate-500 uppercase tracking-wider px-4">
+            <div>Keyword</div>
+            <div>Status</div>
+            <div>Importance</div>
+            <div>Strategy</div>
           </div>
-        ))}
-      </div>
-    );
+          {data.map((row, idx) => {
+            const status = row.status?.toString() || '';
+            const isMatched = status.includes('✓') || status.toLowerCase().includes('match');
+            const isMissing = status.includes('✗') || status.toLowerCase().includes('miss');
+            const isWeak = status.includes('⚠') || status.toLowerCase().includes('weak');
+            
+            return (
+              <div key={idx} className="grid grid-cols-4 items-center bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 text-sm hover:bg-white/[0.04] transition-all duration-150">
+                <div className="font-bold text-white">{row.keyword}</div>
+                <div>
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                    isMatched ? 'bg-emerald-500/10 text-emerald-400' :
+                    isMissing ? 'bg-red-500/10 text-red-400' :
+                    isWeak ? 'bg-amber-500/10 text-amber-400' : 'bg-purple-500/10 text-purple-400'
+                  }`}>
+                    {row.status}
+                  </span>
+                </div>
+                <div className="text-slate-400">{row.importance}</div>
+                <div className="text-xs text-slate-500">{row.strategy}</div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // 3. Bullet Intelligence Table: | Original Bullet | Detected Weakness | Optimized STAR Rewrite (Template) | Why Better |
+    if (headers.includes('Original Bullet') && headers.includes('Optimized STAR Rewrite (Template)')) {
+      const data = rowArray.map(tr => {
+        const tds = tr?.props?.children?.map?.(td => td?.props?.children || '') || [];
+        return {
+          original: tds[0],
+          weakness: tds[1],
+          rewrite: tds[2],
+          why: tds[3]
+        };
+      });
+
+      return (
+        <div className="my-6 space-y-6 no-print">
+          {data.map((row, idx) => (
+            <div key={idx} className="border border-white/[0.06] rounded-xl overflow-hidden bg-white/[0.01] hover:border-orange-500/20 transition-all duration-200">
+              <div className="bg-red-500/5 px-4 py-3 border-b border-white/[0.05]">
+                <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Original Bullet</span>
+                <p className="text-sm text-slate-400 mt-1 italic">"{row.original}"</p>
+              </div>
+              <div className="px-4 py-3 bg-white/[0.01] border-b border-white/[0.05]">
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Detected Weaknesses</span>
+                <p className="text-sm text-slate-300 mt-1">{row.weakness}</p>
+              </div>
+              <div className="bg-emerald-500/5 px-4 py-3 border-b border-white/[0.05]">
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Optimized STAR Rewrite (Template)</span>
+                <p className="text-sm text-white font-semibold mt-1">"{row.rewrite}"</p>
+              </div>
+              <div className="px-4 py-3 bg-white/[0.02]">
+                <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Why It's Better</span>
+                <p className="text-xs text-slate-400 mt-1">{row.why}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+  } catch (err) {
+    console.error("CustomTable render crash caught and recovered:", err);
   }
 
   return (
