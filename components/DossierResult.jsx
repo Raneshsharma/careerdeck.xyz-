@@ -88,6 +88,7 @@ const TYPE_ACCENT = {
   jd: "border-amber-500/30 text-amber-400",
   news: "border-blue-500/30 text-blue-400",
   resume: "border-orange-500/30 text-orange-400",
+  linkedin: "border-sky-500/30 text-sky-400",
 };
 
 function CustomTable({ children, ...props }) {

@@ -18,6 +18,7 @@ import HistoryButton from "@/components/HistoryButton";
 import OnboardingTour, { shouldShowTour } from "@/components/OnboardingTour";
 import UpgradeModal from "@/components/UpgradeModal";
 import ResumeCoach from "@/components/ResumeCoach";
+import LinkedinCoach from "@/components/LinkedinCoach";
 
 const DOSSIER_LABELS = {
   company: "Company Dossier",
@@ -25,6 +26,7 @@ const DOSSIER_LABELS = {
   jd: "JD Dossier",
   news: "News Dossier",
   resume: "Candidate Intelligence",
+  linkedin: "LinkedIn Intelligence",
 };
 
 function DashboardContent() {
@@ -330,7 +332,7 @@ function DashboardContent() {
                 <span data-tour="form">
                 <NonReversingReveal id="form-card" className="bg-[#0B0F19]/60 border border-white/[0.08] backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 sm:p-8">
                   <div className="mb-6"><h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{DOSSIER_LABELS[dossierType]}</h1>
-                  <p className="text-sm text-slate-400 mt-1">{dossierType === "company" && "Deep dive into a company's business model, strategy, culture, and interview prep."}{dossierType === "role" && "Understand a role's responsibilities, skills, career path, and interview expectations."}{dossierType === "jd" && "Decode a specific job description — hidden expectations, STAR blueprints, and hiring manager perspective."}{dossierType === "news" && "Last 30 days of high-signal developments, analyzed for business and interview relevance."}</p></div>
+                  <p className="text-sm text-slate-400 mt-1">{dossierType === "company" && "Deep dive into a company's business model, strategy, culture, and interview prep."}{dossierType === "role" && "Understand a role's responsibilities, skills, career path, and interview expectations."}{dossierType === "jd" && "Decode a specific job description — hidden expectations, STAR blueprints, and hiring manager perspective."}{dossierType === "news" && "Last 30 days of high-signal developments, analyzed for business and interview relevance."}{dossierType === "resume" && "Optimize your resume, simulate recruiter screens, and map your hiring readiness."}{dossierType === "linkedin" && "Analyze your LinkedIn profile for professional brand, search visibility, and networking potential."}</p></div>
                   <DossierTabs selected={dossierType} onChange={(t) => { setDossierType(t); setErrorMessage(null) }} disabled={generating} />
                   <div className="mt-6"><DossierForm onSubmit={handleSubmit} generating={generating} dossierType={dossierType} /></div>
                 </NonReversingReveal>
@@ -405,6 +407,29 @@ function DashboardContent() {
           )}
           {showCoach && (
             <ResumeCoach
+              dossierContent={content}
+              onClose={() => setShowCoach(false)}
+            />
+          )}
+        </>
+      )}
+
+      {/* ── AI LinkedIn Coach floating button (linkedin dossier only) ── */}
+      {dossierType === "linkedin" && content && !generating && (
+        <>
+          {!showCoach && (
+            <button
+              onClick={() => setShowCoach(true)}
+              className="fixed bottom-20 right-4 lg:bottom-8 lg:right-8 z-40 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white text-sm font-bold shadow-[0_8px_30px_rgba(14,165,233,0.4)] hover:shadow-[0_8px_40px_rgba(14,165,233,0.6)] hover:scale-105 transition-all duration-200 no-print"
+              aria-label="Open AI LinkedIn Coach"
+            >
+              <span className="text-base">💼</span>
+              <span>LinkedIn Coach</span>
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-[10px] font-black">AI</span>
+            </button>
+          )}
+          {showCoach && (
+            <LinkedinCoach
               dossierContent={content}
               onClose={() => setShowCoach(false)}
             />

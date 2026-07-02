@@ -6,6 +6,7 @@ const TABS = [
   { id: "jd", label: "Job Description", desc: "Decode a specific JD — hidden expectations and STAR blueprints." },
   { id: "news", label: "News", desc: "30 days of high-signal developments analyzed for interviews." },
   { id: "resume", label: "Candidate", desc: "Optimize your resume, simulate interviews, and map alignment." },
+  { id: "linkedin", label: "LinkedIn", desc: "Analyze your LinkedIn profile for professional brand and recruiter visibility." },
 ];
 
 export default function DossierTabs({ selected, onChange, disabled }) {

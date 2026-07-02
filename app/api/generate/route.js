@@ -17,6 +17,7 @@ import { roleGraph } from "@/src/graph/roleGraph";
 import { jdGraph } from "@/src/graph/jdGraph";
 import { newsGraph } from "@/src/graph/newsGraph";
 import { resumeGraph } from "@/src/graph/resumeGraph";
+import { linkedinGraph } from "@/src/graph/linkedinGraph";
 import { EvaluationEngine } from "@/src/evaluation/evaluationEngine";
 import { QualityMetricsStore } from "@/src/evaluation/qualityMetricsStore";
 import { UNIVERSAL_MASTER_PROMPT, DOMAIN_MASTER_PROMPTS } from "@/src/prompts/masterPrompt";
@@ -373,12 +374,13 @@ export async function POST(request) {
     }
     acquired = true;
 
-    const { dossierType, companyName, role, jobDescription, resumeText } = await request.json();
+    const { dossierType, companyName, role, jobDescription, resumeText, linkedinText } = await request.json();
 
     const cName = sanitize(companyName || "");
     const rName = sanitize(role || "");
     const jd = sanitize(jobDescription || "");
     const rText = sanitize(resumeText || "");
+    const lText = sanitize(linkedinText || "");
     const dosType = dossierType || "company";
 
     // Validation
@@ -407,17 +409,21 @@ export async function POST(request) {
         if (!rText.trim()) return Response.json({ error: "Resume text is required" }, { status: 400 });
         if (rText.length > 50000) return Response.json({ error: "Resume text must be ≤50,000 characters" }, { status: 400 });
         break;
+      case "linkedin":
+        if (!lText.trim()) return Response.json({ error: "LinkedIn profile text is required" }, { status: 400 });
+        if (lText.length > 50000) return Response.json({ error: "LinkedIn text must be ≤50,000 characters" }, { status: 400 });
+        break;
       default:
         return Response.json({ error: `Unknown dossier type: ${dosType}` }, { status: 400 });
     }
 
-    // ── LANGGRAPH PIPELINE: company, role, jd, news, and resume dossier types use parallel graphs ──
-    if (dosType === "company" || dosType === "role" || dosType === "jd" || dosType === "news" || dosType === "resume") {
+    // ── LANGGRAPH PIPELINE ──
+    if (dosType === "company" || dosType === "role" || dosType === "jd" || dosType === "news" || dosType === "resume" || dosType === "linkedin") {
       const emitter = createSSEEmitter();
       const { stream } = emitter;
       const stopHeartbeat = startHeartbeat(emitter);
 
-      const genId = await recordGeneration(user.id, dosType, cName || "Resume", rName || "Candidate");
+      const genId = await recordGeneration(user.id, dosType, cName || (dosType === "linkedin" ? "LinkedIn" : "Resume"), rName || "Candidate");
       if (genId) {
         try { emitter.emit("gen-id", { id: genId }); } catch {}
       }
@@ -427,6 +433,7 @@ export async function POST(request) {
         role: rName || undefined,
         jobDescription: jd || undefined,
         resumeText: rText || undefined,
+        linkedinText: lText || undefined,
         dossierType: dosType,
       };
 
@@ -434,6 +441,7 @@ export async function POST(request) {
         : dosType === "role" ? roleGraph
         : dosType === "jd" ? jdGraph
         : dosType === "resume" ? resumeGraph
+        : dosType === "linkedin" ? linkedinGraph
         : newsGraph;
 
       // Run graph asynchronously — emit sections as they complete
@@ -491,6 +499,14 @@ export async function POST(request) {
             ? [
                 "resumeStrategy", "masterDashboard", "roiImprovements", "attentionHeatmap",
                 "candidateMoat", "recruiterSimulation", "bulletAudits", "candidateStory", "learningRoadmap"
+              ]
+            : dosType === "linkedin"
+            ? [
+                "linkedinDashboard", "linkedinSnapshot", "professionalBrand", "recruiterFirstImpression",
+                "profileStrengthScorecard", "headlineIntelligence", "aboutIntelligence",
+                "experienceIntelligence", "skillsIntelligence", "personalBrandIntelligence",
+                "recruiterSearchIntelligence", "networkingIntelligence", "contentIntelligence",
+                "careerDirection", "profileGapAnalysis", "recruiterPersonas", "candidateMoat", "linkedinActionPlan"
               ]
             : [
                 "newsOverview", "executiveSummary", "whatHappened", "whyItHappened",

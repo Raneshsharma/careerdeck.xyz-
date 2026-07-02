@@ -8,6 +8,7 @@ export default function DossierForm({ onSubmit, generating, dossierType }) {
   const [role, setRole] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [resumeText, setResumeText] = useState("");
+  const [linkedinText, setLinkedinText] = useState("");
   const [parsing, setParsing] = useState(false);
   const [errors, setErrors] = useState({});
   const [shaking, setShaking] = useState(false);
@@ -18,6 +19,10 @@ export default function DossierForm({ onSubmit, generating, dossierType }) {
   const showRoleRequired = dossierType === "role" || dossierType === "jd" || dossierType === "resume";
   const showJD = dossierType === "jd" || dossierType === "resume";
   const showResume = dossierType === "resume";
+  const showLinkedin = dossierType === "linkedin";
+  // LinkedIn optional fields
+  const showLinkedinTargetRole = dossierType === "linkedin";
+  const showLinkedinTargetCompany = dossierType === "linkedin";
 
   const triggerShake = () => {
     setShaking(true);
@@ -51,8 +56,13 @@ export default function DossierForm({ onSubmit, generating, dossierType }) {
       }
 
       const data = await res.json();
-      setResumeText(data.text);
-      toast.success("Resume text extracted successfully!", { id: toastId });
+      if (showLinkedin) {
+        setLinkedinText(data.text);
+        toast.success("LinkedIn profile text extracted!", { id: toastId });
+      } else {
+        setResumeText(data.text);
+        toast.success("Resume text extracted successfully!", { id: toastId });
+      }
     } catch (err) {
       toast.error(err.message || "Failed to parse PDF", { id: toastId });
     } finally {
@@ -95,6 +105,16 @@ export default function DossierForm({ onSubmit, generating, dossierType }) {
       }
     }
 
+    if (showLinkedin) {
+      if (!linkedinText.trim()) {
+        newErrors.linkedinText = "Required — upload your LinkedIn PDF or paste your profile text.";
+      } else if (linkedinText.trim().length < 100) {
+        newErrors.linkedinText = `Need at least 100 characters (currently ${linkedinText.trim().length})`;
+      } else if (linkedinText.length > 50000) {
+        newErrors.linkedinText = "Max 50,000 characters";
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -111,6 +131,7 @@ export default function DossierForm({ onSubmit, generating, dossierType }) {
       role: role.trim(),
       jobDescription: jobDescription.trim(),
       resumeText: resumeText.trim(),
+      linkedinText: linkedinText.trim(),
     });
   }
 
@@ -256,6 +277,110 @@ export default function DossierForm({ onSubmit, generating, dossierType }) {
             <span className={`text-xs ${jdCharCount < 200 ? "text-red-400" : jdCharCount > 9000 ? "text-amber-400" : "text-slate-500"}`}>
               {jdCharCount} / 10,000
             </span>
+          </div>
+        </div>
+      )}
+      {/* LinkedIn Profile */}
+      {showLinkedin && (
+        <div className="space-y-4">
+          {/* Target Company (optional) */}
+          {showLinkedinTargetCompany && (
+            <div>
+              <label htmlFor="liCompany" className="block text-sm font-semibold text-slate-300 mb-1">
+                Target Company <span className="text-slate-500 font-normal">(optional — for gap analysis)</span>
+              </label>
+              <input
+                id="liCompany"
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="e.g. Google, Zomato, McKinsey"
+                maxLength={100}
+                disabled={generating}
+                className="w-full pl-4 pr-4 py-3 rounded-lg border border-white/[0.08] bg-[#0B0F19]/40 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+            </div>
+          )}
+          {/* Target Role (optional) */}
+          {showLinkedinTargetRole && (
+            <div>
+              <label htmlFor="liRole" className="block text-sm font-semibold text-slate-300 mb-1">
+                Target Role <span className="text-slate-500 font-normal">(optional — for gap analysis)</span>
+              </label>
+              <input
+                id="liRole"
+                type="text"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                placeholder="e.g. Product Manager, Growth Analyst"
+                maxLength={100}
+                disabled={generating}
+                className="w-full pl-4 pr-4 py-3 rounded-lg border border-white/[0.08] bg-[#0B0F19]/40 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+            </div>
+          )}
+
+          {/* LinkedIn PDF Upload */}
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-1">
+              LinkedIn Profile <span className="text-red-400">*</span>
+            </label>
+            <div className="mb-2 p-3 bg-sky-500/5 border border-sky-500/20 rounded-lg text-xs text-sky-400 leading-relaxed">
+              💡 <strong>How to export:</strong> Go to LinkedIn → Your Profile → More → Save to PDF. Then upload it below.
+            </div>
+            <label
+              htmlFor="linkedinFile"
+              className={`flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 ${
+                parsing ? "border-sky-500/40 bg-sky-500/5" : "border-white/[0.08] hover:border-sky-500/30 hover:bg-sky-500/5"
+              } disabled:opacity-50`}
+            >
+              <svg className="w-5 h-5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+              <span className="text-sm font-medium text-slate-300">
+                {parsing ? "Extracting text..." : linkedinText ? "✓ LinkedIn PDF loaded — re-upload to change" : "Upload LinkedIn PDF"}
+              </span>
+            </label>
+            <input
+              id="linkedinFile"
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileUpload}
+              disabled={generating || parsing}
+              className="hidden"
+            />
+          </div>
+
+          {/* Text Paste Fallback */}
+          <div>
+            <label htmlFor="linkedinText" className="block text-sm font-semibold text-slate-300 mb-1">
+              Or paste profile text
+              <span className="text-slate-500 font-normal ml-2">(copy everything from your LinkedIn profile page)</span>
+            </label>
+            <textarea
+              id="linkedinText"
+              value={linkedinText}
+              onChange={(e) => setLinkedinText(e.target.value)}
+              placeholder="Paste your full LinkedIn profile text here — headline, about, experience, education, skills..."
+              rows={8}
+              maxLength={50000}
+              disabled={generating}
+              className={`w-full px-4 py-3 rounded-lg border bg-[#0B0F19]/40 text-white placeholder-slate-600 focus:outline-none focus:ring-2 transition-all duration-200 resize-y ${
+                errors.linkedinText
+                  ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
+                  : "border-white/[0.08] focus:ring-sky-500/20 focus:border-sky-500/50"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            />
+            <div className="flex justify-between items-center mt-1">
+              {errors.linkedinText ? (
+                <p className="text-red-400 text-xs">{errors.linkedinText}</p>
+              ) : (
+                <span />
+              )}
+              <span className={`text-xs ${linkedinText.trim().length < 100 && linkedinText.length > 0 ? "text-red-400" : "text-slate-500"}`}>
+                {linkedinText.trim().length} / 50,000
+              </span>
+            </div>
           </div>
         </div>
       )}

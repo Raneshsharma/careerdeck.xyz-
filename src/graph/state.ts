@@ -567,6 +567,37 @@ export const CompanyStateAnnotation = Annotation.Root({
     default: () => null,
   }),
 
+  // ── LinkedIn & Personal Brand Intelligence state ─────────────────────────
+  linkedinText: Annotation<string | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  linkedinIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  brandIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  recruiterIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  linkedinOptimization: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  networkingCareerIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
   // ── Metadata / tracing ──────────────────────────────────────────────────
   startedAt: Annotation<string>(),
 
