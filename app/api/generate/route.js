@@ -513,11 +513,14 @@ export async function POST(request) {
               ]
             : dosType === "linkedin"
             ? [
-                "linkedinDashboard", "linkedinSnapshot", "professionalBrand", "recruiterFirstImpression",
-                "profileStrengthScorecard", "headlineIntelligence", "aboutIntelligence",
-                "experienceIntelligence", "skillsIntelligence", "personalBrandIntelligence",
-                "recruiterSearchIntelligence", "networkingIntelligence", "contentIntelligence",
-                "careerDirection", "profileGapAnalysis", "recruiterPersonas", "candidateMoat", "linkedinActionPlan",
+                "linkedinDashboard",
+                "executiveSummary",
+                "professionalBrand",
+                "recruiterSimulation",
+                "priorityImprovements",
+                "aiImprovements",
+                "networkingStrategy",
+                "contentPlan",
                 "resumeLinkedinConsistency"
               ]
             : [
