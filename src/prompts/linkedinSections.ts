@@ -42,6 +42,11 @@ Format the dashboard EXACTLY like this (using this structure, replacing values b
 
 ## 📊 Career Brand Dashboard
 
+### ⚡ Today's Mission
+Provide a prioritized checklist of target fixes, ranked by impact (keep it very brief):
+* **[Action Name]** | +[Score Gain] | [Time, e.g., 3 min] | [Priority stars, e.g., ★★★★★]
+* **[Action Name]** | +[Score Gain] | [Time] | [Priority stars]
+
 | Metric | Score | Detail / Evidence |
 | :--- | :--- | :--- |
 | **LinkedIn Health** | [Score, e.g. 91]/100 | [Short 1-sentence overall status] |
@@ -51,12 +56,6 @@ Format the dashboard EXACTLY like this (using this structure, replacing values b
 | **Networking** | [Score, e.g. 76]/100 | [Connection quality status] |
 | **Content** | [Score, e.g. 45]/100 | [Theme and post status] |
 | **Brand Consistency** | [Score, e.g. 93]/100 | [Alignment of Resume vs LinkedIn Profile] |
-
-### 🎯 Key Gaps & Mission
-* **Top Strength:** [Short strength detail, e.g., Analytics + Marketplace]
-* **Biggest Gap:** [Short gap details, e.g., Thought Leadership / Narrative Gaps]
-* **Today's Mission:** [Direct next action, e.g., Rewrite Profile Headline]
-* **Expected Gain:** [Visibility score boost, e.g., +5 Recruiter Visibility]
 
 ### 📈 Outcome Probability
 Based on the profile's current state and target goal, estimate outcome probability metrics:
@@ -287,14 +286,17 @@ If no resume text is provided in the context, display a friendly notice explaini
 Your job: write the finished LinkedIn Intelligence section "${sectionId}" for ${targetRole ? `target role "${targetRole}"` : "career optimization"}${targetCompany ? ` at "${targetCompany}"` : ""}.
 Target Goal of Candidate: "${targetGoal}". Make sure all recommendations and branding pivots align with achieving this goal.
 
-GLOBAL RULES:
-1. Write with absolute precision, strategic depth, and professional clarity. Every section must be consumable in 30 seconds.
-2. Address the candidate as "you".
-3. NEVER fabricate metrics, achievements, posts, certifications, or recommendations not present in the data.
-4. If a metric is missing, say what to gather — never invent it.
-5. Every recommendation must explain WHY it improves Professional Brand or Recruiter Visibility or Hiring Readiness.
-6. Do NOT put scores in individual sections (except the Dashboard). All scores live in the Dashboard only.
-7. Output polished Markdown with clear headers, tables where specified, and concise bullets.`;
+GLOBAL RULES (CRITICAL):
+1. Think like Apple Health, not McKinsey. Write with absolute brevity.
+2. For every profile section (Headline, About, Experience, Skills, Networking, etc.), you MUST follow this exact format:
+   - A single score line (if applicable)
+   - **Problem / Insight**: Exactly ONE clear sentence.
+   - **Recommendation**: Exactly ONE actionable sentence.
+   - **Action**: A single interactive Markdown link or CTA button line (e.g. apply-headline link, sync link, draft-post link).
+3. Place all detailed analysis, justifications, recruiter simulation voices, data proof, and explanation text inside a Markdown blockquote (starting with '> '). DO NOT write any paragraphs outside of blockquotes. This allows the UI to wrap it in a collapsible drawer.
+4. Address the candidate as "you".
+5. NEVER fabricate metrics, achievements, posts, certifications, or recommendations not present in the data.
+6. Output polished Markdown with clear headers and concise bullets.`;
 
   const userPrompt = `Write the section "${sectionId}".
 
