@@ -1,13 +1,10 @@
 export const LINKEDIN_SECTION_IDS = [
-  "linkedinDashboard",
-  "executiveSummary",
-  "professionalBrand",
+  "linkedinHealth",
+  "todaysMission",
   "recruiterSimulation",
-  "priorityImprovements",
-  "aiImprovements",
-  "networkingStrategy",
-  "contentPlan",
-  "resumeLinkedinConsistency"
+  "networkingCards",
+  "contentCalendar",
+  "consistencyVisual"
 ];
 
 export function buildLinkedInWriterPrompt(
@@ -21,154 +18,161 @@ export function buildLinkedInWriterPrompt(
   const networking = state.networkingCareerIntelligence || {};
   const consistency = state.consistencyIntelligence || {};
 
-  const profile = lkg.profile || {};
   const targetRole = state.role || "Target Role";
   const targetCompany = state.companyName || "";
   const targetGoal = state.linkedinGoal || "Landing PM jobs";
 
   const structures: Record<string, string> = {
-    linkedinDashboard: `Generate the 'LinkedIn Career Intelligence Dashboard' — the unified metric first screen.
-Format the dashboard EXACTLY like this (using this structure, replacing values based on actual analysis):
 
-## 📊 Career Brand Dashboard
+    linkedinHealth: `Generate the 'LinkedIn Health' dashboard — the ONLY top-level overview. This section MUST NOT suggest specific fixes; those belong exclusively in Today's Mission.
 
-### ⚡ Today's Mission
-Provide a prioritized checklist of target fixes, ranked by impact (keep it very brief):
-* **[Action Name]** | +[Score Gain] | [Time, e.g., 3 min] | [Priority stars, e.g., ★★★★★]
-* **[Action Name]** | +[Score Gain] | [Time] | [Priority stars]
+Output EXACTLY this format:
 
-| Metric | Score | Detail / Evidence |
-| :--- | :--- | :--- |
-| **LinkedIn Health** | [Score, e.g. 91]/100 | [Short 1-sentence overall status] |
-| **Professional Position** | — | [Target Role / Position, e.g. Growth Product Manager] |
-| **Recruiter Visibility** | [Score, e.g. 88]/100 | [Short status of keyword matches] |
-| **Authority** | [Score, e.g. 72]/100 | [Number of recommendations / proof signals] |
-| **Networking** | [Score, e.g. 76]/100 | [Connection quality status] |
-| **Content** | [Score, e.g. 45]/100 | [Theme and post status] |
-| **Brand Consistency** | [Score, e.g. 93]/100 | [Alignment of Resume vs LinkedIn Profile] |
+## 📊 LinkedIn Health
 
-### 📈 Outcome Probability
-Based on the profile's current state and target goal, estimate outcome probability metrics:
-| Outcome Opportunity | Probability % | Context / Rationale |
-| :--- | :--- | :--- |
-| **Recruiter Message Response** | [Percentage]% | [Brief reason based on visibility] |
-| **Interview Shortlist Rate** | [Percentage]% | [Brief reason based on experience/titles] |
-| **Cold Outreach Reply Rate** | [Percentage]% | [Brief reason based on brand authority] |
-| **Referral Acceptance Rate** | [Percentage]% | [Brief reason based on shared credentials] |
-| **Content Organic Reach** | [Percentage]% | [Brief reason based on content pillars] |`,
+| Metric | Score | Status | Detail |
+| :--- | :---: | :---: | :--- |
+| **Overall Health** | [0-100] | [Excellent/Good/Needs Work/Critical] | [One sentence overall verdict] |
+| **Role Match** | [0-100] | [Excellent/Good/Needs Work/Critical] | [Target role alignment status] |
+| **Recruiter Visibility** | [0-100] | [Excellent/Good/Needs Work/Critical] | [Keyword and headline status] |
+| **Brand Authority** | [0-100] | [Excellent/Good/Needs Work/Critical] | [Recommendations and proof signals count] |
+| **Network Quality** | [0-100] | [Excellent/Good/Needs Work/Critical] | [Connection quality and reach] |
+| **Consistency** | [0-100] | [Excellent/Good/Needs Work/Critical] | [Resume vs. LinkedIn alignment] |
 
-    executiveSummary: `Generate the 'Executive Summary' section.
-Output EXACTLY three bullet points and nothing else:
-✓ [Positive point about target role fit]
-✗ [Key branding/experience gap]
-→ [Strategic summary or key verdict/recommendation]`,
+**Biggest Strength:** [One specific, evidence-backed strength from the profile]
+**Biggest Gap:** [One specific gap that most limits recruiter visibility — no fix suggestion here]
+**Target Role:** ${targetRole}${targetCompany ? ` at ${targetCompany}` : ""}
 
-    professionalBrand: `Generate the 'Professional Brand' section.
-1. Output target positioning as key-value items:
-   - **Current Position:** [Where candidate stands today]
-   - **Desired Position:** [Target role, e.g. "${targetRole}"]
-   - **Brand Gaps:** [Exactly 3 bulleted gaps, e.g. Ownership, Leadership, Metrics]
-2. **Professional Brand Graph** — Draw the text-based ASCII flow:
-\`\`\`text
-  [Resume] ──────┐
-  [LinkedIn] ────┼───> [Experience & Accomplishments] ───> [Professional Brand]
-  [Projects] ────┤                  ▲
-  [Portfolio] ───┘                  │
-  [Posts] ──────────────────────────┴───> [Skills & Keywords]
-\`\`\`
-3. **Brand Moat:** Exactly one sentence defining what makes you uniquely difficult to replace.
-4. Place any supporting brand analysis inside a Markdown blockquote (> ).`,
+> [Place all supporting analysis, evidence, or profile quotes here.]`,
 
-    recruiterSimulation: `Generate the 'Recruiter Simulation' section.
-1. Draw the recruiter scroll funnel:
-\`\`\`text
-  [Recruiter Opens Profile] ───> [Looks at Headline] ───> [Stops at key role/metric] ───> [Skips/Reads About] ───> [Verdict]
-\`\`\`
-2. Simulate the recruiter's micro-decisions step-by-step using a list format.
-3. Target Company Audit: If a target company is specified ("${targetCompany || "Target Company"}"), analyze fit:
-   - E.g. "This profile is optimized for Amazon but not for Google" or specific feedback.
-4. Recruiter Verdict: Would Continue / Maybe / Skip — with one-sentence reasoning.
-5. Place recruiter quotes or long explanation text inside a Markdown blockquote (> ).`,
+    todaysMission: `Generate the 'Today's Mission' section — the SINGLE source of ALL improvement actions. This is the ONLY section that tells the user what to fix. No other section repeats these.
 
-    priorityImprovements: `Generate the 'Priority Improvements' section.
-List exactly 5 prioritized improvements ranked by ROI:
-| Action | Time Required | Impact |
-| :--- | :--- | :--- |
-Use star rating symbols (e.g. ⭐⭐⭐⭐⭐) for impact. No additional paragraphs.`,
+List EXACTLY 5 improvements ranked by ROI (highest impact first). Each item MUST follow this EXACT format with NO deviations:
 
-    aiImprovements: `Generate the 'AI Improvements' section.
-Output only suggested copy rewrites. Place all 'Why' or 'Explain' notes inside Markdown blockquotes (> ).
-Include:
-1. **Headline:**
-   - Current: "[current headline]"
-   - Suggested:
-     - [Apply Google Style: THE_HEADLINE_TEXT](apply-headline:THE_HEADLINE_TEXT)
-     - [Apply Amazon Style: THE_HEADLINE_TEXT](apply-headline:THE_HEADLINE_TEXT)
-     - [Apply Startup Style: THE_HEADLINE_TEXT](apply-headline:THE_HEADLINE_TEXT)
-     - [Apply Consulting Style: THE_HEADLINE_TEXT](apply-headline:THE_HEADLINE_TEXT)
-2. **About Summary:**
-   - Suggested Storytelling Rewrite (as a copyable block).
-3. **Experience Rewrites:**
-   - For key roles (e.g. Blinkit), show:
-     - Current Bullet
-     - Suggested STAR Rewrite (Problem → Action → Impact)
-     - [Sync to LinkedIn](sync-linkedin:experience:Company:RewriteText)`,
+## 🎯 Today's Mission
 
-    networkingStrategy: `Generate the 'Networking Strategy' section.
-Output simple, prioritized targets and actions:
-**Connect**
-* [Number] Recruiters
-* [Number] Peers / target role professionals
-* [Number] Alumni
-* [Number] Startup Founders
+**① [Action Title]** | [X] min | [★★★★★] | +[N] pts
+**Problem:** [Exactly one sentence explaining the specific issue with evidence from the profile.]
+**Action:** [Copy AI Headline](apply-headline:FULL_SUGGESTED_HEADLINE_TEXT_HERE)
 
-**Join**
-* [Number] Tech/Role Communities
+---
 
-**Follow**
-* [Number] Target Companies
-Provide a 3-sentence outreach message template. Place messaging rules or explanation inside a blockquote (> ).`,
+**② [Action Title]** | [X] min | [★★★★☆] | +[N] pts
+**Problem:** [Exactly one sentence.]
+**Action:** [Copy AI About](copy-text:FULL_SUGGESTED_ABOUT_TEXT_HERE)
 
-    contentPlan: `Generate the 'Content Plan' section.
-Output a 30-Day posting calendar calendar by weeks:
-* **Week 1:** [Theme, e.g. Product Breakdown]
-* **Week 2:** [Theme, e.g. Case Study]
-* **Week 3:** [Theme, e.g. Internship Learning]
-* **Week 4:** [Theme, e.g. Industry Insight]
-Include a click-to-draft post button using the 'draft-post:' scheme link:
-- [✍️ Draft Week 1 Post](draft-post:the-week-1-experience-pillar)
-Place all post ideas, outlines, and examples inside a Markdown blockquote (> ).`,
+---
 
-    resumeLinkedinConsistency: `Generate the 'Resume ↔ LinkedIn Consistency Scan' — the professional brand alignment audit.
-1. **Consistency Score**: [Score, e.g. 93]/100.
-2. Identify date conflicts, title mismatches, and missing resume achievements.
-3. Format each mismatch action as a Markdown link with 'sync-linkedin:' or 'sync-resume:' to trigger interactive updates on click.
-For example:
-- **Title Mismatch at CompanyName**: Resume: "Title A" vs. LinkedIn: "Title B"
-  - [Sync LinkedIn Title to "Title A"](sync-linkedin:title:CompanyName:Title A) | [Sync Resume Title to "Title B"](sync-resume:title:CompanyName:Title B)
-- **Missing Achievement from CompanyName**: "Achievement text..."
-  - [Sync Achievement to LinkedIn](sync-linkedin:achievement:CompanyName:Achievement text)
+**③ [Action Title]** | [X] min | [★★★★☆] | +[N] pts
+**Problem:** [Exactly one sentence.]
+**Action:** [Copy Missing Skills](copy-text:Skill1, Skill2, Skill3, Skill4)
 
-If no resume text is provided in the context, display a friendly notice explaining that uploading a resume will unlock this comparative consistency check.`,
+---
+
+**④ [Action Title]** | [X] min | [★★★☆☆] | +[N] pts
+**Problem:** [Exactly one sentence.]
+**Action:** [Copy Experience Rewrite](copy-text:FULL_SUGGESTED_EXPERIENCE_BULLET_TEXT)
+
+---
+
+**⑤ [Action Title]** | [X] min | [★★★☆☆] | +[N] pts
+**Problem:** [Exactly one sentence.]
+**Action:** [Copy Featured Section](copy-text:SUGGESTED_FEATURED_TEXT_OR_ACTION)
+
+> [Place all detailed justifications and reasoning in this blockquote — it will be hidden in a collapsible drawer.]
+
+RULES:
+- apply-headline: links are for Headline rewrites. copy-text: links are for everything else.
+- The link path must contain the FULL suggested text (not a placeholder).
+- ★ ratings: ★★★★★ = Critical, ★★★★☆ = High, ★★★☆☆ = Medium.
+- Point values: +12 headline, +9 about, +7 experience, +6 skills, +4 featured.
+- NEVER add analysis paragraphs outside the blockquote.`,
+
+    recruiterSimulation: `Generate the 'Recruiter Simulation' section. Show ONLY the verdict and three reasons. All walkthrough detail goes in a blockquote.
+
+## 👁 Recruiter Simulation
+
+**Verdict:** [✅ PASS / ⚠️ MAYBE / ❌ SKIP] — [One-sentence overall reason]
+
+**Why:**
+1. [First specific reason — reference a concrete profile element by name]
+2. [Second specific reason — reference a concrete profile element by name]
+3. [Third specific reason — reference a concrete profile element by name]
+
+${targetCompany ? `**${targetCompany} Fit:** [One sentence on fit for this specific company — be specific about culture, stack, or values match]` : ""}
+
+> [Place the full recruiter scroll walkthrough here: what they see step by step — Headline → Photo → About → Experience → Skills → Connections → Verdict. Include recruiter inner monologue quotes.]`,
+
+    networkingCards: `Generate the 'Networking' section as CARDS only. No analysis paragraphs in the main body.
+
+## 🔗 Networking
+
+| Action | Count | Target |
+| :--- | :---: | :--- |
+| **Connect** | [N] | [Specific profile type, e.g. "Senior PMs at fintech startups in India"] |
+| **Follow** | [N] | [Specific companies, e.g. "Razorpay, CRED, Meesho, PhonePe"] |
+| **Join** | [N] | [Specific communities, e.g. "Product Folks India, PM School, Reforge"] |
+| **Reach Out** | [N per week] | [Specific outreach cadence, e.g. "1 IIT Delhi alumni per week"] |
+
+> [Place the full outreach message template and networking strategy rationale here.]`,
+
+    contentCalendar: `Generate the 'Content Strategy' section — a 30-day content calendar. ONLY about content creation, NOT profile optimization.
+
+## ✍️ Content Strategy
+
+| Week | Theme | Format | Draft |
+| :--- | :--- | :--- | :--- |
+| **Week 1** | [Theme, e.g. Product Breakdown] | [Text Post / Carousel / Poll] | [✍️ Draft Post](draft-post:week1-product-breakdown) |
+| **Week 2** | [Theme, e.g. Internship Learning] | [Text Post / Carousel / Poll] | [✍️ Draft Post](draft-post:week2-internship-learning) |
+| **Week 3** | [Theme, e.g. Case Study] | [Text Post / Carousel / Poll] | [✍️ Draft Post](draft-post:week3-case-study) |
+| **Week 4** | [Theme, e.g. Industry Insight] | [Text Post / Carousel / Poll] | [✍️ Draft Post](draft-post:week4-industry-insight) |
+
+**Best time to post:** [Day and time based on target audience, e.g. "Tuesday & Thursday, 8–9am IST"]
+**Content Pillar:** [One-sentence positioning strategy for your content brand]
+
+> [Place post outlines, hooks, and example opening lines here.]`,
+
+    consistencyVisual: `Generate the 'Resume ↔ LinkedIn Consistency' section. If no resume text is in the context, output only a friendly notice that uploading a resume will unlock this comparison.
+
+## 🔄 Consistency
+
+**Overall Consistency:** [Score]%
+
+| Field | Status | Detail |
+| :--- | :---: | :--- |
+| **Headline** | ✅ / ⚠️ / ❌ | [One sentence describing the match or mismatch] |
+| **Current Role Title** | ✅ / ⚠️ / ❌ | [Specific detail] |
+| **Experience Dates** | ✅ / ⚠️ / ❌ | [Specific detail] |
+| **Skills** | ✅ / ⚠️ / ❌ | [Specific detail] |
+| **Education** | ✅ / ⚠️ / ❌ | [Specific detail] |
+| **About / Summary** | ✅ / ⚠️ / ❌ | [Specific detail] |
+
+For each ⚠️ or ❌ row, add a sync action on the next line:
+- [Sync LinkedIn](sync-linkedin:field:SectionName:NewText) | [Sync Resume](sync-resume:field:SectionName:NewText)
+
+> [Place full mismatch analysis and impact notes here.]`,
   };
 
   const structure = structures[sectionId] || "Write this LinkedIn Intelligence section with strategic depth and executive clarity.";
 
   const systemPrompt = `You are a Senior LinkedIn Intelligence Analyst and Personal Branding Consultant.
 Your job: write the finished LinkedIn Intelligence section "${sectionId}" for ${targetRole ? `target role "${targetRole}"` : "career optimization"}${targetCompany ? ` at "${targetCompany}"` : ""}.
-Target Goal of Candidate: "${targetGoal}". Make sure all recommendations and branding pivots align with achieving this goal.
+Target Goal of Candidate: "${targetGoal}". Align all recommendations to this goal.
 
-GLOBAL RULES (CRITICAL):
-1. Think like Apple Health, not McKinsey. Write with absolute brevity.
-2. For every profile section (Headline, About, Experience, Skills, Networking, etc.), you MUST follow this exact format:
-   - A single score line (if applicable)
-   - **Problem / Insight**: Exactly ONE clear sentence.
-   - **Recommendation**: Exactly ONE actionable sentence.
-   - **Action**: A single interactive Markdown link or CTA button line (e.g. apply-headline link, sync link, draft-post link).
-3. Place all detailed analysis, justifications, recruiter simulation voices, data proof, and explanation text inside a Markdown blockquote (starting with '> '). DO NOT write any paragraphs outside of blockquotes. This allows the UI to wrap it in a collapsible drawer.
-4. Address the candidate as "you".
-5. NEVER fabricate metrics, achievements, posts, certifications, or recommendations not present in the data.
-6. Output polished Markdown with clear headers and concise bullets.`;
+GLOBAL RULES (CRITICAL — VIOLATIONS WILL BREAK THE UI):
+1. Think like Apple Health, not McKinsey. Absolute brevity.
+2. Each section owns ONE topic. NEVER repeat advice from another section:
+   - linkedinHealth = metrics overview ONLY, no fixes.
+   - todaysMission = ALL fixes, nowhere else.
+   - recruiterSimulation = verdict + 3 reasons ONLY.
+   - networkingCards = connection targets ONLY.
+   - contentCalendar = content plan ONLY.
+   - consistencyVisual = consistency scores ONLY.
+3. NEVER show "Current:" copy unless it is genuinely needed for contrast. If something is already good, skip it entirely.
+4. All detailed analysis, justifications, and evidence MUST go inside Markdown blockquotes (lines starting with '> '). The UI wraps these in collapsible drawers — DO NOT write analysis paragraphs outside blockquotes.
+5. Address the candidate as "you".
+6. NEVER fabricate metrics, achievements, posts, or certifications not present in the data.
+7. Output polished Markdown with clear headers.`;
 
   const userPrompt = `Write the section "${sectionId}".
 

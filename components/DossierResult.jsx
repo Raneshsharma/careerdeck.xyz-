@@ -121,6 +121,27 @@ function SyncButton({ target, actionData, children }) {
   );
 }
 
+function CopyTextButton({ text, children }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard!");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs font-bold border border-sky-500/20 my-2 no-print cursor-pointer transition-all duration-200"
+    >
+      <span>{children}</span>
+      <span className="text-[10px] uppercase font-bold opacity-80 bg-sky-500/25 px-1.5 py-0.5 rounded">
+        {copied ? "✓ Copied" : "Copy"}
+      </span>
+    </button>
+  );
+}
+
 function DraftPostButton({ bullet, onTriggerCoach, children }) {
   const handleDraft = () => {
     if (onTriggerCoach) {
@@ -176,6 +197,91 @@ const TYPE_ACCENT = {
   linkedin: "border-sky-500/30 text-sky-400",
 };
 
+// ── LinkedIn Health Table ─────────────────────────────────────────────────
+function LinkedInHealthTable({ data }) {
+  const statusColor = (status) => {
+    const s = (status || "").toLowerCase();
+    if (s.includes("excellent")) return { bar: "bg-emerald-500", badge: "bg-emerald-500/10 text-emerald-400", border: "border-emerald-500/20" };
+    if (s.includes("good")) return { bar: "bg-sky-500", badge: "bg-sky-500/10 text-sky-400", border: "border-sky-500/20" };
+    if (s.includes("needs work")) return { bar: "bg-amber-500", badge: "bg-amber-500/10 text-amber-400", border: "border-amber-500/20" };
+    return { bar: "bg-red-500", badge: "bg-red-500/10 text-red-400", border: "border-red-500/20" };
+  };
+  return (
+    <div className="my-6 space-y-3 no-print">
+      {data.map((row, idx) => {
+        const score = parseInt(row.score) || 0;
+        const colors = statusColor(row.status);
+        return (
+          <div key={idx} className={`bg-white/[0.02] border ${colors.border} rounded-xl p-4 hover:bg-white/[0.04] transition-all duration-200`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold text-white">{row.metric}</span>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${colors.badge}`}>{row.status}</span>
+                <span className="text-xs text-slate-500 font-mono">{score}</span>
+              </div>
+            </div>
+            <div className="w-full bg-white/[0.04] h-1.5 rounded-full overflow-hidden mb-2">
+              <div className={`h-full rounded-full transition-all duration-700 ${colors.bar}`} style={{ width: `${score}%` }} />
+            </div>
+            {row.detail && <p className="text-xs text-slate-400">{row.detail}</p>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Networking Cards Table ─────────────────────────────────────────────────
+function NetworkingCardTable({ data }) {
+  const actionColor = (action) => {
+    const a = (action || "").toLowerCase();
+    if (a.includes("connect")) return "bg-sky-500/10 border-sky-500/20 text-sky-400";
+    if (a.includes("follow")) return "bg-violet-500/10 border-violet-500/20 text-violet-400";
+    if (a.includes("join")) return "bg-emerald-500/10 border-emerald-500/20 text-emerald-400";
+    return "bg-amber-500/10 border-amber-500/20 text-amber-400";
+  };
+  return (
+    <div className="grid grid-cols-2 gap-3 my-6 no-print">
+      {data.map((row, idx) => (
+        <div key={idx} className={`border rounded-xl p-4 flex flex-col gap-1 hover:bg-white/[0.02] transition-all duration-200 bg-white/[0.01] ${actionColor(row.action).split(" ")[1]}`}>
+          <span className={`text-xs font-bold uppercase tracking-wider ${actionColor(row.action).split(" ")[2]}`}>{row.action}</span>
+          <span className="text-2xl font-extrabold text-white leading-none">{row.count}</span>
+          <span className="text-xs text-slate-400 leading-snug">{row.target}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Consistency Visual Table ───────────────────────────────────────────────
+function ConsistencyTable({ data }) {
+  const iconColor = (status) => {
+    const s = (status || "").toString();
+    if (s.includes("✅")) return "text-emerald-400 bg-emerald-500/10";
+    if (s.includes("⚠")) return "text-amber-400 bg-amber-500/10";
+    return "text-red-400 bg-red-500/10";
+  };
+  const statusIcon = (status) => {
+    const s = (status || "").toString();
+    if (s.includes("✅")) return "✅";
+    if (s.includes("⚠")) return "⚠️";
+    return "❌";
+  };
+  return (
+    <div className="my-6 space-y-2 no-print">
+      {data.map((row, idx) => (
+        <div key={idx} className="flex items-center gap-3 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 hover:bg-white/[0.04] transition-all duration-150">
+          <span className={`text-sm w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${iconColor(row.status)}`}>{statusIcon(row.status)}</span>
+          <div className="flex-1 min-w-0">
+            <span className="text-sm font-semibold text-white">{row.field}</span>
+            {row.detail && <p className="text-xs text-slate-400 mt-0.5 truncate">{row.detail}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function CustomTable({ children, ...props }) {
   try {
     const thead = children?.find?.(c => c?.type === 'thead');
@@ -190,6 +296,40 @@ function CustomTable({ children, ...props }) {
 
     const rows = tbody?.props?.children;
     const rowArray = Array.isArray(rows) ? rows : rows ? [rows] : [];
+
+    const getCellText = (cell) => {
+      if (typeof cell === 'string') return cell.trim();
+      if (Array.isArray(cell)) return cell.map(getCellText).join('');
+      if (cell?.props?.children) return getCellText(cell.props.children);
+      return '';
+    };
+
+    // LinkedIn Health Table: | Metric | Score | Status | Detail |
+    if (headers.includes('Metric') && headers.includes('Score') && headers.includes('Status') && headers.includes('Detail')) {
+      const data = rowArray.map(tr => {
+        const tds = tr?.props?.children?.map?.(td => getCellText(td?.props?.children || '')) || [];
+        return { metric: tds[0], score: tds[1], status: tds[2], detail: tds[3] };
+      });
+      return <LinkedInHealthTable data={data} />;
+    }
+
+    // Networking Cards Table: | Action | Count | Target |
+    if (headers.includes('Action') && headers.includes('Count') && headers.includes('Target')) {
+      const data = rowArray.map(tr => {
+        const tds = tr?.props?.children?.map?.(td => getCellText(td?.props?.children || '')) || [];
+        return { action: tds[0], count: tds[1], target: tds[2] };
+      });
+      return <NetworkingCardTable data={data} />;
+    }
+
+    // Consistency Table: | Field | Status | Detail |
+    if (headers.includes('Field') && headers.includes('Status') && headers.includes('Detail')) {
+      const data = rowArray.map(tr => {
+        const tds = tr?.props?.children?.map?.(td => getCellText(td?.props?.children || '')) || [];
+        return { field: tds[0], status: tds[1], detail: tds[2] };
+      });
+      return <ConsistencyTable data={data} />;
+    }
 
     // 1. ATS Match Table: | Metric | Score | Rating | Recommendation |
     if (headers.includes('Metric') && headers.includes('Score') && headers.includes('Rating')) {
@@ -473,6 +613,10 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
                 if (href?.startsWith("apply-headline:")) {
                   const headline = href.slice(15);
                   return <HeadlineOptionButton headline={headline}>{children}</HeadlineOptionButton>;
+                }
+                if (href?.startsWith("copy-text:")) {
+                  const text = href.slice(10);
+                  return <CopyTextButton text={text}>{children}</CopyTextButton>;
                 }
                 if (href?.startsWith("sync-linkedin:")) {
                   const actionData = href.slice(14);
