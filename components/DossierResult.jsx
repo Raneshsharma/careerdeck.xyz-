@@ -379,27 +379,33 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
       <div className="bg-[#0B0F19]/60 border border-white/[0.08] backdrop-blur-md rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 sm:p-10 text-slate-200">
         <article className="dossier-markdown">
           <InlineCoachContext.Provider value={dossierType === "resume" && onContentUpdate ? { content, onContentUpdate } : null}>
-          {sections.map((section, idx) => (
-            <div key={section.id || idx} id={section.id}>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  h2: ({ children, ...props }) => <h2 id={section.id} {...props}>{children}</h2>,
-                  table: CustomTable,
-                  li: dossierType === "resume" && onContentUpdate ? EnhancedListItem : undefined,
-                }}
-              >
-                {section.body}
-              </ReactMarkdown>
-              {section.title && (
-                <div className="mb-8 border-t border-white/[0.05] pt-4">
-                  <SourceTiles sources={sourceMetadata} />
-                  <SectionVoting dossierId={genId} sectionKey={section.title} />
-                  <SectionFeedback dossierId={genId} sectionKey={section.title} />
-                </div>
-              )}
-            </div>
-          ))}
+          {sections.map((section, idx) => {
+            const mdComponents = {
+              h2: ({ children, ...props }) => <h2 id={section.id} {...props}>{children}</h2>,
+              table: CustomTable,
+            };
+            if (dossierType === "resume" && onContentUpdate) {
+              mdComponents.li = EnhancedListItem;
+            }
+
+            return (
+              <div key={section.id || idx} id={section.id}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={mdComponents}
+                >
+                  {section.body}
+                </ReactMarkdown>
+                {section.title && (
+                  <div className="mb-8 border-t border-white/[0.05] pt-4">
+                    <SourceTiles sources={sourceMetadata} />
+                    <SectionVoting dossierId={genId} sectionKey={section.title} />
+                    <SectionFeedback dossierId={genId} sectionKey={section.title} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
           </InlineCoachContext.Provider>
         </article>
 
