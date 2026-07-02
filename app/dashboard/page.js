@@ -282,7 +282,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#030712] relative overflow-x-hidden text-slate-200">
+    <div className="min-h-screen bg-[#030712] relative overflow-x-clip text-slate-200">
       {/* 3D Perspective Grid Background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(124,58,237,0.06),transparent_50%)] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none z-0" />
