@@ -5,6 +5,7 @@ import { brandIntelligenceNode } from "./nodes/brandIntelligenceNode";
 import { recruiterIntelligenceNode } from "./nodes/recruiterIntelligenceNode";
 import { linkedinOptimizationNode } from "./nodes/linkedinOptimizationNode";
 import { networkingCareerNode } from "./nodes/networkingCareerNode";
+import { consistencyNode } from "./nodes/consistencyNode";
 import { generateSection } from "../prompts/llm";
 import { buildLinkedInWriterPrompt, LINKEDIN_SECTION_IDS } from "../prompts/linkedinSections";
 import { UNIVERSAL_MASTER_PROMPT, DOMAIN_MASTER_PROMPTS } from "../prompts/masterPrompt";
@@ -32,12 +33,13 @@ function createLinkedInSectionNode(sectionId: string) {
 
 const g = new StateGraph(CompanyStateAnnotation) as any;
 
-// ── 5 Sequential Intelligence Engines ─────────────────────────────────────
+// ── 6 Sequential Intelligence Engines ─────────────────────────────────────
 g.addNode("linkedinIntelligenceEngine", linkedinIntelligenceNode);
 g.addNode("brandIntelligenceEngine", brandIntelligenceNode);
 g.addNode("recruiterIntelligenceEngine", recruiterIntelligenceNode);
 g.addNode("linkedinOptimizationEngine", linkedinOptimizationNode);
 g.addNode("networkingCareerEngine", networkingCareerNode);
+g.addNode("consistencyEngine", consistencyNode);
 
 // Connect engines sequentially
 g.addEdge(START, "linkedinIntelligenceEngine");
@@ -45,11 +47,12 @@ g.addEdge("linkedinIntelligenceEngine", "brandIntelligenceEngine");
 g.addEdge("brandIntelligenceEngine", "recruiterIntelligenceEngine");
 g.addEdge("recruiterIntelligenceEngine", "linkedinOptimizationEngine");
 g.addEdge("linkedinOptimizationEngine", "networkingCareerEngine");
+g.addEdge("networkingCareerEngine", "consistencyEngine");
 
-// ── 18 Parallel Section Nodes ──────────────────────────────────────────────
+// ── Parallel Section Nodes ──────────────────────────────────────────────
 LINKEDIN_SECTION_IDS.forEach((s) => {
   g.addNode(s, createLinkedInSectionNode(s));
-  g.addEdge("networkingCareerEngine", s);
+  g.addEdge("consistencyEngine", s);
   g.addEdge(s, END);
 });
 

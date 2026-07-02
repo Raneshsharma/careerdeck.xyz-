@@ -374,7 +374,16 @@ export async function POST(request) {
     }
     acquired = true;
 
-    const { dossierType, companyName, role, jobDescription, resumeText, linkedinText } = await request.json();
+    const {
+      dossierType,
+      companyName,
+      role,
+      jobDescription,
+      resumeText,
+      linkedinText,
+      linkedinGoal,
+      profileChecklist,
+    } = await request.json();
 
     const cName = sanitize(companyName || "");
     const rName = sanitize(role || "");
@@ -435,6 +444,8 @@ export async function POST(request) {
         resumeText: rText || undefined,
         linkedinText: lText || undefined,
         dossierType: dosType,
+        linkedinGoal: linkedinGoal || undefined,
+        profileChecklist: profileChecklist || undefined,
       };
 
       const graphToUse = dosType === "company" ? companyGraph
@@ -506,7 +517,8 @@ export async function POST(request) {
                 "profileStrengthScorecard", "headlineIntelligence", "aboutIntelligence",
                 "experienceIntelligence", "skillsIntelligence", "personalBrandIntelligence",
                 "recruiterSearchIntelligence", "networkingIntelligence", "contentIntelligence",
-                "careerDirection", "profileGapAnalysis", "recruiterPersonas", "candidateMoat", "linkedinActionPlan"
+                "careerDirection", "profileGapAnalysis", "recruiterPersonas", "candidateMoat", "linkedinActionPlan",
+                "resumeLinkedinConsistency"
               ]
             : [
                 "newsOverview", "executiveSummary", "whatHappened", "whyItHappened",

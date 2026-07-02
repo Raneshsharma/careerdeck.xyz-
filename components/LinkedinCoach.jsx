@@ -81,7 +81,7 @@ function MessageBubble({ msg, isStreaming }) {
 }
 
 // ── Main LinkedInCoach Component ───────────────────────────────────────────
-export default function LinkedInCoach({ dossierContent, onClose, contextItem }) {
+export default function LinkedInCoach({ dossierContent, onClose, contextItem, preloadedPrompt }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -96,6 +96,14 @@ export default function LinkedInCoach({ dossierContent, onClose, contextItem }) 
     requestAnimationFrame(() => setPanelVisible(true));
     inputRef.current?.focus();
   }, []);
+
+  // Handle preloaded prompt automatically
+  useEffect(() => {
+    if (preloadedPrompt) {
+      sendMessage(preloadedPrompt);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preloadedPrompt]);
 
   // Auto-scroll on new content
   useEffect(() => {

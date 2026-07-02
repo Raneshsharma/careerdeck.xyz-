@@ -17,6 +17,7 @@ export const LINKEDIN_SECTION_IDS = [
   "recruiterPersonas",
   "candidateMoat",
   "linkedinActionPlan",
+  "resumeLinkedinConsistency"
 ];
 
 export function buildLinkedInWriterPrompt(
@@ -28,27 +29,36 @@ export function buildLinkedInWriterPrompt(
   const recruiter = state.recruiterIntelligence || {};
   const optimization = state.linkedinOptimization || {};
   const networking = state.networkingCareerIntelligence || {};
+  const consistency = state.consistencyIntelligence || {};
 
   const profile = lkg.profile || {};
   const targetRole = state.role || "Target Role";
   const targetCompany = state.companyName || "";
+  const targetGoal = state.linkedinGoal || "Landing PM jobs";
 
   const structures: Record<string, string> = {
-    linkedinDashboard: `Generate the 'LinkedIn Intelligence Dashboard' — the hero first screen.
-1. Write a 2-line **LinkedIn Health Summary** (candidate's current professional brand in plain language).
-2. Generate the **Hero Metrics** table:
-- **Profile Strength**: [score/100]
-- **Recruiter Visibility**: [score/100]  
-- **Brand Clarity**: [score/100]
-- **Networking Score**: [score/100]
-- **Keyword Coverage**: [score/100]
-- **Leadership Signals**: [score/100]
-- **Content Authority**: [score/100]
-- **Hiring Readiness**: [score/100]
-3. Generate the **Explainable Score Breakdown** for each metric with Evidence → Reason → Gap → Improvement → Confidence.
-4. Show the **Top Strength**, **Top Weakness**, **Fastest Improvement** (with Time Required and Expected Gain).
-5. Show **Brand Archetypes**: Primary / Secondary / Supporting with evidence.
-Format hero metrics as a scorecard table: | Metric | Score | Rating | Key Evidence | Gap |`,
+    linkedinDashboard: `Generate the 'LinkedIn Career Intelligence Dashboard' — the unified metric first screen.
+Format the dashboard EXACTLY like this (using this structure, replacing values based on actual analysis):
+
+## 📊 Career Intelligence Dashboard
+
+| Metric | Score | Detail / Evidence |
+| :--- | :--- | :--- |
+| **LinkedIn Health** | [Score, e.g. 91]/100 | [Short 1-sentence overall status] |
+| **Professional Position** | — | [Target Role / Position, e.g. Growth Product Manager] |
+| **Recruiter Visibility** | [Score, e.g. 88]/100 | [Short status of keyword matches] |
+| **Authority** | [Score, e.g. 72]/100 | [Number of recommendations / proof signals] |
+| **Networking** | [Score, e.g. 76]/100 | [Connection quality status] |
+| **Content** | [Score, e.g. 45]/100 | [Theme and post status] |
+| **Brand Consistency** | [Score, e.g. 93]/100 | [Alignment of Resume vs LinkedIn Profile] |
+
+### 🎯 Key Gaps & Mission
+* **Top Strength:** [Short strength detail, e.g., Analytics + Marketplace]
+* **Biggest Gap:** [Short gap details, e.g., Thought Leadership / Narrative Gaps]
+* **Today's Mission:** [Direct next action, e.g., Rewrite Profile Headline]
+* **Expected Gain:** [Visibility score boost, e.g., +5 Recruiter Visibility]
+
+Ensure that ALL scores are numbers (out of 100) and are realistic based on the LKG analysis. Do not include other content.`,
 
     linkedinSnapshot: `Generate 'LinkedIn in One Minute' — one focused paragraph.
 Explain in plain, recruiter-readable language:
@@ -58,13 +68,14 @@ Explain in plain, recruiter-readable language:
 - What makes them distinctive.
 Do NOT use jargon. Write as if explaining to a hiring manager in 60 seconds.`,
 
-    professionalBrand: `Generate the 'Professional Brand' section.
-1. State the **Primary Brand** in one sentence (e.g., "Growth-focused Product Manager with a builder's mindset").
-2. List **Brand Evidence**: specific bullets, titles, metrics, and achievements that create this brand.
-3. Identify the **Brand Archetype** (Primary / Secondary / Supporting) with reasoning.
-4. Evaluate **Brand Consistency**: is the story coherent across headline, about, and experience?
-5. List **Brand Gaps**: what is missing that weakens the brand?
-6. State the **Professional Moat**: what makes this person uniquely difficult to replace?`,
+    professionalBrand: `Generate the 'Professional Brand & Strategy' section.
+1. State the **Primary Brand Strategy** (Professional Identity, Brand Tone, target recruiter goal).
+2. Detail the **Target Positioning**:
+   - Current Market Position: [Where the candidate stands today, e.g. Growth Product Intern]
+   - Future Position: [The targeted next step, e.g. Associate Product Manager]
+   - Brand Gaps: [Gaps to close to qualify for the future position, e.g. Leadership/Experimentation]
+3. Define the **Brand Moat**: what makes this candidate uniquely difficult to replace.
+4. Set the **Engagement Pillars**: Target networking goal and primary content themes.`,
 
     recruiterFirstImpression: `Generate the 'Recruiter First Impression' section.
 Simulate the 8-second recruiter scan:
@@ -78,6 +89,7 @@ Be direct and honest. Recruiters are blunt. Do not over-praise.`,
     profileStrengthScorecard: `Generate the 'Profile Strength Scorecard'.
 Evaluate each section with score (0-100), rating, evidence, and one improvement action:
 | Section | Score | Rating | Evidence | #1 Improvement |
+| :--- | :--- | :--- | :--- | :--- |
 Include: Headline, About, Experience, Projects, Skills, Recommendations, Featured, Education, Certifications, Networking, Content.
 Below the table, show the **Explainable Score Weights** for overall Profile Strength.
 End with a **Score vs. Top 10% Profile** benchmark comparison.`,
@@ -85,19 +97,27 @@ End with a **Score vs. Top 10% Profile** benchmark comparison.`,
     headlineIntelligence: `Generate the 'Headline Intelligence' section.
 1. Display the **Current Headline** and analyze: keyword density, brand clarity, recruiter appeal, role targeting.
 2. List what is **Missing** from the headline.
-3. Generate exactly **3 Optimized Headline Alternatives**:
-- Option 1: Keyword-heavy (ATS optimized)
-- Option 2: Brand-led (personal brand first)
-- Option 3: Achievement-led (impact first)
-For each: explain why it is stronger, what recruiters will notice, and which role it targets best.`,
+3. Generate exactly **4 Optimized Headline Alternatives** matching specific company styles:
+   - **Google Style** (Direct, keyword-optimized, high clarity: "Role | Core Skills | Business Impact")
+   - **Amazon Style** (Data-driven, execution-focused: "Role | Specific Achievements & Metrics")
+   - **Startup Style** (Builder, growth-oriented, high energy: "Role | Helping X do Y | Key Skill")
+   - **Consulting Style** (Structured, domain authority: "Role | Domain Expert in X | Value Proposition")
+Format each alternative exactly as a Markdown link with the 'apply-headline:' scheme:
+[Apply Google Style: THE_HEADLINE_TEXT](apply-headline:THE_HEADLINE_TEXT)
+[Apply Amazon Style: THE_HEADLINE_TEXT](apply-headline:THE_HEADLINE_TEXT)
+[Apply Startup Style: THE_HEADLINE_TEXT](apply-headline:THE_HEADLINE_TEXT)
+[Apply Consulting Style: THE_HEADLINE_TEXT](apply-headline:THE_HEADLINE_TEXT)
+Followed by a brief explanation of why each is strong.`,
 
-    aboutIntelligence: `Generate the 'About Section Intelligence'.
-1. Evaluate the **Current About**: Story → Metrics → Leadership → Credibility → Keywords → CTA.
-2. Score each dimension (0-10) with evidence.
-3. Identify the 3 biggest weaknesses.
-4. Generate a complete **Optimized About Section** rewrite.
-Rules for the rewrite: First sentence hooks a recruiter. Uses authentic professional language. Includes at least one metric if available in evidence. Has a clear CTA (call to action). Reflects the primary brand archetype.
-5. Explain exactly **Why the Rewrite is Stronger**.`,
+    aboutIntelligence: `Generate the 'About Section Storytelling'.
+Evaluate the current summary, then provide a complete storytelling rewrite following this exact progressive framework:
+1. **Journey**: The hook that establishes your professional story.
+2. **Problem**: The core challenge you love to solve.
+3. **Passion**: Why you choose to focus on this domain.
+4. **Proof**: Hard metrics and evidence of your impact (strictly no fabrications).
+5. **Future & CTA**: Where you are heading next and how to get in touch.
+
+Format the rewrite clearly as a blockquote or code block so the user can easily copy it.`,
 
     experienceIntelligence: `Generate the 'Experience Intelligence' section.
 For EACH work experience:
@@ -108,61 +128,55 @@ For EACH work experience:
 Format as: Company Name → Role → Duration → then a comparison table:
 | Original Bullet | Weakness | Optimized Version |`,
 
-    skillsIntelligence: `Generate the 'Skills Intelligence' section.
+    skillsIntelligence: `Generate the 'Skills & SEO Keyword Audit' section.
 1. **Skill Cluster Map** — organize current skills into 4 clusters:
-| Cluster | Skills |
-Technical | ...
-Business | ...
-Leadership | ...
-Industry | ...
-2. **Missing Skills**: high-priority and medium-priority skills absent from the profile.
-3. **Recommended Removals**: outdated or irrelevant skills diluting the brand.
-4. **Endorsement Strategy**: which skills to prioritize for endorsements and why.`,
+   - Technical, Business, Leadership, Industry.
+2. **SEO Keyword Placement Map** — show where critical target keywords appear today and where they should be added:
+| Keyword | Headline | About | Experience | Skills | Recommendation |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+3. **Missing Skills**: high-priority and medium-priority skills absent from the profile.
+4. **Recommended Removals**: outdated or irrelevant skills diluting the brand.`,
 
-    personalBrandIntelligence: `Generate the 'Personal Brand Intelligence' section.
+    personalBrandIntelligence: `Generate the 'Personal Brand Strategy' section.
 1. **Positioning Statement** (one sentence): How does this person position themselves vs. similar professionals?
 2. **Authority Score**: [score/100] with evidence.
-3. **Consistency Audit**: Is the brand consistent across headline → about → experience → skills?
-4. **Differentiation**: What makes this profile stand out in a competitive pool?
-5. **Professional Moat**: Evidence of expertise that competitors cannot easily replicate.
-6. **Brand Recommendations**: Top 3 actions to strengthen the personal brand.`,
+3. **Differentiation**: What makes this profile stand out in a competitive pool?
+4. **Professional Moat**: Evidence of expertise that competitors cannot easily replicate.
+5. **Brand Recommendations**: Top 3 actions to strengthen the personal brand.`,
 
-    recruiterSearchIntelligence: `Generate the 'Recruiter Search Intelligence' section.
-1. **Search Visibility Score**: [score/100].
-2. **Surfaces For**: List specific keyword searches that would surface this profile today.
-3. **Missing From**: List keyword searches this profile should appear in but doesn't.
-4. **Keyword Gap Analysis**: Missing keywords by category (Role, Industry, Skills, Function).
-5. **Search Rank Improvement Actions**: Top 5 specific changes to improve search ranking.
-6. **Algorithm Signals**: LinkedIn's search ranking factors and how this profile performs on each.`,
+    recruiterSearchIntelligence: `Generate the 'Recruiter Search Visibility' section.
+Simulate search discovery algorithms and display a direct target checklist:
+| Recruiter searching | Visibility Status (YES/PARTIAL/LOW) | Search Term Strategy |
+| :--- | :--- | :--- |
+Include roles related to target role (e.g. Associate PM, Growth PM, Product Analyst, Strategy, etc.).
+1. Explain WHY the profile surfaces or fails to surface for each search term.
+2. Detail the exact SEO adjustments required to move LOW/PARTIAL terms to YES.`,
 
-    networkingIntelligence: `Generate the 'Networking Intelligence' section.
-1. **Networking Score**: [score/100] with evidence.
-2. **Connection Quality Assessment**: Based on visible signals (recommendations, endorsements, featured connections).
-3. **Recommendation Analysis**: Current recommendations — strength, relevance, and what type of recommendations are missing.
-4. **Networking Gaps**: What is missing from the network that is hurting visibility?
-5. **Recommended Actions**:
-- Who to connect with (roles, seniority levels, industries).
-- Communities and LinkedIn groups to join.
-- Companies to follow for network signal.`,
+    networkingIntelligence: `Generate the 'Networking Intelligence & Outreach targets' section.
+1. **Target Networking Connection Categories**: Recommend specific connection target counts by group:
+   - APMs / Peers (e.g. 20)
+   - Product Directors / Hiring Managers (e.g. 10)
+   - School / Company Alumni (e.g. 10)
+   - Talent Acquisition / Recruiters (e.g. 15)
+   - Startup Founders (e.g. 5)
+For each group, specify the exact networking outreach rationale.
+2. **Outreach Messaging Template**: Provide a 3-sentence, high-response outreach message template.`,
 
-    contentIntelligence: `Generate the 'Content Intelligence' section.
-If posts or articles are present in the profile, analyze them.
-If absent, provide a complete content strategy based on the brand.
-1. **Current Content Analysis**: Themes, consistency, authority, estimated reach.
-2. **Content Authority Score**: [score/100].
-3. **Recommended Content Pillars** (3 pillars based on brand archetype):
-- Pillar 1: [topic] — why it builds authority
-- Pillar 2: [topic] — why it builds authority
-- Pillar 3: [topic] — why it builds authority
-4. **Posting Frequency Recommendation** with reasoning.
-5. **Content Types**: What formats (posts, articles, carousels, polls) work best for this brand?`,
+    contentIntelligence: `Generate the 'Content Strategy & Pillars' section.
+Rather than generic posting suggestions, generate a structured calendar and pillars based on the candidate's experience:
+1. **Content Pillars**: Define 3 core themes (e.g. Product Reviews, Growth Insight, Consumer Behavior).
+2. **Content Posting Calendar**:
+   - **Monday**: [Pillar theme, e.g. Product Breakdown] — Description & post trigger.
+   - **Thursday**: [Pillar theme, e.g. Growth Insight] — Description & post trigger.
+   - **Saturday**: [Pillar theme, e.g. Learning / Behind-the-scenes] — Description & post trigger.
+3. **Posting Frequency & format** recommendations.`,
 
     careerDirection: `Generate the 'Career Direction' section.
 1. **Current Career Trajectory**: Where is this career heading based on evidence?
 2. **Career Momentum**: Strong / Moderate / Stagnant — with reasoning.
 3. **Top 5 Target Roles** — formatted as:
 | Role | Fit Score | Why | Key Gap |
-Roles must be derived from actual career evidence, not generic suggestions.
+| :--- | :--- | :--- | :--- |
 4. **Industries to Target** with reasoning.
 5. **Career Acceleration Actions**: 3 specific actions to accelerate trajectory.`,
 
@@ -170,6 +184,7 @@ Roles must be derived from actual career evidence, not generic suggestions.
 Compare the current LinkedIn profile against the ideal profile for the target role${targetRole ? ` "${targetRole}"` : ""}${targetCompany ? ` at "${targetCompany}"` : ""}.
 Format as:
 | Dimension | Current | Ideal | Gap | Action |
+| :--- | :--- | :--- | :--- | :--- |
 Include: Headline, About, Experience, Skills, Recommendations, Featured, Certifications, Network.
 2. **Gap Priority Matrix**: Rank gaps by impact (High/Medium/Low) and time to fix (Quick/Medium/Long).
 3. **Profile Score vs. Target Role**: [current score] → [target score] — what it would take to close the gap.`,
@@ -190,26 +205,41 @@ Answer: Why should recruiters remember THIS LinkedIn profile?
 4. **Moat Gaps**: What is missing that would make the moat unassailable?
 5. **Competitor Benchmark**:
 | Dimension | This Profile | Top 10% Profile | Gap |
+| :--- | :--- | :--- | :--- |
 Rate dimensions with stars (★★★★★).`,
 
     linkedinActionPlan: `Generate the 'LinkedIn Action Plan' — the complete ranked improvement roadmap.
 Format as a priority matrix table:
 | Priority | Action | Section | Time Required | Impact | ROI |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 Priority: 🔴 Critical / 🟡 Important / 🟢 Nice to Have
 Impact: score improvement expected (e.g., +12 Recruiter Visibility)
-ROI: ★★★★★ rating
+ROI: ★★★ indicators
 Include all improvements identified across ALL sections of this dossier.
 Group by: Quick Wins (< 30 mins) | Medium Effort (1-3 hours) | Strategic (1+ days).
 End with: **Expected Profile Transformation**: current state → after all actions state.`,
+
+    resumeLinkedinConsistency: `Generate the 'Resume ↔ LinkedIn Consistency Scan' — the professional brand alignment audit.
+Perform a forensic cross-check between the parsed Resume and the LinkedIn profile.
+1. **Consistency Score**: [Score, e.g. 93]/100.
+2. **Employment Date Mismatches**: Identify any dates that conflict for identical companies/roles.
+3. **Job Title Inconsistencies**: Highlight discrepancies where the titles differ (e.g. "Lead Product Analyst" on Resume vs "Product Intern" on LinkedIn).
+4. **Missing Accomplishments in LinkedIn**: Extract high-impact achievements, metrics, or projects present on the Resume but missing on LinkedIn.
+Format each mismatch action as a Markdown link with 'sync-linkedin:' or 'sync-resume:' to trigger interactive updates on click.
+For example:
+- **Title Mismatch at CompanyName**: Resume: "Title A" vs. LinkedIn: "Title B"
+  - [Sync LinkedIn Title to "Title A"](sync-linkedin:title:CompanyName:Title A) | [Sync Resume Title to "Title B"](sync-resume:title:CompanyName:Title B)
+- **Missing Achievement from CompanyName**: "Achievement text..."
+  - [Sync Achievement to LinkedIn](sync-linkedin:achievement:CompanyName:Achievement text)
+
+If no resume text is provided in the context, display a friendly notice explaining that uploading a resume will unlock this comparative consistency check.`,
   };
 
   const structure = structures[sectionId] || "Write this LinkedIn Intelligence section with strategic depth and executive clarity.";
 
   const systemPrompt = `You are a Senior LinkedIn Intelligence Analyst and Personal Branding Consultant.
 Your job: write the finished LinkedIn Intelligence section "${sectionId}" for ${targetRole ? `target role "${targetRole}"` : "career optimization"}${targetCompany ? ` at "${targetCompany}"` : ""}.
-
-SECTION INSTRUCTIONS:
-${structure}
+Target Goal of Candidate: "${targetGoal}". Make sure all recommendations and branding pivots align with achieving this goal.
 
 GLOBAL RULES:
 1. Write with absolute precision, strategic depth, and professional clarity. Every section must be consumable in 30 seconds.
@@ -236,6 +266,9 @@ ${JSON.stringify(optimization, null, 2)}
 
 NETWORKING & CAREER INTELLIGENCE:
 ${JSON.stringify(networking, null, 2)}
+
+CONSISTENCY SCAN DATA (RESUME VS LINKEDIN):
+${JSON.stringify(consistency, null, 2)}
 
 Output ONLY polished Markdown.`;
 

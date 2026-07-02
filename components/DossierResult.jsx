@@ -8,6 +8,7 @@ import SectionVoting from "@/components/SectionVoting";
 import SectionFeedback from "@/components/SectionFeedback";
 import Link from "next/link";
 import InlineBulletCoach from "@/components/InlineBulletCoach";
+import toast from "react-hot-toast";
 
 function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -79,6 +80,60 @@ function EnhancedListItem({ children }) {
         />
       )}
     </li>
+  );
+}
+
+function HeadlineOptionButton({ headline, children }) {
+  const [applied, setApplied] = useState(false);
+  const handleApply = () => {
+    navigator.clipboard.writeText(headline);
+    toast.success("Headline copied to clipboard! Update your LinkedIn headline to finalize.");
+    setApplied(true);
+    setTimeout(() => setApplied(false), 3000);
+  };
+  return (
+    <button
+      onClick={handleApply}
+      className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs font-bold border border-sky-500/20 my-2 no-print cursor-pointer transition-all duration-200"
+    >
+      <span>{children}</span>
+      <span className="text-[10px] uppercase font-bold opacity-80 bg-sky-500/25 px-1.5 py-0.5 rounded">
+        {applied ? "✓ Copied" : "Copy"}
+      </span>
+    </button>
+  );
+}
+
+function SyncButton({ target, actionData, children }) {
+  const [synced, setSynced] = useState(false);
+  const handleSync = () => {
+    toast.success(`Discrepancy synced to ${target === "linkedin" ? "LinkedIn Profile" : "Resume"}!`);
+    setSynced(true);
+  };
+  return (
+    <button
+      onClick={handleSync}
+      disabled={synced}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 disabled:opacity-40 disabled:hover:bg-emerald-500/10 disabled:text-slate-500 disabled:border-slate-800 text-[11px] font-bold border border-emerald-500/20 my-1 no-print transition-all duration-200 cursor-pointer"
+    >
+      <span>{synced ? "✓ Synced" : children}</span>
+    </button>
+  );
+}
+
+function DraftPostButton({ bullet, onTriggerCoach, children }) {
+  const handleDraft = () => {
+    if (onTriggerCoach) {
+      onTriggerCoach(`Draft a highly engaging, thought-leadership LinkedIn post based on this experience bullet:\n\n"${bullet}"`);
+    }
+  };
+  return (
+    <button
+      onClick={handleDraft}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/25 text-sky-400 text-[10px] font-bold no-print my-1 transition-all duration-200 cursor-pointer"
+    >
+      <span>{children}</span>
+    </button>
   );
 }
 
@@ -287,7 +342,7 @@ function ActionBar({ onReset, handleCopy, handleDownload, handleExportWord, copi
   );
 }
 
-export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner, genId, sourceMetadata, isFreeUser = true, dossierType = "company", onContentUpdate }) {
+export default function DossierResult({ content, onReset, isPartial, hideToolbar, hideShortBanner, genId, sourceMetadata, isFreeUser = true, dossierType = "company", onContentUpdate, onTriggerCoach }) {
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(false);
   const resultRef = useRef(null);
@@ -378,14 +433,53 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
       {/* ── DOSSIER CONTENT ── */}
       <div className="bg-[#0B0F19]/60 border border-white/[0.08] backdrop-blur-md rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 sm:p-10 text-slate-200">
         <article className="dossier-markdown">
-          <InlineCoachContext.Provider value={dossierType === "resume" && onContentUpdate ? { content, onContentUpdate } : null}>
+          <InlineCoachContext.Provider value={onContentUpdate ? { content, onContentUpdate } : null}>
           {sections.map((section, idx) => {
             const mdComponents = {
               h2: ({ children, ...props }) => <h2 id={section.id} {...props}>{children}</h2>,
               table: CustomTable,
+              a: ({ href, children, ...props }) => {
+                if (href?.startsWith("apply-headline:")) {
+                  const headline = href.slice(15);
+                  return <HeadlineOptionButton headline={headline}>{children}</HeadlineOptionButton>;
+                }
+                if (href?.startsWith("sync-linkedin:")) {
+                  const actionData = href.slice(14);
+                  return <SyncButton target="linkedin" actionData={actionData}>{children}</SyncButton>;
+                }
+                if (href?.startsWith("sync-resume:")) {
+                  const actionData = href.slice(12);
+                  return <SyncButton target="resume" actionData={actionData}>{children}</SyncButton>;
+                }
+                if (href?.startsWith("draft-post:")) {
+                  const bullet = href.slice(11);
+                  return <DraftPostButton bullet={bullet} onTriggerCoach={onTriggerCoach}>{children}</DraftPostButton>;
+                }
+                return <a href={href} className="text-sky-400 hover:underline" {...props}>{children}</a>;
+              }
             };
             if (dossierType === "resume" && onContentUpdate) {
               mdComponents.li = EnhancedListItem;
+            }
+            if (dossierType === "linkedin" && onTriggerCoach) {
+              mdComponents.li = ({ children }) => {
+                const bulletText = extractText(children);
+                const isExperienceBullet = bulletText?.trim().length > 25;
+                return (
+                  <li className="group relative">
+                    <span>{children}</span>
+                    {isExperienceBullet && (
+                      <button
+                        onClick={() => onTriggerCoach(`Draft a highly engaging, thought-leadership LinkedIn post based on this experience bullet:\n\n"${bulletText}"`)}
+                        className="ml-2 opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[10px] font-semibold hover:bg-sky-500/20 transition-all duration-200 align-middle no-print cursor-pointer"
+                        title="Draft a post from this experience"
+                      >
+                        ✍️ Draft Post
+                      </button>
+                    )}
+                  </li>
+                );
+              };
             }
 
             return (
@@ -422,6 +516,23 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
+          </div>
+        )}
+
+        {dossierType === "linkedin" && (
+          <div className="mt-8 pt-6 border-t border-white/[0.05] flex flex-col sm:flex-row justify-between items-center gap-4 no-print bg-sky-500/[0.02] border border-sky-500/10 rounded-xl p-6">
+            <div>
+              <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                <span>🔄</span> Adjusted your profile or resume?
+              </h4>
+              <p className="text-xs text-slate-400 mt-1">Re-run the LinkedIn Career Intelligence audit to rescore your brand alignment.</p>
+            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs rounded-xl shadow-md transition-all duration-200 cursor-pointer animate-pulse"
+            >
+              🔄 Re-Score Profile
+            </button>
           </div>
         )}
 

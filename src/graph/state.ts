@@ -598,6 +598,21 @@ export const CompanyStateAnnotation = Annotation.Root({
     default: () => null,
   }),
 
+  linkedinGoal: Annotation<string | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  profileChecklist: Annotation<Record<string, boolean> | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
+  consistencyIntelligence: Annotation<any | null>({
+    reducer: (_previous, next) => next ?? _previous,
+    default: () => null,
+  }),
+
   // ── Metadata / tracing ──────────────────────────────────────────────────
   startedAt: Annotation<string>(),
 

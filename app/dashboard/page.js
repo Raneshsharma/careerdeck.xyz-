@@ -47,6 +47,7 @@ function DashboardContent() {
   const [loadingDossier, setLoadingDossier] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showCoach, setShowCoach] = useState(false);
+  const [coachPreloadedPrompt, setCoachPreloadedPrompt] = useState("");
   const abortRef = useRef(null);
   const prevStateRef = useRef({ activeDossierId: null, content: "" });
 
@@ -343,7 +344,28 @@ function DashboardContent() {
             {content && !generating && (
               <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
                 <div className="flex-1 min-w-0">
-                  <DossierResult content={content} onReset={handleReset} isPartial={wasPartial} hideToolbar={false} hideShortBanner={false} genId={genId} sourceMetadata={sourceMetadata} isFreeUser={!profileData?.profile?.plan_tier || profileData?.profile?.plan_tier === "free"} dossierType={dossierType} onContentUpdate={(updated) => setContent(updated)} />
+                  <DossierResult
+                    content={content}
+                    onReset={handleReset}
+                    isPartial={wasPartial}
+                    hideToolbar={false}
+                    hideShortBanner={false}
+                    genId={genId || activeDossierId}
+                    sourceMetadata={sourceMetadata}
+                    isFreeUser={!profileData?.profile?.plan_tier || profileData?.profile?.plan_tier === "free"}
+                    dossierType={dossierType}
+                    onContentUpdate={(updated) => {
+                      setContent(updated);
+                      const targetId = activeDossierId || genId;
+                      if (targetId) {
+                        saveContent(targetId, updated);
+                      }
+                    }}
+                    onTriggerCoach={(preloadedPrompt) => {
+                      setCoachPreloadedPrompt(preloadedPrompt);
+                      setShowCoach(true);
+                    }}
+                  />
                 </div>
                 <aside className="hidden lg:block w-56 shrink-0 lg:sticky lg:top-24">
                   <SectionNav content={content} dossierType={dossierType} />
@@ -431,7 +453,11 @@ function DashboardContent() {
           {showCoach && (
             <LinkedinCoach
               dossierContent={content}
-              onClose={() => setShowCoach(false)}
+              onClose={() => {
+                setShowCoach(false);
+                setCoachPreloadedPrompt("");
+              }}
+              preloadedPrompt={coachPreloadedPrompt}
             />
           )}
         </>
