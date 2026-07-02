@@ -7,21 +7,22 @@ export async function POST(request) {
     const { data: { user } } = await supabaseAuth.auth.getUser();
 
     const body = await request.json().catch(() => ({}));
-    const { dossierId, sectionKey, comment } = body;
+    const { dossierId, sectionKey, comment, dossierType } = body;
 
     if (!dossierId || !sectionKey || !comment?.trim()) {
       return Response.json({ error: "dossierId, sectionKey, and comment are required" }, { status: 400 });
     }
 
     if (comment.length > 2000) {
-      return Response.json({ error: "Comment must be ≤2000 characters" }, { status: 400 });
+      return Response.json({ error: "Comment must be <= 2000 characters" }, { status: 400 });
     }
 
     const { error } = await supabase.from("section_comments").insert({
-      dossier_id: dossierId,
-      section_key: sectionKey,
-      comment: comment.trim(),
-      user_id: user?.id || null,
+      dossier_id:   dossierId,
+      section_key:  sectionKey,
+      comment:      comment.trim(),
+      user_id:      user?.id || null,
+      dossier_type: dossierType || null,
     });
 
     if (error) {

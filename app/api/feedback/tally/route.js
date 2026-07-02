@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const dossierId = searchParams.get("dossierId");
+  const dossierId  = searchParams.get("dossierId");
   const sectionKey = searchParams.get("sectionKey");
 
   if (!dossierId || !sectionKey) {
@@ -16,12 +16,13 @@ export async function GET(request) {
       .eq("dossier_id", dossierId)
       .eq("section_key", sectionKey);
 
-    const likes = data?.filter((r) => r.vote === 1).length || 0;
-    const dislikes = data?.filter((r) => r.vote === -1).length || 0;
+    const helpful   = data?.filter(r => r.vote === 1).length  || 0;
+    const needsWork = data?.filter(r => r.vote === -1).length || 0;
+    const wrongInfo = data?.filter(r => r.vote === -2).length || 0;
 
-    return Response.json({ likes, dislikes });
+    return Response.json({ helpful, needsWork, wrongInfo, likes: helpful, dislikes: needsWork });
   } catch (e) {
     console.error("Tally error:", e);
-    return Response.json({ likes: 0, dislikes: 0 }, { status: 500 });
+    return Response.json({ helpful: 0, needsWork: 0, wrongInfo: 0, likes: 0, dislikes: 0 });
   }
 }

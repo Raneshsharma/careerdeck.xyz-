@@ -4,8 +4,7 @@ import { useMemo, useState, useEffect, useRef, createContext, useContext } from 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import SourceTiles from "@/components/SourceTiles";
-import SectionVoting from "@/components/SectionVoting";
-import SectionFeedback from "@/components/SectionFeedback";
+import FeedbackPanel from "@/components/FeedbackPanel";
 import Link from "next/link";
 import InlineBulletCoach from "@/components/InlineBulletCoach";
 import toast from "react-hot-toast";
@@ -668,8 +667,11 @@ export default function DossierResult({ content, onReset, isPartial, hideToolbar
                 {section.title && (
                   <div className="mb-8 border-t border-white/[0.05] pt-4">
                     <SourceTiles sources={sourceMetadata} />
-                    <SectionVoting dossierId={genId} sectionKey={section.title} />
-                    <SectionFeedback dossierId={genId} sectionKey={section.title} />
+                    <FeedbackPanel
+                      dossierId={genId}
+                      sectionKey={section.title}
+                      dossierType={dossierType}
+                    />
                   </div>
                 )}
               </div>
