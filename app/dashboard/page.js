@@ -342,7 +342,7 @@ function DashboardContent() {
             )}
 
             {content && !generating && (
-              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
                 <div className="flex-1 min-w-0">
                   <DossierResult
                     content={content}

@@ -28,6 +28,11 @@ const TYPE_COLORS = {
     desktopActive: "text-sky-300 font-semibold bg-sky-500/10",
     mobileActive: "bg-sky-500 text-white shadow-sm shadow-sky-500/20",
   },
+  resume: {
+    dot: "bg-violet-400",
+    desktopActive: "text-violet-300 font-semibold bg-violet-500/10",
+    mobileActive: "bg-violet-500 text-white shadow-sm shadow-violet-500/20",
+  },
 };
 
 const DEFAULT_COLORS = {
